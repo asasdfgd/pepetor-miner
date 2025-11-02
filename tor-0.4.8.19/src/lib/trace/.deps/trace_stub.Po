@@ -1,0 +1,10 @@
+src/lib/trace/trace_stub.o: src/lib/trace/trace_stub.c \
+  src/lib/subsys/subsys.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include/stdbool.h \
+  src/lib/trace/trace_sys.h
+
+src/lib/subsys/subsys.h:
+
+/Library/Developer/CommandLineTools/usr/lib/clang/14.0.0/include/stdbool.h:
+
+src/lib/trace/trace_sys.h:

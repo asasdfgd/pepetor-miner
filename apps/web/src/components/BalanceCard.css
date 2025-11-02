@@ -1,0 +1,155 @@
+.balance-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.balance-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.balance-card-header h3 {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.balance-display {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.balance-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-value {
+  font-size: 3em;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.balance-unit {
+  font-size: 1.2em;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.balance-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 15px 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.client-id {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.client-id label {
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.client-pub-key {
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  word-break: break-all;
+  margin-bottom: 10px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.8;
+}
+
+.error {
+  background: rgba(255, 59, 48, 0.2);
+  border: 1px solid rgba(255, 59, 48, 0.5);
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 0.95em;
+}
+
+.error strong {
+  display: block;
+  margin-bottom: 4px;
+}

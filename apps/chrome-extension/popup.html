@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEPETOR Miner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Not Logged In State -->
+    <div id="notLoggedIn" class="state-container hidden">
+      <div class="warning-icon">🔐</div>
+      <h2>Not Logged In</h2>
+      <p>Open the app to log in first</p>
+      <button id="openAppBtn" class="btn btn-primary">
+        Open PEPETOR App
+      </button>
+      <button id="openOptionsBtn" class="btn btn-secondary">
+        Settings
+      </button>
+    </div>
+
+    <!-- Logged In State -->
+    <div id="loggedIn" class="state-container hidden">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-left">
+          <span class="logo">🧅</span>
+          <span class="title">PEPETOR</span>
+        </div>
+        <button id="syncBtn" class="sync-btn" title="Refresh">
+          🔄
+        </button>
+      </div>
+
+      <!-- Balance Card -->
+      <div class="balance-card">
+        <div class="balance-label">Your Balance</div>
+        <div class="balance-amount" id="balanceAmount">0</div>
+        <div class="balance-sublabel">Credits</div>
+      </div>
+
+      <!-- Tor Status Section -->
+      <div class="section">
+        <div class="section-title">
+          <span>🧅 Tor Status</span>
+          <span id="torStatusBadge" class="status-badge">—</span>
+        </div>
+
+        <!-- Tor Controls -->
+        <div class="tor-controls">
+          <button id="torStartBtn" class="control-btn control-btn-success">
+            ▶️ Start
+          </button>
+          <button id="torStopBtn" class="control-btn control-btn-danger">
+            ⏹️ Stop
+          </button>
+        </div>
+
+        <!-- Tor Stats -->
+        <div id="torStats" class="stats-grid hidden">
+          <div class="stat-item">
+            <div class="stat-label">Data In</div>
+            <div class="stat-value" id="statDataIn">0 KB</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Data Out</div>
+            <div class="stat-value" id="statDataOut">0 KB</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Connections</div>
+            <div class="stat-value" id="statConnections">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Circuits</div>
+            <div class="stat-value" id="statCircuits">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-Submission Section -->
+      <div class="section">
+        <div class="section-title">
+          <span>📊 Sessions</span>
+          <span id="submissionBadge" class="submission-badge">idle</span>
+        </div>
+
+        <!-- Monitoring Controls -->
+        <div class="monitoring-controls">
+          <button id="monitoringStartBtn" class="control-btn control-btn-info">
+            ▶️ Monitor
+          </button>
+          <button id="monitoringStopBtn" class="control-btn control-btn-warning">
+            ⏹️ Stop
+          </button>
+        </div>
+
+        <!-- Submission Stats -->
+        <div id="submissionStats" class="submission-stats hidden">
+          <div class="stat-row">
+            <span>Submitted:</span>
+            <span id="submittedCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span>Total Earned:</span>
+            <span id="totalEarned">0 cr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="footer-actions">
+        <button id="openDashboardBtn" class="btn btn-link">
+          📊 Dashboard
+        </button>
+        <button id="openAnalyticsBtn" class="btn btn-link">
+          📈 Analytics
+        </button>
+        <button id="logoutBtn" class="btn btn-link danger">
+          🚪 Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="state-container">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

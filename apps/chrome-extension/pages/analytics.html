@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPETOR Miner - Analytics Dashboard</title>
+    <link rel="stylesheet" href="../popup.css">
+    <link rel="stylesheet" href="analytics.css">
+</head>
+<body>
+    <div class="analytics-container">
+        <!-- Header -->
+        <div class="analytics-header">
+            <h1>📊 Earnings Dashboard</h1>
+            <div class="header-controls">
+                <button id="refreshBtn" class="btn-icon" title="Refresh data">🔄</button>
+                <button id="exportBtn" class="btn-icon" title="Export data">📥</button>
+                <button id="clearBtn" class="btn-icon" title="Clear history">🗑️</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card summary-card">
+                <div class="card-icon">💰</div>
+                <div class="card-content">
+                    <div class="card-label">Total Lifetime</div>
+                    <div class="card-value" id="totalLifetime">0 cr</div>
+                    <div class="card-subtitle" id="totalSessions">0 sessions</div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <div class="card-label">Today's Earnings</div>
+                    <div class="card-value" id="todayEarnings">0 cr</div>
+                    <div class="card-subtitle" id="todayChange">No change</div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-icon">⏰</div>
+                <div class="card-content">
+                    <div class="card-label">Credits/Hour</div>
+                    <div class="card-value" id="creditsPerHour">0 cr</div>
+                    <div class="card-subtitle">Today's rate</div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-icon">🎯</div>
+                <div class="card-content">
+                    <div class="card-label">Projected Daily</div>
+                    <div class="card-value" id="projectedDaily">0 cr</div>
+                    <div class="card-subtitle">If rate continues</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="charts-row">
+            <!-- Daily Earnings Chart -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Daily Earnings (30 days)</h3>
+                </div>
+                <div id="dailyChart" class="chart-container">
+                    <svg id="dailyChartSvg" class="simple-chart"></svg>
+                </div>
+                <div id="dailyChartLoading" class="chart-loading">Loading chart...</div>
+            </div>
+
+            <!-- Weekly Distribution -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Weekly Distribution</h3>
+                </div>
+                <div id="weeklyChart" class="chart-container">
+                    <svg id="weeklyChartSvg" class="simple-chart"></svg>
+                </div>
+                <div id="weeklyChartLoading" class="chart-loading">Loading chart...</div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="charts-row">
+            <!-- Hourly Earnings Today -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Hourly Breakdown (Today)</h3>
+                </div>
+                <div id="hourlyChart" class="chart-container">
+                    <svg id="hourlyChartSvg" class="simple-chart"></svg>
+                </div>
+                <div id="hourlyChartLoading" class="chart-loading">Loading chart...</div>
+            </div>
+
+            <!-- Last 7 Days Stats -->
+            <div class="card stats-card">
+                <div class="card-header">
+                    <h3>Last 7 Days</h3>
+                </div>
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Earnings</span>
+                        <span class="stat-value" id="last7Total">0 cr</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Daily Average</span>
+                        <span class="stat-value" id="last7Average">0 cr</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Sessions</span>
+                        <span class="stat-value" id="last7Sessions">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Uptime</span>
+                        <span class="stat-value" id="last7Uptime">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="card metrics-card">
+            <div class="card-header">
+                <h3>Performance Metrics</h3>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-icon">🌟</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Best Hour Today</div>
+                        <div class="metric-value" id="bestHour">—</div>
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Peak Earnings</div>
+                        <div class="metric-value" id="peakEarnings">0 cr</div>
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Avg per Session</div>
+                        <div class="metric-value" id="avgPerSession">0 cr</div>
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Last Updated</div>
+                        <div class="metric-value" id="lastUpdated">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="analytics-footer">
+            <button id="backBtn" class="btn btn-secondary">← Back to Popup</button>
+            <div class="footer-info">
+                <small id="dataInfo">Data from local storage</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../services/StorageService.js"></script>
+    <script src="../services/AnalyticsService.js"></script>
+    <script src="analytics.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                  🍎 PEPETOR-MINER Mac 12 Quick Start                           ║
+║                     "Failed to Start Session" FIX                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+🔴 PROBLEM: You're getting "Failed to Start Session" error on Mac 12
+🟢 SOLUTION: Tor is not installed. Follow these 3 steps (5 minutes)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: CHECK YOUR SYSTEM (2 minutes)
+────────────────────────────────────
+
+  bash scripts/diagnose.sh
+
+  Look for red ❌ marks - those are problems to fix.
+  (Most likely: Tor is not installed)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 2: INSTALL TOR (2 minutes)
+──────────────────────────────
+
+  bash scripts/install-tor-mac12.sh
+
+  This will:
+  ✓ Check if Tor is installed
+  ✓ Install via Homebrew (if needed)
+  ✓ Add Tor to your PATH
+  ✓ Verify it works
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 3: START EVERYTHING (30 seconds)
+─────────────────────────────────────
+
+  npm run dev
+
+  You should see:
+  [BACKEND] Server is running on http://localhost:3001 ✓
+  [FRONTEND] ready in 234 ms ✓
+  [BACKEND] [TOR] Bootstrapped 100% - Ready ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ THEN IT WORKS! 
+─────────────────
+
+  1. Open http://localhost:3000 in browser
+  2. Click "Start Tor" (wait 30-60 seconds)
+  3. Click "Start Monitoring"
+  4. Load Chrome extension
+  5. Browse normally - traffic captured automatically!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ IF SOMETHING DOESN'T WORK
+─────────────────────────────
+
+  Quick Test:
+    bash scripts/test-backend.sh
+
+  Read These Files:
+    • IMMEDIATE_FIX_MAC12.md        ← Quick reference (5 min read)
+    • MAC12_SETUP_GUIDE.md          ← Complete guide (20 min read)
+    • TROUBLESHOOTING.md            ← All errors explained (30 min read)
+
+  Common Fixes:
+    
+    Error: "brew: command not found"
+    → Install Homebrew first:
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    Error: "port 3001 already in use"
+    → Kill the process:
+      lsof -i :3001 | grep LISTEN | awk '{print $2}' | xargs kill -9
+    
+    Error: "Cannot find module"
+    → Install dependencies:
+      npm run dev:setup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 ALL NEW RESOURCES
+────────────────────
+
+  Scripts Created:
+    scripts/diagnose.sh             → Auto-check everything
+    scripts/install-tor-mac12.sh    → One-command Tor install
+    scripts/test-backend.sh         → Test backend/Tor
+
+  Documentation Created:
+    IMMEDIATE_FIX_MAC12.md          → 5-minute quick fix ⭐
+    MAC12_SETUP_GUIDE.md            → Complete setup
+    TROUBLESHOOTING.md              → All error solutions
+    FIX_SUMMARY.md                  → What was added
+    START_HERE_MAC12.txt            → This file
+
+  Backend Changes:
+    GET /api/tor/debug              → New debug endpoint
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ KEY POINTS
+──────────────
+
+  1. Most common problem: Tor not installed or not in PATH
+  2. Fastest fix: bash scripts/install-tor-mac12.sh
+  3. Verify system: bash scripts/diagnose.sh
+  4. Test backend: bash scripts/test-backend.sh
+  5. Start all: npm run dev
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👉 NEXT STEP: Run these commands NOW
+
+  1. bash scripts/diagnose.sh
+  2. bash scripts/install-tor-mac12.sh
+  3. npm run dev
+
+You should be up and running in 5 minutes! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

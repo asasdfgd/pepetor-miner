@@ -1,0 +1,6 @@
+src/app/main/risky_options.o: src/app/main/risky_options.c orconfig.h \
+  src/app/main/risky_options.h
+
+orconfig.h:
+
+src/app/main/risky_options.h:

@@ -1,0 +1,405 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+  width: 420px;
+  min-height: 600px;
+}
+
+.popup-container {
+  width: 100%;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.state-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.state-container.hidden {
+  display: none;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  font-size: 28px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.sync-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sync-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(180deg);
+}
+
+.sync-btn.syncing {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Balance Card */
+.balance-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.balance-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #999;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.balance-amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.balance-sublabel {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Sections */
+.section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.status-badge,
+.submission-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.status-badge.running {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.stopped {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.submission-badge {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.submission-badge.monitoring {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Controls */
+.tor-controls,
+.monitoring-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.control-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.control-btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.control-btn-success:hover {
+  background: #218838;
+}
+
+.control-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.control-btn-danger:hover {
+  background: #c82333;
+}
+
+.control-btn-info {
+  background: #17a2b8;
+  color: white;
+}
+
+.control-btn-info:hover {
+  background: #138496;
+}
+
+.control-btn-warning {
+  background: #ffc107;
+  color: #333;
+}
+
+.control-btn-warning:hover {
+  background: #e0a800;
+}
+
+.control-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-item {
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  font-variant-numeric: tabular-nums;
+}
+
+.submission-stats {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row span:last-child {
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* Footer Actions */
+.footer-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.btn-link {
+  background: transparent;
+  color: white;
+  font-size: 11px;
+  padding: 8px;
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-link.danger:hover {
+  background: rgba(220, 53, 69, 0.3);
+}
+
+/* Not Logged In State */
+.warning-icon {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 12px;
+  color: white;
+}
+
+#notLoggedIn h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+#notLoggedIn p {
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Loading State */
+#loadingState {
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid white;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  body {
+    width: 360px;
+  }
+
+  .balance-amount {
+    font-size: 28px;
+  }
+
+  .control-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+.hidden {
+  display: none !important;
+}

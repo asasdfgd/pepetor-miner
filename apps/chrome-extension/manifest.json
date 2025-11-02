@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "PEPETOR Miner",
+  "version": "1.0.0",
+  "description": "Earn crypto by sharing bandwidth with PEPETOR Tor network",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "activeTab",
+    "proxy"
+  ],
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "http://localhost:3000/*",
+    "https://*/*",
+    "socks5://127.0.0.1:9149/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:3000/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PEPETOR Miner",
+    "default_icon": {
+      "16": "images/icon-16.svg",
+      "48": "images/icon-48.svg",
+      "128": "images/icon-128.svg"
+    }
+  },
+  "icons": {
+    "16": "images/icon-16.svg",
+    "48": "images/icon-48.svg",
+    "128": "images/icon-128.svg"
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*", "pages/*", "services/*"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}

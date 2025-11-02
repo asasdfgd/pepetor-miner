@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEPETOR Miner - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <!-- Header -->
+    <header class="options-header">
+      <h1>🧅 PEPETOR Miner Settings</h1>
+      <p>Configure your extension</p>
+    </header>
+
+    <!-- Content -->
+    <main class="options-content">
+      <!-- API Configuration Section -->
+      <section class="options-section">
+        <h2>API Configuration</h2>
+        <p class="section-description">
+          Configure your backend API endpoint for direct connections
+        </p>
+
+        <div class="form-group">
+          <label for="apiUrl">API Base URL</label>
+          <input
+            type="url"
+            id="apiUrl"
+            placeholder="http://localhost:3001/api"
+            class="form-input"
+          >
+          <small class="form-help">
+            Default: http://localhost:3001/api
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="token">Auth Token (JWT)</label>
+          <textarea
+            id="token"
+            placeholder="Paste your JWT token here..."
+            class="form-textarea"
+            rows="4"
+          ></textarea>
+          <small class="form-help">
+            Your session token for backend authentication. 
+            <a href="http://localhost:3000/dashboard" target="_blank">Get it from the dashboard</a>
+          </small>
+        </div>
+
+        <button id="copyTokenBtn" class="btn btn-secondary">
+          📋 Copy Token to Clipboard
+        </button>
+      </section>
+
+      <!-- Auto-Sync Section -->
+      <section class="options-section">
+        <h2>Sync Settings</h2>
+        <p class="section-description">
+          Adjust how often the extension syncs with your backend
+        </p>
+
+        <div class="form-group">
+          <label for="syncInterval">Sync Interval (seconds)</label>
+          <input
+            type="number"
+            id="syncInterval"
+            min="3"
+            max="60"
+            value="5"
+            class="form-input"
+          >
+          <small class="form-help">
+            How often to check for balance and Tor status updates (3-60 seconds)
+          </small>
+        </div>
+      </section>
+
+      <!-- Notifications Section -->
+      <section class="options-section">
+        <h2>Notifications</h2>
+        <p class="section-description">
+          Control when you receive notifications
+        </p>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="notifyOnSessionSubmit" checked>
+            <span>Notify when session submitted</span>
+          </label>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="notifyOnEarnings" checked>
+            <span>Notify on earnings milestone (+1 credit)</span>
+          </label>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="notifyOnTorError">
+            <span>Notify on Tor errors</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Debug Section -->
+      <section class="options-section">
+        <h2>Debug & Troubleshooting</h2>
+        <p class="section-description">
+          Tools for troubleshooting connection issues
+        </p>
+
+        <button id="testConnectionBtn" class="btn btn-secondary">
+          🧪 Test Backend Connection
+        </button>
+
+        <button id="clearStorageBtn" class="btn btn-danger">
+          🗑️ Clear All Saved Data
+        </button>
+
+        <div id="testResult" class="test-result hidden">
+          <div id="testResultContent"></div>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section class="options-section">
+        <h2>About</h2>
+        <p class="section-description">
+          PEPETOR Miner - Earn cryptocurrency by sharing bandwidth
+        </p>
+        <div class="about-info">
+          <p><strong>Version:</strong> 1.0.0</p>
+          <p><strong>Backend:</strong> <span id="backendUrl">http://localhost:3001/api</span></p>
+          <p><strong>Frontend:</strong> http://localhost:3000</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="options-footer">
+      <button id="saveBtn" class="btn btn-primary btn-large">
+        ✓ Save Settings
+      </button>
+      <span id="saveStatus" class="save-status"></span>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

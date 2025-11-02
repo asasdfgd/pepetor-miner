@@ -1,0 +1,96 @@
+{
+  "rewardSystem": {
+    "name": "PEPETOR Miner Rewards",
+    "description": "Earn $PEPETOR tokens by running the PepeTor miner",
+    "tokenMint": "PENDING_DEPLOYMENT",
+    "rewardWallet": "PENDING_FROM_DISTRIBUTION",
+    "network": "mainnet-beta"
+  },
+  "rewardRates": {
+    "description": "How users earn PEPETOR tokens",
+    "baseRate": {
+      "value": 0.001,
+      "unit": "PEPETOR per minute of active mining",
+      "explanation": "Base reward for running miner"
+    },
+    "bonuses": {
+      "uptime": {
+        "description": "Bonus for continuous uptime",
+        "tier1": "1.1x multiplier for 1+ hour continuous",
+        "tier2": "1.25x multiplier for 8+ hours continuous",
+        "tier3": "1.5x multiplier for 24+ hours continuous"
+      },
+      "referral": {
+        "description": "Earn PEPETOR when friends join",
+        "amount": 10,
+        "unit": "PEPETOR per successful referral"
+      },
+      "staking": {
+        "description": "Lock PEPETOR for additional rewards",
+        "7day": "1.05x annual yield",
+        "30day": "1.15x annual yield",
+        "90day": "1.30x annual yield"
+      }
+    }
+  },
+  "claimProcess": {
+    "description": "How users claim earned rewards",
+    "steps": [
+      "User earns PEPETOR through mining activity",
+      "Rewards accumulate in user's balance (tracked in backend)",
+      "User clicks 'Claim Rewards' in app",
+      "Backend verifies user activity & balance",
+      "Backend creates Solana transaction to send PEPETOR",
+      "Tokens appear in user's Phantom/Solflare wallet"
+    ],
+    "frequency": "User can claim once per day (minimum)",
+    "minimumClaim": 1,
+    "fee": "Negligible SOL network fee (~0.00025 SOL)"
+  },
+  "security": {
+    "requirements": [
+      "User must have Phantom or compatible wallet",
+      "User must provide receiving wallet address",
+      "Backend validates wallet address format",
+      "Backend rate-limits claims (1 per day)",
+      "All transactions signed by backend service key"
+    ]
+  },
+  "phaseRollout": {
+    "phase1": {
+      "name": "Beta (Week 1-2)",
+      "scope": "Testnet only - small rewards for testing",
+      "rewardRate": "10x higher to test quickly",
+      "users": "Internal team + selected testers"
+    },
+    "phase2": {
+      "name": "Soft Launch (Week 3-4)",
+      "scope": "Mainnet with limited supply",
+      "maxDailyPayout": 10000,
+      "unit": "PEPETOR",
+      "users": "Closed beta users"
+    },
+    "phase3": {
+      "name": "Public Launch (Week 5+)",
+      "scope": "Full mainnet rollout",
+      "maxDailyPayout": "Unlimited (bounded by rewards pool)",
+      "users": "Everyone"
+    }
+  },
+  "metrics": {
+    "trackedData": [
+      "Mining session duration (minutes)",
+      "Data transferred (MB/GB)",
+      "Uptime percentage",
+      "Verification success rate",
+      "Referrals count"
+    ],
+    "reporting": "Daily reward report sent to user email"
+  },
+  "future": {
+    "swapIntegration": "Allow PEPETOR <> SOL/USDC on Raydium/Orca",
+    "marketMaking": "Liquidity pools on major DEXes",
+    "partnerships": "Accept PEPETOR for premium features",
+    "nft": "Special NFTs for milestone holders"
+  }
+}
