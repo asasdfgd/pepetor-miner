@@ -1,0 +1,454 @@
+.extension-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Header */
+.ext-header {
+  text-align: center;
+  padding: 3rem 0;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.ext-header h1 {
+  font-size: 2.5rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.ext-header p {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+/* Download Section */
+.download-section {
+  margin: 2rem 0;
+}
+
+.download-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.download-info h2 {
+  font-size: 2rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.version-info {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  color: #374151;
+  line-height: 1.8;
+}
+
+.specs {
+  margin: 2rem 0;
+}
+
+.specs h3 {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.specs ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.specs li {
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.security-badge {
+  margin-top: 2rem;
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Extension Preview */
+.extension-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview-frame {
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 280px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.preview-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat {
+  background: #f3f4f6;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.stat .label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat .value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-top: 0.25rem;
+}
+
+.preview-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.preview-btn:hover {
+  background: #5568d3;
+}
+
+/* Installation Steps */
+.installation {
+  background: white;
+  padding: 3rem 1rem;
+  border-radius: 8px;
+}
+
+.container-narrow {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.installation h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  color: var(--text-color);
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.step {
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.step h3 {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.step p {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.step-arrow {
+  color: #667eea;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 1rem;
+}
+
+/* Features */
+.extension-features {
+  margin: 2rem 0;
+}
+
+.extension-features h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.feature {
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature:hover {
+  background: white;
+  border: 2px solid #667eea;
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature h3 {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.feature p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Requirements */
+.requirements {
+  margin: 2rem 0;
+}
+
+.requirements h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.requirements-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.req-box {
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.req-box h3 {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.req-box ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.req-box li {
+  color: #374151;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.req-box li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* FAQ */
+.faq-section {
+  margin: 2rem 0;
+}
+
+.faq-section h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.faq-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.faq-item {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.faq-item h4 {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.faq-item p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* CTA */
+.extension-cta {
+  text-align: center;
+  padding: 3rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 8px;
+}
+
+.extension-cta h2 {
+  font-size: 2rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.extension-cta p {
+  font-size: 1.05rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .download-content {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    gap: 0.5rem;
+  }
+
+  .step {
+    min-width: 120px;
+    padding: 1rem;
+  }
+
+  .requirements-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ext-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .download-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .installation h2,
+  .extension-features h2,
+  .requirements h2,
+  .faq-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .steps {
+    flex-direction: column;
+  }
+
+  .step-arrow {
+    transform: rotate(90deg);
+    margin: 0;
+  }
+
+  .faq-list {
+    grid-template-columns: 1fr;
+  }
+
+  .extension-cta h2 {
+    font-size: 1.5rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .ext-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .download-info h2 {
+    font-size: 1.25rem;
+  }
+
+  .specs ul {
+    font-size: 0.9rem;
+  }
+
+  .preview-frame {
+    width: 100%;
+  }
+}

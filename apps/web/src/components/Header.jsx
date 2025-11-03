@@ -26,6 +26,16 @@ function Header() {
           </Link>
 
           <nav className="nav-menu">
+            {!isAuthenticated && (
+              <>
+                <Link to="/extension" className="nav-link">
+                  Extension
+                </Link>
+                <Link to="/faq" className="nav-link">
+                  FAQ
+                </Link>
+              </>
+            )}
             {isAuthenticated ? (
               <>
                 <div className="user-info">
