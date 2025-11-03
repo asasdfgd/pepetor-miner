@@ -28,12 +28,15 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbConnected = mongoose.connection.readyState === 1;
+  
   res.json({
     success: true,
     status: 'Server is running',
     timestamp: new Date().toISOString(),
     database: {
-      status: 'connected',
+      status: dbConnected ? 'connected' : 'disconnected',
       name: 'MongoDB',
     },
   });
@@ -107,8 +110,11 @@ const startServer = async () => {
   try {
     console.log('🚀 Starting PEPETOR-MINER Backend Server...\n');
 
-    // Connect to MongoDB
-    await connectDB();
+    // Connect to MongoDB (non-blocking)
+    const dbConnection = await connectDB();
+    if (dbConnection) {
+      console.log('📊 Database connected and ready');
+    }
 
     // Start Express server
     app.listen(PORT, () => {
