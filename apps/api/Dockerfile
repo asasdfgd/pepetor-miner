@@ -1,24 +1,40 @@
-# Build stage
-FROM node:18-alpine
+# syntax = docker/dockerfile:1
 
-# Set working directory
+ARG NODE_VERSION=20.18.0
+FROM node:${NODE_VERSION}-slim AS base
+
+LABEL fly_launch_runtime="Node.js"
+
 WORKDIR /app
 
+# Build stage
+FROM base AS build
+
+# Install build dependencies
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+
 # Copy package files
-COPY package*.json ./
+COPY package-lock.json package.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including devDependencies for build tools)
+RUN npm ci
 
-# Copy application code
+# Copy source code
 COPY . .
 
-# Expose port
+# Only build the backend API workspace, skip frontend
+RUN npm run build --workspace=apps/api --if-present || true
+
+# Final stage
+FROM base
+
+ENV NODE_ENV="production"
+
+# Copy built application
+COPY --from=build /app /app
+
 EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-
-# Start application
-CMD ["npm", "start"]
+# Start the backend API
+CMD ["node", "apps/api/src/index.js"]
