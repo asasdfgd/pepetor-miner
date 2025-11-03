@@ -3,10 +3,10 @@ services:
     name: pepetor-miner
     env: node
     plan: starter
-    buildCommand: npm ci --only=production
+    buildCommand: npm ci --omit=dev --prefer-offline
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_OPTIONS
-        value: --max-old-space-size=512
+        value: --max-old-space-size=1024
