@@ -15,11 +15,17 @@ RUN apt-get update -qq && \
 # Copy package files from monorepo root
 COPY package*.json ./
 
-# Copy only what we need for the API
+# Copy workspace package files - needed for npm ci to resolve dependencies
+COPY apps/api/package*.json ./apps/api/
+COPY apps/web/package*.json ./apps/web/
+
+# Copy actual source code
 COPY apps/api ./apps/api
 
-# Install dependencies - monorepo workspaces will be resolved automatically
-RUN npm ci --prefer-offline --no-audit 2>&1
+# Install dependencies for all workspaces (will be symlinked)
+RUN echo "🔧 Installing dependencies..." && \
+    npm ci --prefer-offline --no-audit 2>&1 && \
+    echo "✅ Dependencies installed successfully"
 
 # Set environment for production
 ENV NODE_ENV=production

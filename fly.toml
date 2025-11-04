@@ -23,6 +23,14 @@ port = 443
 handlers = ["tls", "http"]
 
 [[services.tcp_checks]]
-grace_period = "5s"
+grace_period = "10s"
 interval = "30s"
 timeout = "5s"
+
+# HTTP health check
+[[services.http_checks]]
+grace_period = "15s"
+interval = "30s"
+timeout = "5s"
+path = "/api/health"
+protocol = "http"
