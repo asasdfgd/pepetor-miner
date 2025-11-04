@@ -75,7 +75,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Extension Showcase */}
+      {/* Extension Showcase - Installation Guide Removed */}
       <section className="extension-showcase">
         <div className="container">
           <div className="showcase-content">
