@@ -18,8 +18,8 @@ COPY package*.json ./
 # Copy only what we need for the API
 COPY apps/api ./apps/api
 
-# Install dependencies for the workspace
-RUN npm ci --prefer-offline --no-audit --workspace=apps/api
+# Install dependencies - monorepo workspaces will be resolved automatically
+RUN npm ci --prefer-offline --no-audit 2>&1
 
 # Set environment for production
 ENV NODE_ENV=production
