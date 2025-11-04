@@ -1,40 +1,36 @@
 # syntax = docker/dockerfile:1
 
 ARG NODE_VERSION=20.18.0
-FROM node:${NODE_VERSION}-slim AS base
+FROM node:${NODE_VERSION}-slim
 
 LABEL fly_launch_runtime="Node.js"
 
 WORKDIR /app
 
-# Build stage
-FROM base AS build
-
-# Install build dependencies
+# Install essential build dependencies
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+    apt-get install --no-install-recommends -y build-essential python3 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy package files
-COPY package-lock.json package.json ./
+# Copy package files from monorepo root
+COPY package*.json ./
 
-# Install all dependencies (including devDependencies for build tools)
-RUN npm ci
+# Copy API-specific files
+COPY apps/api ./apps/api
 
-# Copy source code
-COPY . .
+# Copy shared config
+COPY config ./config || true
 
-# Only build the backend API workspace, skip frontend
-RUN npm run build --workspace=apps/api --if-present || true
+# Install all dependencies
+RUN npm ci --prefer-offline --no-audit
 
-# Final stage
-FROM base
-
-ENV NODE_ENV="production"
-
-# Copy built application
-COPY --from=build /app /app
-
+# Set environment for production
+ENV NODE_ENV=production
 EXPOSE 3001
 
-# Start the backend API
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+
+# Start the API server
 CMD ["node", "apps/api/src/index.js"]
