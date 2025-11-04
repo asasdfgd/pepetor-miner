@@ -121,9 +121,9 @@ const startServer = async () => {
       console.log('📊 Database connected and ready');
     }
 
-    // Start Express server
-    app.listen(PORT, () => {
-      console.log(`\n✅ Backend server is running on port ${PORT}`);
+    // Start Express server on all interfaces for Docker/Fly.io compatibility
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`\n✅ Backend server is running on 0.0.0.0:${PORT}`);
       console.log(`📝 API Documentation: http://localhost:${PORT}/api`);
       console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
       console.log(`👥 Users Endpoint: http://localhost:${PORT}/api/users\n`);
