@@ -1,13 +1,18 @@
+console.log('🚀 [APP START] Loading Express modules...');
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+console.log('🚀 [APP START] Loading custom modules...');
 const { connectDB, disconnectDB } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const torRoutes = require('./routes/torRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
+
+console.log('🚀 [APP START] All modules loaded successfully');
 
 const app = express();
 const PORT = process.env.PORT || 3001;

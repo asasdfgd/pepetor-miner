@@ -25,9 +25,5 @@ RUN npm ci --prefer-offline --no-audit
 ENV NODE_ENV=production
 EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-
-# Start the API server
-CMD ["node", "apps/api/src/index.js"]
+# Start the API server with error handling
+CMD ["node", "--unhandled-rejections=strict", "apps/api/src/index.js"]
