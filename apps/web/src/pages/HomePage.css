@@ -145,10 +145,6 @@
   color: var(--text-color);
   font-family: 'Orbitron', 'Exo 2', sans-serif;
   letter-spacing: 1px;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* Features Grid */
