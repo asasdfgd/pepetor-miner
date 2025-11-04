@@ -15,15 +15,15 @@ RUN apt-get update -qq && \
 # Copy package files from monorepo root
 COPY package*.json ./
 
-# Copy API-specific files
+# Copy only what we need for the API
 COPY apps/api ./apps/api
 
-# Install all dependencies
-RUN npm ci --prefer-offline --no-audit
+# Install dependencies for the workspace
+RUN npm ci --prefer-offline --no-audit --workspace=apps/api
 
 # Set environment for production
 ENV NODE_ENV=production
 EXPOSE 3001
 
-# Start the API server with error handling
-CMD ["node", "--unhandled-rejections=strict", "apps/api/src/index.js"]
+# Start the API server - removed --unhandled-rejections=strict to see actual errors
+CMD ["node", "apps/api/src/index.js"]
