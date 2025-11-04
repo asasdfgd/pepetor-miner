@@ -81,100 +81,39 @@ function HomePage() {
           <h2 className="section-title">How to Install PepeTor Miner</h2>
           
           <div className="install-content">
-            <h3>System Requirements</h3>
-            <p>Before installing PepeTor Miner, ensure you have:</p>
+            <h3>Step 1: Create Your ClearNetLabs Account</h3>
+            <p>Sign up for free. No email verification required—instant dashboard access. You'll use these credentials to authenticate your miner.</p>
+
+            <h3>Step 2: Download PepeTor Miner Extension</h3>
+            <p>Get the PepeTor Miner browser extension for Chrome or Chromium-based browsers. Coming soon to the Chrome Web Store for one-click installation.</p>
+
+            <h3>Step 3: Install the Extension</h3>
+            <p>Extract the extension files and load them into Chrome via chrome://extensions/. Enable Developer mode, click "Load unpacked," and select the extension folder. The PepeTor icon will appear in your toolbar.</p>
+
+            <h3>Step 4: Start Mining</h3>
+            <p>Click the PepeTor Miner extension icon. Log in with your account. Privacy mode is enabled by default. Click "Start Mining" and you're earning $PEPETOR immediately.</p>
+
+            <h3>Step 5: Manage and Withdraw</h3>
+            <p>Monitor your earnings on the dashboard. You can pause mining anytime, set power limits, and withdraw $PEPETOR directly to your Solana wallet. Create and trade tokens as you earn.</p>
+
+            <h3 style={{ marginTop: '2rem' }}>What You'll Need</h3>
             <ul className="requirements-list">
-              <li>✓ Google Chrome or Chromium-based browser (v90+)</li>
-              <li>✓ 50MB free disk space</li>
-              <li>✓ Internet connection</li>
-              <li>✓ Active ClearNetLabs account</li>
+              <li>Chrome or Chromium browser (v90 or higher)</li>
+              <li>50MB free disk space</li>
+              <li>Active internet connection</li>
+              <li>ClearNetLabs account</li>
             </ul>
 
-            <h3 style={{ marginTop: '2rem' }}>Installation Steps</h3>
-            
-            <div className="install-step">
-              <h4>Step 1: Create Your Account</h4>
-              <p>Visit ClearNetLabs and sign up for a free account. No email verification required — instant access to your dashboard.</p>
-              <code>Visit: clearnetlabs.fun → Click "Get Started Free"</code>
-            </div>
+            <h3 style={{ marginTop: '2rem' }}>Common Issues</h3>
+            <p><strong>Extension won't load?</strong> Make sure Developer mode is enabled and you selected the correct folder path.</p>
+            <p><strong>Mining not starting?</strong> Verify your account is active and your internet connection is stable.</p>
+            <p><strong>Browser feeling slow?</strong> PepeTor uses less than 5MB of RAM. Check if other extensions or browser tabs are consuming resources.</p>
 
-            <div className="install-step">
-              <h4>Step 2: Download the Extension</h4>
-              <p>Navigate to the Extension page and download the PepeTor Miner browser extension.</p>
-              <code>Download: chrome-extension-v1.0.zip (4.8MB)</code>
-              <p><strong>Or install directly from Chrome Web Store:</strong></p>
-              <code>Search: "PepeTor Miner" in Chrome Web Store</code>
-            </div>
-
-            <div className="install-step">
-              <h4>Step 3: Load Extension into Chrome</h4>
-              <p>If downloading manually (not from Web Store):</p>
-              <ol className="code-steps">
-                <li>Extract the downloaded ZIP file to a folder</li>
-                <li>Open Chrome and go to <code>chrome://extensions/</code></li>
-                <li>Enable "Developer mode" (toggle in top right)</li>
-                <li>Click "Load unpacked" and select the extracted folder</li>
-                <li>The PepeTor Miner extension should appear in your Chrome toolbar</li>
-              </ol>
-            </div>
-
-            <div className="install-step">
-              <h4>Step 4: Authenticate & Start Mining</h4>
-              <p>Click the PepeTor Miner extension icon in your toolbar:</p>
-              <ol className="code-steps">
-                <li>Log in with your ClearNetLabs credentials</li>
-                <li>Review the privacy settings (enabled by default)</li>
-                <li>Click "Start Mining" to begin earning $PEPETOR</li>
-                <li>Monitor your earnings in real-time on the dashboard</li>
-              </ol>
-            </div>
-
-            <div className="install-step">
-              <h4>Step 5: Manage Your Miner</h4>
-              <p>Once mining, you can:</p>
-              <ul className="features-list-inline">
-                <li>✓ Pause/resume mining anytime</li>
-                <li>✓ Set power limits (CPU, network)</li>
-                <li>✓ View hourly earnings</li>
-                <li>✓ Withdraw to wallet</li>
-                <li>✓ Create and trade tokens</li>
-              </ul>
-            </div>
-
-            <h3 style={{ marginTop: '2rem' }}>Troubleshooting</h3>
-            
-            <div className="troubleshooting">
-              <div className="trouble-item">
-                <h5>Extension won't load</h5>
-                <p>Ensure Developer mode is enabled and path is correct. Try restarting Chrome.</p>
-              </div>
-              <div className="trouble-item">
-                <h5>Mining isn't starting</h5>
-                <p>Check your internet connection and verify your account is active on clearnetlabs.fun</p>
-              </div>
-              <div className="trouble-item">
-                <h5>Low hash rate</h5>
-                <p>This is normal. Mining adjusts based on your network. Earnings increase with network growth.</p>
-              </div>
-              <div className="trouble-item">
-                <h5>Browser running slow</h5>
-                <p>PepeTor uses &lt;5MB RAM. Check other extensions or reduce browser tabs.</p>
-              </div>
-            </div>
-
-            <h3 style={{ marginTop: '2rem' }}>Next Steps</h3>
-            <p>After installation:</p>
-            <ol className="next-steps-list">
-              <li>Let the miner run for 1 hour to accumulate earnings</li>
-              <li>Create your first custom token on the Dashboard</li>
-              <li>Trade your $PEPETOR on Raydium or Jupiter DEX</li>
-              <li>Refer friends to earn bonus rewards</li>
-              <li>Upgrade to premium miner for 2x earnings</li>
-            </ol>
+            <h3 style={{ marginTop: '2rem' }}>What's Next?</h3>
+            <p>Let your miner run for an hour to accumulate earnings. Then create your first custom token, trade on Raydium or Jupiter, and refer friends for bonus rewards.</p>
 
             <div className="support-box">
-              <h4>Need Help?</h4>
-              <p>Join our community Discord or email support@clearnetlabs.fun</p>
+              <p>Questions? Join our Discord community or email support@clearnetlabs.fun</p>
             </div>
           </div>
         </div>
