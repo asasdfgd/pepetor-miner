@@ -38,6 +38,28 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from frontend dist
+const path = require('path');
+const fs = require('fs');
+
+// Resolve the frontend dist path - handle both local dev and Docker
+let frontendDistPath;
+if (process.env.NODE_ENV === 'production') {
+  // In Docker: /app/apps/web/dist
+  frontendDistPath = '/app/apps/web/dist';
+} else {
+  // Local development
+  frontendDistPath = path.join(__dirname, '../../apps/web/dist');
+}
+
+// Check if dist folder exists
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  console.log('✅ Serving static files from:', frontendDistPath);
+} else {
+  console.warn('⚠️  Frontend dist not found at:', frontendDistPath);
+}
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const mongoose = require('mongoose');
@@ -108,7 +130,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
+// Catch-all route: serve index.html for client-side routing
+app.get('*', (req, res) => {
+  const indexPath = path.join(frontendDistPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error('❌ Failed to serve index.html:', err.message);
+      res.status(404).json({
+        success: false,
+        message: 'Frontend not found',
+        path: req.path,
+      });
+    }
+  });
+});
+
+// 404 handler (API endpoints only)
 app.use((req, res) => {
   res.status(404).json({
     success: false,
