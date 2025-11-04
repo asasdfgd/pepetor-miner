@@ -8,18 +8,19 @@ dockerignore = "apps/api/.dockerignore"
 
 [env]
 NODE_ENV = "production"
+PORT = "3001"
 
 [[services]]
 internal_port = 3001
 protocol = "tcp"
 
 [[services.ports]]
-handlers = ["http"]
 port = 80
+handlers = ["http"]
 
 [[services.ports]]
-handlers = ["tls", "http"]
 port = 443
+handlers = ["tls", "http"]
 
 [[services.tcp_checks]]
 grace_period = "5s"

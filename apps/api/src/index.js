@@ -114,22 +114,32 @@ app.use((req, res) => {
 const startServer = async () => {
   try {
     console.log('🚀 Starting PEPETOR-MINER Backend Server...\n');
+    console.log(`📌 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📌 Port: ${PORT}`);
 
     // Connect to MongoDB (non-blocking)
+    console.log('🔌 Attempting MongoDB connection...');
     const dbConnection = await connectDB();
     if (dbConnection) {
       console.log('📊 Database connected and ready');
     }
 
     // Start Express server on all interfaces for Docker/Fly.io compatibility
-    app.listen(PORT, '0.0.0.0', () => {
+    console.log('🚀 Starting Express server...');
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`\n✅ Backend server is running on 0.0.0.0:${PORT}`);
       console.log(`📝 API Documentation: http://localhost:${PORT}/api`);
       console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
       console.log(`👥 Users Endpoint: http://localhost:${PORT}/api/users\n`);
     });
+
+    server.on('error', (error) => {
+      console.error('❌ Server error:', error);
+      process.exit(1);
+    });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
+    console.error('Stack:', error.stack);
     process.exit(1);
   }
 };
@@ -145,6 +155,19 @@ process.on('SIGTERM', async () => {
   console.log('\n\n⏹️  Shutting down server gracefully...');
   await disconnectDB();
   process.exit(0);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  console.error('Stack:', error.stack);
+  process.exit(1);
 });
 
 // Start the server
