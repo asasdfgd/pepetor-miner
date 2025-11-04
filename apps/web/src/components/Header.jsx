@@ -22,7 +22,15 @@ function Header() {
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo">
-            🔥 PEPETOR-MINER
+            <img 
+              src="https://brown-glamorous-crane-421.mypinata.cloud/ipfs/bafybeicqq3g3o57pdm7wesrlrjw5b77a5n2nzems32qcmodmspfbgbha44" 
+              alt="ClearNetLabs Logo" 
+              className="logo-img"
+            />
+            <div className="logo-text-container">
+              <span className="logo-text-main">ClearNetLabs</span>
+              <span className="logo-text-sub">PepeTor Miner</span>
+            </div>
           </Link>
 
           <nav className="nav-menu">

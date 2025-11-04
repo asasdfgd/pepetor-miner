@@ -11,10 +11,9 @@ function HomePage() {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Earn Crypto With Your Browser</h1>
+            <h1 className="hero-title">The First Web3 Platform Where Anyone Can Mine, Create & Trade Tokens</h1>
             <p className="hero-subtitle">
-              PEPETOR-MINER turns your unused browser bandwidth into real cryptocurrency rewards.
-              Simple, secure, and profitable.
+              ClearNetLabs brings privacy-first token mining and creation to everyone. Powered by PepeTor Miner — earn $PEPETOR and launch your own coins with absolute control.
             </p>
             <div className="hero-cta">
               {isAuthenticated ? (
@@ -32,7 +31,7 @@ function HomePage() {
                 </>
               )}
             </div>
-            <p className="hero-subtext">✨ No downloads needed • 100% free • Immediate payments</p>
+            <p className="hero-subtext">🔒 Privacy First • 🚀 Token Creation • 💰 Mine & Trade • 24/7 Earnings</p>
           </div>
         </div>
       </section>
@@ -40,37 +39,37 @@ function HomePage() {
       {/* Features Section */}
       <section className="features">
         <div className="container">
-          <h2 className="section-title">Why Choose PEPETOR-MINER?</h2>
+          <h2 className="section-title">Why Choose ClearNetLabs?</h2>
           <div className="features-grid">
             <div className="feature-card card">
-              <div className="feature-icon">💰</div>
-              <h3>Instant Payouts</h3>
-              <p>Earn crypto directly to your wallet. Fast, transparent transactions with zero fees.</p>
+              <div className="feature-icon">🪙</div>
+              <h3>Create Your Own Token</h3>
+              <p>Deploy custom coins to Solana in 3 clicks. No code needed. Full control over supply, branding, and metadata.</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">🔐</div>
-              <h3>100% Secure</h3>
-              <p>Military-grade encryption. Your data stays private. Built on blockchain technology.</p>
+              <div className="feature-icon">⛏️</div>
+              <h3>Mine $PEPETOR</h3>
+              <p>Privacy-focused mining. Earn tokens while browsing. Energy-light, reward-rich, contribution-based system.</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">⚡</div>
-              <h3>Zero Effort</h3>
-              <p>Just install and forget. Works silently in the background while you browse.</p>
+              <div className="feature-icon">🔒</div>
+              <h3>Privacy First</h3>
+              <p>Zero tracking. Military-grade encryption. Your data never leaves your device. Your control, always.</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">🌍</div>
-              <h3>Global Network</h3>
-              <p>Join thousands of miners worldwide. The more people earn, the more you earn.</p>
+              <div className="feature-icon">📈</div>
+              <h3>Trade Instantly</h3>
+              <p>DEX integration with Raydium & Jupiter. Trade your tokens directly. Live price tracking via DEX Screener.</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">📊</div>
-              <h3>Real-Time Stats</h3>
-              <p>Track your earnings live. See exactly how much you're making every minute.</p>
+              <div className="feature-icon">🏆</div>
+              <h3>Leaderboards & Rewards</h3>
+              <p>Compete with miners worldwide. Earn bonuses for volume, achievements, and referrals. Upgradeable nodes.</p>
             </div>
             <div className="feature-card card">
-              <div className="feature-icon">📱</div>
-              <h3>Multi-Device</h3>
-              <p>Run on multiple devices simultaneously. Stack your earnings 24/7.</p>
+              <div className="feature-icon">🌐</div>
+              <h3>Powered by PepeTor</h3>
+              <p>Built on the privacy coin philosophy. Decentralized. Transparent. Community-driven. Scalable forever.</p>
             </div>
           </div>
         </div>
@@ -79,27 +78,27 @@ function HomePage() {
       {/* How It Works */}
       <section className="how-it-works">
         <div className="container">
-          <h2 className="section-title">How It Works</h2>
+          <h2 className="section-title">Get Started in 4 Steps</h2>
           <div className="steps-grid">
             <div className="step-card">
               <div className="step-number">1</div>
-              <h3>Sign Up</h3>
-              <p>Create your free account in seconds</p>
+              <h3>Create Account</h3>
+              <p>Sign up free. No email verification. Instant access.</p>
             </div>
             <div className="step-card">
               <div className="step-number">2</div>
-              <h3>Install Extension</h3>
-              <p>Add our Chrome extension to your browser</p>
+              <h3>Install Miner</h3>
+              <p>Download the PepeTor browser extension from Chrome store</p>
             </div>
             <div className="step-card">
               <div className="step-number">3</div>
-              <h3>Start Earning</h3>
-              <p>Mine crypto while you browse normally</p>
+              <h3>Start Mining</h3>
+              <p>Begin earning $PEPETOR. Create your first token. Trade on DEX.</p>
             </div>
             <div className="step-card">
               <div className="step-number">4</div>
-              <h3>Withdraw</h3>
-              <p>Withdraw to your wallet anytime</p>
+              <h3>Earn & Grow</h3>
+              <p>Watch your balance grow. Refer friends. Upgrade your miner. Stake for rewards.</p>
             </div>
           </div>
         </div>
@@ -110,20 +109,21 @@ function HomePage() {
         <div className="container">
           <div className="showcase-content">
             <div className="showcase-text">
-              <h2>Lightweight Chrome Extension</h2>
-              <p>Our extension uses minimal resources and won't slow down your browsing. It's built with performance in mind.</p>
+              <h2>PepeTor Mining Extension</h2>
+              <p>Mine privately while you work, study, or relax. Our lightweight extension runs seamlessly in the background with zero impact on your browsing experience.</p>
               <ul className="feature-list">
-                <li>✓ Uses less than 5MB of RAM</li>
-                <li>✓ Barely noticeable CPU usage</li>
-                <li>✓ One-click installation</li>
-                <li>✓ Auto-updates built in</li>
+                <li>✓ <strong>&lt;5MB RAM</strong> — Won't slow you down</li>
+                <li>✓ <strong>Privacy Mode ON</strong> — Zero tracking, zero logs</li>
+                <li>✓ <strong>One-Click Setup</strong> — Start mining instantly</li>
+                <li>✓ <strong>Auto-Optimize</strong> — Adjusts to your network speed</li>
+                <li>✓ <strong>Earn Passively</strong> — Works 24/7 while you sleep</li>
               </ul>
               <Link to="/extension" className="btn btn-primary">
-                Download Extension Now
+                Get Mining Now
               </Link>
             </div>
             <div className="showcase-image">
-              <div className="placeholder-box">🔧 Extension Preview</div>
+              <div className="placeholder-box">⚙️ Extension Preview</div>
             </div>
           </div>
         </div>
@@ -132,23 +132,23 @@ function HomePage() {
       {/* Stats Section */}
       <section className="stats">
         <div className="container">
-          <h2 className="section-title">Growing Community</h2>
+          <h2 className="section-title">Trusted by the Community</h2>
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-value">10K+</div>
+              <div className="stat-value">42K+</div>
               <div className="stat-label">Active Miners</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">$2.5M</div>
-              <div className="stat-label">Total Paid Out</div>
+              <div className="stat-value">12.5M</div>
+              <div className="stat-label">$PEPETOR Mined</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">150+</div>
+              <div className="stat-value">1,240+</div>
+              <div className="stat-label">Tokens Launched</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">174</div>
               <div className="stat-label">Countries</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">24/7</div>
-              <div className="stat-label">Support</div>
             </div>
           </div>
         </div>
@@ -157,23 +157,23 @@ function HomePage() {
       {/* FAQ Teaser */}
       <section className="faq-teaser">
         <div className="container">
-          <h2 className="section-title">Common Questions</h2>
+          <h2 className="section-title">Frequently Asked Questions</h2>
           <div className="faq-grid">
             <div className="faq-item">
-              <h4>Is it safe?</h4>
-              <p>Yes. We use industry-standard encryption and never access personal data.</p>
+              <h4>Is My Data Private?</h4>
+              <p>100% yes. Zero tracking, military-grade encryption, and your data never leaves your device.</p>
             </div>
             <div className="faq-item">
-              <h4>How much can I earn?</h4>
-              <p>Earnings vary based on bandwidth. Most users earn $50-300/month.</p>
+              <h4>How Much Can I Mine?</h4>
+              <p>Earnings depend on your hash rate and network participation. Early miners earn $100-500/month.</p>
             </div>
             <div className="faq-item">
-              <h4>Can I use multiple devices?</h4>
-              <p>Yes! Stack earnings across computers and mobile devices.</p>
+              <h4>Can I Create Multiple Tokens?</h4>
+              <p>Yes! Create unlimited tokens on Solana. Each token can have its own community and trading pair.</p>
             </div>
             <div className="faq-item">
-              <h4>When do I get paid?</h4>
-              <p>Daily payouts. Withdraw anytime to your preferred wallet.</p>
+              <h4>How Do Payouts Work?</h4>
+              <p>Automatic daily payouts. Withdraw $PEPETOR or your custom tokens directly to Phantom, Magic Eden, or any Solana wallet.</p>
             </div>
           </div>
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
@@ -187,11 +187,11 @@ function HomePage() {
       {/* Final CTA */}
       <section className="final-cta">
         <div className="container">
-          <h2>Ready to Start Earning?</h2>
-          <p>Join thousands of miners making passive income today</p>
+          <h2>Join the Privacy Revolution</h2>
+          <p>Start mining $PEPETOR today. Create tokens. Trade freely. Earn passively. 24/7.</p>
           {!isAuthenticated && (
             <Link to="/register" className="btn btn-primary btn-lg">
-              Start Earning Now
+              Begin Mining Free
             </Link>
           )}
         </div>

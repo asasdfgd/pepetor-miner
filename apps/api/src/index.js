@@ -42,15 +42,9 @@ app.use((req, res, next) => {
 const path = require('path');
 const fs = require('fs');
 
-// Resolve the frontend dist path - handle both local dev and Docker
-let frontendDistPath;
-if (process.env.NODE_ENV === 'production') {
-  // In Docker: /app/apps/web/dist
-  frontendDistPath = '/app/apps/web/dist';
-} else {
-  // Local development
-  frontendDistPath = path.join(__dirname, '../../apps/web/dist');
-}
+// Resolve the frontend dist path - relative to current working directory
+// In Docker, process.cwd() = /app, so apps/web/dist should exist
+const frontendDistPath = path.resolve(process.cwd(), 'apps/web/dist');
 
 // Check if dist folder exists
 if (fs.existsSync(frontendDistPath)) {

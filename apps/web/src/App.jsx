@@ -51,7 +51,7 @@ function AppContent() {
 
       <footer className="app-footer">
         <div className="container">
-          <p>&copy; 2024 PEPETOR-MINER. All rights reserved.</p>
+          <p>&copy; 2024 ClearNetLabs. All rights reserved. | Powered by PepeTor Miner</p>
         </div>
       </footer>
     </div>
