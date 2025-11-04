@@ -18,9 +18,6 @@ COPY package*.json ./
 # Copy API-specific files
 COPY apps/api ./apps/api
 
-# Copy shared config
-COPY config ./config || true
-
 # Install all dependencies
 RUN npm ci --prefer-offline --no-audit
 
