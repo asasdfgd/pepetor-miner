@@ -5,7 +5,7 @@ import './ExtensionPage.css';
 function ExtensionPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  // Deployment trigger
+  // v2.0 - Fresh deployment
 
   const handleDownload = () => {
     if (!isAuthenticated) {
