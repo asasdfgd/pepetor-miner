@@ -149,75 +149,6 @@
   background: #5568d3;
 }
 
-/* Installation Steps */
-.installation {
-  background: white;
-  padding: 3rem 1rem;
-  border-radius: 8px;
-}
-
-.container-narrow {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.installation h2 {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 3rem;
-  color: var(--text-color);
-}
-
-.steps {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.step {
-  flex: 1;
-  min-width: 150px;
-  text-align: center;
-  padding: 1.5rem;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 2px solid #e5e7eb;
-}
-
-.step-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: #667eea;
-  color: white;
-  border-radius: 50%;
-  font-weight: 700;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.step h3 {
-  font-size: 1.1rem;
-  color: var(--text-color);
-  margin-bottom: 0.5rem;
-}
-
-.step p {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.step-arrow {
-  color: #667eea;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 1rem;
-}
-
 /* Features */
 .extension-features {
   margin: 2rem 0;
@@ -406,20 +337,10 @@
     font-size: 1.5rem;
   }
 
-  .installation h2,
   .extension-features h2,
   .requirements h2,
   .faq-section h2 {
     font-size: 1.5rem;
-  }
-
-  .steps {
-    flex-direction: column;
-  }
-
-  .step-arrow {
-    transform: rotate(90deg);
-    margin: 0;
   }
 
   .faq-list {
