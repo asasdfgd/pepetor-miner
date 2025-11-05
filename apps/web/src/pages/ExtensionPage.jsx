@@ -5,7 +5,7 @@ import './ExtensionPage.css';
 function ExtensionPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  // v2.0 - Fresh deployment
+  // v2.1 - Force cache clear via webhook
 
   const handleDownload = () => {
     if (!isAuthenticated) {
