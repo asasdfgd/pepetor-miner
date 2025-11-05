@@ -314,15 +314,6 @@
     grid-template-columns: 1fr;
   }
 
-  .steps {
-    gap: 0.5rem;
-  }
-
-  .step {
-    min-width: 120px;
-    padding: 1rem;
-  }
-
   .requirements-grid {
     grid-template-columns: 1fr;
   }
