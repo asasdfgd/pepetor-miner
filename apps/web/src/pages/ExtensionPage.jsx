@@ -5,7 +5,7 @@ import './ExtensionPage.css';
 function ExtensionPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  // v2.1 - Force cache clear via webhook
+  // REBUILT: 2024-11-05 - Force fresh Vercel deploy - v3.1
 
   const handleDownload = () => {
     if (!isAuthenticated) {
