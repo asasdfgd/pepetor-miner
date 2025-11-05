@@ -76,38 +76,6 @@ function ExtensionPage() {
           </div>
         </section>
 
-        {/* Installation Steps */}
-        <section className="installation">
-          <div className="container-narrow">
-            <h2>How to Install</h2>
-            <div className="steps">
-              <div className="step">
-                <div className="step-badge">1</div>
-                <h3>Click Download</h3>
-                <p>Download the extension package from above</p>
-              </div>
-              <div className="step-arrow">→</div>
-              <div className="step">
-                <div className="step-badge">2</div>
-                <h3>Open Chrome</h3>
-                <p>Go to chrome://extensions and enable Developer Mode</p>
-              </div>
-              <div className="step-arrow">→</div>
-              <div className="step">
-                <div className="step-badge">3</div>
-                <h3>Load Extension</h3>
-                <p>Drag and drop the downloaded file or use "Load unpacked"</p>
-              </div>
-              <div className="step-arrow">→</div>
-              <div className="step">
-                <div className="step-badge">4</div>
-                <h3>Start Earning</h3>
-                <p>Pin the extension and watch your balance grow!</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Features */}
         <section className="extension-features card">
           <h2>Extension Features</h2>
