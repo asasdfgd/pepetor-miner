@@ -20,3 +20,4 @@ export default defineConfig({
     sourcemap: false,
   },
 })
+// Force rebuild cache bust - $(date +%s)
