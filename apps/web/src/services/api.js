@@ -61,7 +61,7 @@ apiClient.interceptors.response.use(
       if (refreshToken) {
         return apiClient.post('/auth/refresh-token', { refreshToken })
           .then(response => {
-            const newToken = response.data.accessToken;
+            const newToken = response.accessToken;
             localStorage.setItem('authToken', newToken);
             apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -76,6 +76,10 @@ apiClient.interceptors.response.use(
             window.location.href = '/login';
             return Promise.reject(err);
           });
+      } else {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        return Promise.reject(error);
       }
     }
 
