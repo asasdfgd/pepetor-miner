@@ -31,6 +31,29 @@ const fromBase64 = (base64String) => {
 };
 
 /**
+ * Create canonical JSON with guaranteed key ordering
+ * Must match backend's canonicalJSON for signature verification to work
+ */
+const canonicalJSON = (obj) => {
+  const keys = Object.keys(obj).sort();
+  const pairs = keys.map(key => {
+    const value = obj[key];
+    let serializedValue;
+    if (typeof value === 'string') {
+      serializedValue = JSON.stringify(value);
+    } else if (typeof value === 'number') {
+      serializedValue = value.toString();
+    } else if (value === null) {
+      serializedValue = 'null';
+    } else {
+      serializedValue = JSON.stringify(value);
+    }
+    return `"${key}":${serializedValue}`;
+  });
+  return '{' + pairs.join(',') + '}';
+};
+
+/**
  * Generate or retrieve client keypair
  * Note: In production, this would be managed by native host/extension
  */
@@ -75,7 +98,7 @@ export const getClientPublicKey = () => {
  */
 const signSessionData = (dataToSign, secretKey) => {
   // Backend expects this exact format for signature verification
-  // Must match the exact field names and order
+  // Must match the exact field names
   const backendFormat = {
     client_pub: toBase64(dataToSign.clientPub),
     session_id: dataToSign.sessionId,
@@ -85,9 +108,9 @@ const signSessionData = (dataToSign, secretKey) => {
     bytes_out: dataToSign.bytes_out,
   };
   
-  // Create consistent JSON string for signing (JSON.stringify has consistent key ordering in modern JS)
-  const messageJson = JSON.stringify(backendFormat);
-  console.log('🔐 Signing session data:', messageJson);
+  // Use canonical JSON (deterministic key ordering) to match backend verification
+  const messageJson = canonicalJSON(backendFormat);
+  console.log('🔐 Signing session data with canonical JSON:', messageJson);
   
   const messageBytes = new TextEncoder().encode(messageJson);
   const signedMessage = nacl.sign.detached(messageBytes, secretKey);

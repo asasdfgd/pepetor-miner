@@ -60,11 +60,33 @@ function generateKeypair() {
 }
 
 /**
+ * Create canonical JSON with guaranteed key ordering
+ */
+function canonicalJSON(obj) {
+  const keys = Object.keys(obj).sort();
+  const pairs = keys.map(key => {
+    const value = obj[key];
+    let serializedValue;
+    if (typeof value === 'string') {
+      serializedValue = JSON.stringify(value);
+    } else if (typeof value === 'number') {
+      serializedValue = value.toString();
+    } else if (value === null) {
+      serializedValue = 'null';
+    } else {
+      serializedValue = JSON.stringify(value);
+    }
+    return `"${key}":${serializedValue}`;
+  });
+  return '{' + pairs.join(',') + '}';
+}
+
+/**
  * Sign session data with a secret key
  */
 function signSessionData(sessionData, secretKeyBase64) {
   const secretKeyBytes = Buffer.from(secretKeyBase64, 'base64');
-  const message = JSON.stringify(sessionData);
+  const message = canonicalJSON(sessionData);
   const messageBytes = Buffer.from(message);
 
   const signatureBytes = nacl.sign.detached(messageBytes, secretKeyBytes);

@@ -1,6 +1,29 @@
 const nacl = require('tweetnacl');
 
 /**
+ * Create canonical JSON with guaranteed key ordering
+ * Used to ensure client and server sign/verify the same message
+ */
+function canonicalJSON(obj) {
+  const keys = Object.keys(obj).sort();
+  const pairs = keys.map(key => {
+    const value = obj[key];
+    let serializedValue;
+    if (typeof value === 'string') {
+      serializedValue = JSON.stringify(value);
+    } else if (typeof value === 'number') {
+      serializedValue = value.toString();
+    } else if (value === null) {
+      serializedValue = 'null';
+    } else {
+      serializedValue = JSON.stringify(value);
+    }
+    return `"${key}":${serializedValue}`;
+  });
+  return '{' + pairs.join(',') + '}';
+}
+
+/**
  * Verify Ed25519 signature for session receipt
  * 
  * @param {Object} sessionData - Session data that was signed
@@ -14,15 +37,14 @@ function verifySessionSignature(sessionData, signature, clientPub) {
     const pubKeyBytes = Buffer.from(clientPub, 'base64');
     const signatureBytes = Buffer.from(signature, 'base64');
     
-    // Reconstruct the message that should have been signed
-    // The message should be a consistent JSON representation
-    const message = JSON.stringify(sessionData);
+    // Reconstruct the message with canonical JSON (deterministic key ordering)
+    const message = canonicalJSON(sessionData);
     const messageBytes = Buffer.from(message);
     
     console.log('🔐 Verifying signature:');
-    console.log('   Public Key (base64):', clientPub);
-    console.log('   Signed Message:', message);
-    console.log('   Signature (base64):', signature);
+    console.log('   Public Key (base64):', clientPub.substring(0, 20) + '...');
+    console.log('   Canonical JSON Message:', message);
+    console.log('   Signature (base64):', signature.substring(0, 20) + '...');
     
     // Verify the signature
     const isValid = nacl.sign.detached.verify(
@@ -37,8 +59,8 @@ function verifySessionSignature(sessionData, signature, clientPub) {
   } catch (error) {
     console.error('❌ Signature verification error:', error.message);
     console.error('   Session data:', sessionData);
-    console.error('   Signature:', signature);
-    console.error('   Client pub:', clientPub);
+    console.error('   Signature:', signature.substring(0, 20) + '...');
+    console.error('   Client pub:', clientPub.substring(0, 20) + '...');
     return false;
   }
 }
@@ -70,7 +92,7 @@ function generatePublicKeyFromSeed(seed) {
 function signSessionData(sessionData, secretKeyBase64) {
   try {
     const secretKeyBytes = Buffer.from(secretKeyBase64, 'base64');
-    const message = JSON.stringify(sessionData);
+    const message = canonicalJSON(sessionData);
     const messageBytes = Buffer.from(message);
     
     const signature = nacl.sign.detached(messageBytes, secretKeyBytes);
@@ -85,4 +107,5 @@ module.exports = {
   verifySessionSignature,
   generatePublicKeyFromSeed,
   signSessionData,
+  canonicalJSON,
 };
