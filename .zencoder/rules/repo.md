@@ -3,206 +3,188 @@ description: Repository Information Overview
 alwaysApply: true
 ---
 
-# PEPETOR-MINER Repository Information
+# Repository Information Overview
 
 ## Repository Summary
-
-PEPETOR-MINER is a full-stack monorepo JavaScript application with three main components: Express.js backend API with MongoDB database, React frontend web application, and Chrome browser extension. All components share Node.js/npm as the runtime and package manager for seamless integration and code reuse.
+PEPETOR-MINER is a privacy-first distributed mining platform with Tor support, Solana blockchain integration, and Chrome browser extension. It's organized as an npm monorepo with Node.js 20.18.0 backend, React 18.2.0 frontend, and supporting services including a Python Tor privacy backend.
 
 ## Repository Structure
 
-```
-PEPETOR-MINER/
-├── backend/              # Express.js REST API Server with MongoDB
-│   ├── src/
-│   │   ├── index.js      # Server entry point
-│   │   ├── config/       # Configuration (database connection)
-│   │   ├── models/       # Data models (User.js)
-│   │   ├── controllers/  # Business logic (userController.js)
-│   │   ├── routes/       # API route handlers (userRoutes.js)
-│   │   ├── middleware/   # Custom middleware
-│   │   └── utils/        # Utilities
-│   ├── package.json
-│   ├── .env.example
-│   └── README.md
-├── frontend/             # React Web Application
-│   ├── src/
-│   │   ├── main.jsx      # React entry point
-│   │   ├── App.jsx       # Main component
-│   │   ├── pages/        # Page components
-│   │   ├── components/   # Reusable components
-│   │   ├── services/     # API client
-│   │   ├── hooks/        # Custom hooks
-│   │   ├── styles/       # CSS styling
-│   │   └── utils/        # Utilities
-│   ├── index.html        # HTML entry point
-│   ├── vite.config.js    # Vite build config
-│   ├── package.json
-│   ├── .env.example
-│   └── README.md
-├── chrome-extension/     # Chrome Browser Extension (scaffolding)
-├── config/               # Shared configuration
-├── scripts/              # Build & deployment scripts
-├── docs/                 # Documentation
-├── .env.example          # Root environment template
-└── .gitignore
-```
+The monorepo contains multiple applications under `apps/` directory with shared configuration at the root level:
 
-## Backend (Express.js + MongoDB)
+### Main Repository Components
+- **apps/api**: Express.js REST API backend server (Node.js)
+- **apps/web**: React + Vite frontend application
+- **apps/chrome-extension**: Chromium MV3 browser extension
+- **apps/tor-backend**: FastAPI Python privacy backend (Tor support)
+- **packages/sdk**: Placeholder for shared SDK utilities
+- **scripts/**: Build and deployment automation scripts
 
-**Location**: `backend/`
+## Projects
 
-### Language & Runtime
-- **Language**: JavaScript (Node.js)
-- **Runtime Version**: Node.js >= 18.0.0
-- **Package Manager**: npm >= 9.0.0
-- **Build System**: Node.js native (no build step needed)
-- **Database**: MongoDB (local or MongoDB Atlas cloud)
+### Backend API (apps/api)
+**Configuration File**: `apps/api/package.json`
 
-### Dependencies
-**Main**:
-- `express` (4.18.2) - Web framework
-- `cors` (2.8.5) - Cross-Origin Resource Sharing
-- `dotenv` (16.3.1) - Environment configuration
-- `mongoose` (8.19.2) - MongoDB ODM and schema validation
+#### Language & Runtime
+**Language**: JavaScript (Node.js)
+**Version**: Node.js 20.18.0 (specified in Dockerfile), npm ≥ 9.0.0
+**Build System**: npm
+**Package Manager**: npm
 
-### Models & Endpoints
-**User Model**: MongoDB schema with username, email, password, fullName, avatar, role, isActive, lastLogin fields
-**User Endpoints**:
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+#### Dependencies
+**Main Dependencies**:
+- express 4.18.2 (REST framework)
+- mongoose 8.19.2 (MongoDB ODM)
+- @solana/web3.js 1.87.0 (Solana blockchain)
+- @solana/spl-token 0.1.8 (SPL tokens)
+- jsonwebtoken 9.0.2 (JWT authentication)
+- bcryptjs 2.4.3 (Password hashing)
+- socket.io 4.7.2 (Real-time communication)
+- cors 2.8.5 (CORS middleware)
+- dotenv 16.3.1 (Environment configuration)
+- tweetnacl 1.0.3 (Cryptography)
+- uuid 9.0.0 (UUID generation)
 
-### Build & Installation
+#### Build & Installation
 ```bash
-cd backend
 npm install
-npm start              # Production
-npm run dev            # Development with auto-reload
-```
-
-### Configuration
-- **Port**: 3001 (default)
-- **Database**: MongoDB connection via MONGODB_URI environment variable
-- **Local MongoDB**: mongodb://localhost:27017/pepetor-miner
-- **Cloud MongoDB Atlas**: mongodb+srv://username:password@cluster.mongodb.net/pepetor-miner
-- **CORS**: Enabled for frontend at http://localhost:3000
-
-## Frontend (React + Vite)
-
-**Location**: `frontend/`
-
-### Language & Runtime
-- **Language**: JavaScript (React 18)
-- **Runtime Version**: Node.js >= 18.0.0
-- **Package Manager**: npm >= 9.0.0
-- **Build System**: Vite 5.0.8
-- **Framework**: React 18.2.0 with React Router 6
-
-### Dependencies
-**Main**:
-- `react` (18.2.0) - UI library
-- `react-dom` (18.2.0) - React rendering
-- `react-router-dom` (6.20.0) - Routing
-- `axios` (1.6.2) - HTTP client
-
-**Dev**:
-- `vite` (5.0.8) - Build tool
-- `@vitejs/plugin-react` (4.2.0) - React support
-
-### Build & Installation
-```bash
-cd frontend
-npm install
-npm run dev            # Development server (http://localhost:3000)
-npm run build          # Production build
-npm run preview        # Preview production build
-```
-
-### Configuration
-- **API Base URL**: Set in `.env` (default: http://localhost:3001/api)
-- **Port**: 3000 (dev server)
-- **Build Output**: `dist/` directory
-
-## Development Workflow
-
-### Start Development (Two Terminal Windows)
-
-**Terminal 1 - Backend**:
-```bash
-cd backend
-npm run dev
-# Server runs on http://localhost:3001 with MongoDB
-```
-
-**Terminal 2 - Frontend**:
-```bash
-cd frontend
-npm run dev
-# App runs on http://localhost:3000
-```
-
-Frontend automatically connects to backend via API calls. Backend connects to MongoDB and provides user management endpoints.
-
-## Database Setup
-
-### Local MongoDB
-```bash
-# macOS
-brew install mongodb-community
-brew services start mongodb-community
-
-# Verify
-mongo
-```
-
-### MongoDB Atlas (Cloud)
-1. Create account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create cluster and get connection string
-3. Update backend `.env` with MongoDB Atlas connection string
-
-## Build & Deployment
-
-### Frontend Build
-```bash
-cd frontend
-npm run build  # Creates dist/ folder
-```
-
-### Backend Deployment
-```bash
-cd backend
+npm run build
 npm start
-# Ensure MONGODB_URI environment variable is set
 ```
 
-## Environment Configuration
+#### Docker
+**Dockerfile**: `apps/api/Dockerfile`
+**Image**: node:20.18.0-slim
+**Configuration**: 
+- Installs build-essential and python3 dependencies
+- Copies monorepo package files for workspace resolution
+- Runs `npm ci --prefer-offline --no-audit`
+- Sets NODE_ENV=production
+- Exposes port 3001
 
-Both components use `.env` files. Template: `.env.example`
+#### Testing
+**Framework**: Jest
+**Run Command**:
+```bash
+npm test
+npm test -- --coverage
+```
 
-**Backend** (.env):
-- `NODE_ENV` - development/production
-- `PORT` - Server port
-- `CORS_ORIGIN` - Frontend URL
-- `MONGODB_URI` - MongoDB connection string
+#### Main Files
+**Entry Point**: `apps/api/src/index.js`
+**Structure**:
+- `src/controllers/` - Business logic
+- `src/routes/` - API endpoints
+- `src/models/` - MongoDB schemas
+- `src/services/` - External integrations
+- `src/middleware/` - Auth, logging, CORS
 
-**Frontend** (.env):
-- `VITE_API_BASE_URL` - Backend API URL
+### Frontend Web (apps/web)
+**Configuration File**: `apps/web/package.json`
 
-## Project Status
+#### Language & Runtime
+**Language**: JavaScript/React
+**Version**: React 18.2.0, Vite 7.1.12, Node.js ≥ 18.0.0
+**Build System**: Vite
+**Package Manager**: npm
 
-✅ **Complete**: Backend server with MongoDB database integration
-✅ **Complete**: User model with CRUD endpoints
-✅ **Complete**: React frontend with Vite, routing, API integration
-🔄 **In Progress**: Chrome extension scaffolding
-⏳ **Pending**: Authentication, feature implementation, deployment
+#### Dependencies
+**Main Dependencies**:
+- react 18.2.0 (UI framework)
+- react-dom 18.2.0 (React DOM)
+- react-router-dom 6.20.0 (Client-side routing)
+- axios 1.6.2 (HTTP client)
+- tweetnacl 1.0.3 (Cryptography)
 
-## Next Steps
+**Development Dependencies**:
+- vite 7.1.12 (Build tool and dev server)
+- @vitejs/plugin-react 4.2.0 (React plugin)
+- eslint (Linting)
 
-1. Implement authentication (JWT/OAuth) - Backend
-2. Build feature-specific API endpoints - Backend
-3. Create Chrome extension - Chrome Extension
-4. Set up CI/CD pipeline
-5. Deploy to staging/production environment
+#### Build & Installation
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+```
+
+#### Main Files
+**Entry Point**: `index.html` (Vite entry point)
+**Output Directory**: `dist-new/` (configured in vite.config.js)
+**Vite Config**: `vite.config.js`
+- Dev server on port 3000
+- Proxy to backend API at /api → http://localhost:3001
+- Output builds to dist-new directory
+
+### Chrome Extension (apps/chrome-extension)
+**Type**: Chromium MV3 Browser Extension
+
+**Main Files**:
+- `manifest.json` - Extension metadata
+- `background.js` - Service worker (8.65 KB)
+- `popup.html/js` - Extension popup UI
+- `options.html/js` - Settings page
+- `content.js` - Page content injection
+
+**Structure**: Plain JavaScript/HTML (no build system) - copies directly to extension ID
+
+### Python Tor Backend (apps/tor-backend)
+**Type**: FastAPI Python Application
+
+**Main Files**:
+- `main.py` - Tor-protected endpoints
+- `server.py` - Server configuration
+**Dependencies**: Python 3.x, FastAPI
+
+### Root Configuration
+**Configuration File**: `package.json` (monorepo config)
+
+#### Version Info
+**Version**: 2.0.1
+**Node**: ≥18.0.0
+**npm**: ≥9.0.0
+
+#### Workspaces
+```
+apps/api
+apps/web
+apps/chrome-extension
+apps/tor-backend
+packages/sdk
+```
+
+#### Root Scripts
+```bash
+npm run dev              # Run all apps in development
+npm run dev:api         # Backend only
+npm run dev:web         # Frontend only
+npm run build            # Build all apps
+npm run build:api       # Backend build
+npm run build:web       # Frontend build
+npm test                # Run tests across workspaces
+npm run lint            # Lint all code
+npm run clean           # Remove node_modules & build artifacts
+```
+
+## Deployment
+
+### Vercel (Frontend)
+- Detects monorepo and builds `apps/web`
+- Automatically runs `npm run build`
+- Builds to `dist-new/` directory
+
+### Fly.io (Backend)
+**Configuration**: `fly.toml`
+- Uses `apps/api/Dockerfile`
+- Primary region: `ord` (Chicago)
+- Port: 3001 (internal), 80/443 (external)
+- Health check: GET `/api/health`
+
+## Git Configuration
+**Repository**: https://github.com/asasdfgd/pepetor-miner.git
+**Author**: Giuseppe Pietravalle (qeradad2@gmail.com)
+**Main Branch**: main
+
+## Known Build Issues
+**Vercel Build Error**: Missing `@rollup/rollup-linux-x64-gnu` module - related to npm optional dependency bug (npm/cli#4828). Solution: Clean install of node_modules and package-lock.json.
