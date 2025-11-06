@@ -1,0 +1,446 @@
+.mining-guide-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.guide-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 3px solid #10b981;
+}
+
+.guide-header h2 {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.guide-subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.guide-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+.guide-step {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  padding: 2.5rem;
+  border-radius: 12px;
+  border-left: 5px solid #10b981;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.guide-step:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h3 {
+  font-size: 1.4rem;
+  color: #1f2937;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+
+.step-content p {
+  color: #4b5563;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.step-content ul {
+  list-style-position: inside;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.step-content li {
+  margin-bottom: 0.5rem;
+}
+
+.info-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border-left: 4px solid #10b981;
+}
+
+.info-box strong {
+  color: #1f2937;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #4b5563;
+  padding: 0.5rem 0;
+}
+
+.feature-icon {
+  color: #10b981;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.dashboard-preview {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 2px dashed #10b981;
+}
+
+.dashboard-preview p {
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dashboard-preview ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.mining-controls {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.mining-note {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.8rem;
+}
+
+.mining-controls ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.reward-process {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.reward-process ol {
+  padding-left: 2rem;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.reward-process li {
+  margin-bottom: 0.8rem;
+}
+
+.requirements-section {
+  margin-bottom: 4rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #f3f4f6 100%);
+  border-radius: 12px;
+  border: 2px solid #0284c7;
+}
+
+.requirements-section h3 {
+  font-size: 1.8rem;
+  color: #1f2937;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.requirement-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid #0284c7;
+}
+
+.requirement-card h4 {
+  font-size: 1.2rem;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.requirement-card ul {
+  list-style-position: inside;
+  color: #4b5563;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.requirement-card li {
+  margin-bottom: 0.8rem;
+}
+
+.earnings-section {
+  margin-bottom: 4rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 5%, #f9fafb 100%);
+  border-radius: 12px;
+  border: 2px solid #f59e0b;
+}
+
+.earnings-section h3 {
+  font-size: 1.8rem;
+  color: #1f2937;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.earnings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.earnings-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border-top: 4px solid #f59e0b;
+}
+
+.earnings-card.premium {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-top: 4px solid #047857;
+}
+
+.earnings-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.earnings-card:not(.premium) h4 {
+  color: #1f2937;
+}
+
+.earnings-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.earnings-card:not(.premium) .earnings-value {
+  color: #10b981;
+}
+
+.earnings-card.premium .earnings-value {
+  color: #fbbf24;
+}
+
+.earnings-detail {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.earnings-card:not(.premium) .earnings-detail {
+  color: #6b7280;
+}
+
+.earnings-note {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+  color: #d97706;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.earnings-note p {
+  margin: 0;
+}
+
+.tips-section {
+  margin-bottom: 2rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #f5f3ff 0%, #f3f4f6 100%);
+  border-radius: 12px;
+  border: 2px solid #8b5cf6;
+}
+
+.tips-section h3 {
+  font-size: 1.8rem;
+  color: #1f2937;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.tip-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-top: 4px solid #8b5cf6;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.tip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+}
+
+.tip-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.tip-card h4 {
+  font-size: 1.1rem;
+  color: #1f2937;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+}
+
+.tip-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .mining-guide-section {
+    padding: 2rem 1rem;
+  }
+
+  .guide-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .guide-step {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .step-number {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+
+  .requirements-grid,
+  .earnings-grid,
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-container {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mining-guide-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .guide-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .guide-header {
+    margin-bottom: 2rem;
+  }
+
+  .requirements-section,
+  .earnings-section,
+  .tips-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .requirement-card,
+  .earnings-card,
+  .tip-card {
+    padding: 1.5rem;
+  }
+
+  .step-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .guide-header h2 {
+    margin-bottom: 0.3rem;
+  }
+
+  .guide-subtitle {
+    font-size: 0.95rem;
+  }
+}

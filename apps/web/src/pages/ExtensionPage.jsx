@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import MiningGuideSection from '../components/MiningGuideSection';
 import './ExtensionPage.css';
 
 function ExtensionPage() {
@@ -76,6 +77,9 @@ function ExtensionPage() {
             </div>
           </div>
         </section>
+
+        {/* Mining Guide Section */}
+        <MiningGuideSection />
 
         {/* Features */}
         <section className="extension-features card">
