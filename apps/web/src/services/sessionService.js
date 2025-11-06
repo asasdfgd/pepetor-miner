@@ -210,7 +210,8 @@ export const getClientSessions = async () => {
   try {
     const clientPub = getClientPublicKey();
     const response = await api.get(`/sessions/by-client/list?clientPub=${clientPub}`);
-    return response.data || response;
+    const responseData = response.data || response;
+    return responseData.data || responseData;
   } catch (error) {
     console.error('Error fetching client sessions:', error);
     throw error;

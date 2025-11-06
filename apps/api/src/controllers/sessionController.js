@@ -262,8 +262,8 @@ exports.getUserSessions = async (req, res) => {
         replayChecked: session.replayChecked,
         validationError: session.validationError,
         ipHash: session.ipHash || 'N/A',
-        timestamp: session.createdAt,
-        createdAt: session.createdAt,
+        timestamp: (session.createdAt || session.updatedAt || new Date()).toISOString(),
+        createdAt: (session.createdAt || new Date()).toISOString(),
       })),
     });
   } catch (error) {

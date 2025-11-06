@@ -28,9 +28,12 @@ function SessionHistory({ refreshTrigger }) {
 
   const formatDate = (isoString) => {
     try {
-      return new Date(isoString).toLocaleString();
+      if (!isoString) return 'Unknown';
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      return date.toLocaleString();
     } catch {
-      return isoString;
+      return isoString || 'Unknown';
     }
   };
 
