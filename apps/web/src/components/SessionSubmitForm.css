@@ -1,9 +1,10 @@
 .session-submit-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .session-card-header {
@@ -12,17 +13,17 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .session-card-header h3 {
   margin: 0;
   font-size: 1.4em;
-  color: #333;
+  color: var(--text-color);
 }
 
 .badge-info {
-  background: #667eea;
+  background: var(--accent-purple);
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -68,15 +69,15 @@
 }
 
 .form-section {
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
 }
 
 .form-section h4 {
   margin: 0 0 16px 0;
-  color: #333;
+  color: var(--text-color);
   font-size: 1.1em;
 }
 
@@ -94,36 +95,38 @@
   align-items: center;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
   font-size: 0.95em;
 }
 
 .helper-text {
   font-size: 0.8em;
   font-weight: normal;
-  color: #999;
+  color: var(--text-light);
   margin-left: auto;
 }
 
 .form-group input {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 1em;
   font-family: inherit;
   transition: border-color 0.2s;
   box-sizing: border-box;
+  background: var(--bg-tertiary);
+  color: var(--text-color);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: var(--accent-red);
+  background: var(--bg-secondary);
 }
 
 .form-group input:disabled {
-  background: #f0f0f0;
+  background: var(--bg-tertiary);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -131,7 +134,7 @@
 .advanced-toggle {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--accent-purple);
   cursor: pointer;
   font-weight: 600;
   padding: 8px 0;
@@ -143,7 +146,7 @@
 }
 
 .advanced-toggle:hover {
-  color: #764ba2;
+  color: var(--accent-red);
 }
 
 .preset-buttons {
@@ -154,9 +157,10 @@
 
 .preset-btn {
   padding: 10px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
-  background: white;
+  background: var(--bg-tertiary);
+  color: var(--text-color);
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9em;
@@ -165,7 +169,8 @@
 
 .preset-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-red);
+  box-shadow: 0 4px 12px rgba(255, 45, 85, 0.2);
 }
 
 .preset-btn:disabled {
@@ -179,25 +184,25 @@
 }
 
 .preset-btn.light:hover:not(:disabled) {
-  background: #fffbeb;
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .preset-btn.medium {
-  color: #667eea;
-  border-color: #667eea;
+  color: var(--accent-purple);
+  border-color: var(--accent-purple);
 }
 
 .preset-btn.medium:hover:not(:disabled) {
-  background: #f0f4ff;
+  background: rgba(138, 43, 226, 0.1);
 }
 
 .preset-btn.heavy {
-  color: #ef4444;
-  border-color: #ef4444;
+  color: var(--accent-red);
+  border-color: var(--accent-red);
 }
 
 .preset-btn.heavy:hover:not(:disabled) {
-  background: #fef2f2;
+  background: rgba(255, 45, 85, 0.1);
 }
 
 .form-actions {
@@ -209,7 +214,7 @@
 .submit-btn {
   flex: 1;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -221,7 +226,7 @@
 
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 20px rgba(255, 45, 85, 0.3);
 }
 
 .submit-btn:disabled {
@@ -230,8 +235,8 @@
 }
 
 .session-info {
-  background: #e8f4f8;
-  border-left: 4px solid #06b6d4;
+  background: rgba(138, 43, 226, 0.1);
+  border-left: 4px solid var(--accent-purple);
   padding: 12px 15px;
   border-radius: 4px;
   margin-top: 10px;
@@ -240,14 +245,14 @@
 .session-info p {
   margin: 0 0 10px 0;
   font-weight: 600;
-  color: #0e7490;
+  color: var(--accent-purple);
   font-size: 0.95em;
 }
 
 .session-info ul {
   margin: 0;
   padding-left: 20px;
-  color: #0e7490;
+  color: var(--accent-purple);
   font-size: 0.9em;
 }
 

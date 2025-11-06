@@ -10,7 +10,23 @@ const apiClient = axios.create({
   },
 });
 
-// Add request interceptor for auth token (if needed)
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  isRefreshing = false;
+  failedQueue = [];
+};
+
+// Add request interceptor for auth token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
@@ -22,10 +38,47 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor for error handling
+// Add response interceptor for error handling and token refresh
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        return apiClient.post('/auth/refresh-token', { refreshToken })
+          .then(response => {
+            const newToken = response.data.accessToken;
+            localStorage.setItem('authToken', newToken);
+            apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            processQueue(null, newToken);
+            return apiClient(originalRequest);
+          })
+          .catch(err => {
+            processQueue(err, null);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+            return Promise.reject(err);
+          });
+      }
+    }
+
     console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error.response?.data || error);
   }

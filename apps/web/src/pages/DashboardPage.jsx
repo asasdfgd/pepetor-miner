@@ -39,6 +39,14 @@ function DashboardPage() {
     setRefreshSessions(!refreshSessions);
   };
 
+  const maskEmail = (email) => {
+    if (!email) return '-';
+    const [localPart, domain] = email.split('@');
+    const visibleChars = Math.ceil(localPart.length * 0.3);
+    const masked = localPart.substring(0, visibleChars) + '*'.repeat(localPart.length - visibleChars);
+    return `${masked}@${domain}`;
+  };
+
   return (
     <div className="container">
       <div className="dashboard-page">
@@ -90,7 +98,7 @@ function DashboardPage() {
             <div className="loading">Loading users...</div>
           ) : error ? (
             <div className="error">
-              <strong>Error:</strong> {error}
+              <strong>Error:</strong> {error.includes('Invalid') || error.includes('expired') ? 'Please refresh the page or log in again.' : error}
             </div>
           ) : users.length > 0 ? (
             <div className="users-table">
@@ -108,7 +116,7 @@ function DashboardPage() {
                   {users.map((u) => (
                     <tr key={u._id}>
                       <td>{u.username}</td>
-                      <td>{u.email}</td>
+                      <td>{maskEmail(u.email)}</td>
                       <td>{u.fullName || '-'}</td>
                       <td>
                         <span className={`role-badge ${u.role}`}>{u.role}</span>
