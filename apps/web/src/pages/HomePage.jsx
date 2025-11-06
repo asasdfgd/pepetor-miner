@@ -100,31 +100,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="stats">
-        <div className="container">
-          <h2 className="section-title">Trusted by the Community</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">42K+</div>
-              <div className="stat-label">Active Miners</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">12.5M</div>
-              <div className="stat-label">$PEPETOR Mined</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">1,240+</div>
-              <div className="stat-label">Tokens Launched</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">174</div>
-              <div className="stat-label">Countries</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Teaser */}
       <section className="faq-teaser">
         <div className="container">
@@ -132,19 +107,19 @@ function HomePage() {
           <div className="faq-grid">
             <div className="faq-item">
               <h4>Is My Data Private?</h4>
-              <p>100% yes. Zero tracking, military-grade encryption, and your data never leaves your device.</p>
+              <p>Privacy is a core value of ClearNetLabs. We're building with privacy-first principles in mind.</p>
             </div>
             <div className="faq-item">
-              <h4>How Much Can I Mine?</h4>
-              <p>Earnings depend on your hash rate and network participation. Early miners earn $100-500/month.</p>
+              <h4>What Can I Do Right Now?</h4>
+              <p>Currently, you can create custom tokens on Solana. Mining is coming soon.</p>
             </div>
             <div className="faq-item">
               <h4>Can I Create Multiple Tokens?</h4>
-              <p>Yes! Create unlimited tokens on Solana. Each token can have its own community and trading pair.</p>
+              <p>Yes! Create custom tokens on Solana. Each token can be configured with your own parameters.</p>
             </div>
             <div className="faq-item">
-              <h4>How Do Payouts Work?</h4>
-              <p>Automatic daily payouts. Withdraw $PEPETOR or your custom tokens directly to Phantom, Magic Eden, or any Solana wallet.</p>
+              <h4>When Will Mining Launch?</h4>
+              <p>We're actively developing the mining platform. Check back soon for updates on the launch.</p>
             </div>
           </div>
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>

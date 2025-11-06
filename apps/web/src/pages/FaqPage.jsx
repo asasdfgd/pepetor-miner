@@ -8,164 +8,140 @@ function FaqPage() {
     {
       id: 1,
       category: 'Getting Started',
-      question: 'What is PEPETOR-MINER?',
-      answer: 'PEPETOR-MINER is a distributed computing platform that pays you cryptocurrency for sharing your unused browser bandwidth. It\'s completely legal and safe.'
+      question: 'What is ClearNetLabs?',
+      answer: 'ClearNetLabs is a privacy-focused platform for creating custom tokens and participating in decentralized mining. We\'re building the tools for Web3 creators and miners.'
     },
     {
       id: 2,
       category: 'Getting Started',
       question: 'How do I get started?',
-      answer: 'Simply create a free account, download our Chrome extension, and start earning immediately. No credit card required.'
+      answer: 'Create a free account and explore token creation on Solana. Mining features are coming soon.'
     },
     {
       id: 3,
       category: 'Getting Started',
-      question: 'Is PEPETOR-MINER free?',
-      answer: 'Yes! There are no fees, no hidden costs. Everything is completely free. You only pay when withdrawing to certain payment methods (if at all).'
+      question: 'Is ClearNetLabs free?',
+      answer: 'Yes! Creating an account is completely free. No hidden costs.'
     },
     {
       id: 4,
       category: 'Getting Started',
-      question: 'Can I use this on mobile?',
-      answer: 'Currently, PEPETOR-MINER works on desktop browsers (Chrome, Edge, Brave). Mobile apps are coming soon.'
+      question: 'What can I do right now?',
+      answer: 'Currently, you can create custom tokens on Solana. Our mining platform is under active development.'
     },
     {
       id: 5,
-      category: 'Earnings',
-      question: 'How much can I earn?',
-      answer: 'Most users earn $50-300 per month depending on bandwidth and computer uptime. Some users earn $1000+ with multiple devices running 24/7.'
+      category: 'Token Creation',
+      question: 'How do I create a token?',
+      answer: 'Log into your account and use our token creation tool. You can customize token name, symbol, supply, and metadata.'
     },
     {
       id: 6,
-      category: 'Earnings',
-      question: 'How are earnings calculated?',
-      answer: 'Earnings are based on bandwidth provided and computational resources used. The more you mine and the longer you stay online, the more you earn.'
+      category: 'Token Creation',
+      question: 'Can I create multiple tokens?',
+      answer: 'Yes! You can create multiple tokens. Each token can be configured independently.'
     },
     {
       id: 7,
-      category: 'Earnings',
-      question: 'When do I get paid?',
-      answer: 'You get paid daily. Earnings are added to your account automatically. You can withdraw anytime when your balance reaches the minimum ($10).'
+      category: 'Token Creation',
+      question: 'What blockchain do tokens deploy to?',
+      answer: 'Tokens deploy to Solana, a fast and low-cost blockchain network.'
     },
     {
       id: 8,
-      category: 'Earnings',
-      question: 'What currency do I get paid in?',
-      answer: 'You earn in $PEPETOR cryptocurrency tokens. These can be sold on exchanges for any currency you prefer.'
+      category: 'Token Creation',
+      question: 'What\'s included when I create a token?',
+      answer: 'You get a custom token on Solana with your specifications. Trading and liquidity are handled through DEX integrations.'
     },
     {
       id: 9,
-      category: 'Payouts',
-      question: 'How do I withdraw my earnings?',
-      answer: 'Go to your Dashboard, click "Withdraw", select your wallet type (MetaMask, Trust Wallet, etc.), and confirm. Payouts process within 24 hours.'
+      category: 'Mining',
+      question: 'When will mining launch?',
+      answer: 'We\'re actively developing our mining platform. Stay tuned for announcements about the launch date.'
     },
     {
       id: 10,
-      category: 'Payouts',
-      question: 'What\'s the minimum withdrawal?',
-      answer: 'The minimum withdrawal is $10. No maximum withdrawal limits.'
+      category: 'Mining',
+      question: 'How will mining work?',
+      answer: 'Mining details are still being finalized. Sign up to receive updates when we announce more information.'
     },
     {
       id: 11,
-      category: 'Payouts',
-      question: 'Are there withdrawal fees?',
-      answer: 'No withdrawal fees from our end. You only pay network fees when withdrawing (typically $1-3 depending on blockchain congestion).'
+      category: 'Mining',
+      question: 'Will there be a mining extension?',
+      answer: 'Yes, we\'re building a lightweight browser extension for mining. More details coming soon.'
     },
     {
       id: 12,
-      category: 'Payouts',
-      question: 'How long does a withdrawal take?',
-      answer: 'Withdrawals typically process within 24 hours. Blockchain confirmation takes an additional 5-15 minutes depending on network.'
+      category: 'Privacy',
+      question: 'Is my data private?',
+      answer: 'Privacy is central to our mission. We\'re committed to protecting user data and respecting user privacy.'
     },
     {
       id: 13,
-      category: 'Security',
-      question: 'Is my data safe?',
-      answer: 'Yes. We use military-grade encryption (AES-256) to protect your data. We never store passwords and use JWT tokens for authentication.'
+      category: 'Privacy',
+      question: 'What data do you collect?',
+      answer: 'We only collect the information necessary to run the platform. We don\'t track browsing history or sell user data.'
     },
     {
       id: 14,
-      category: 'Security',
-      question: 'Does the extension have access to my browsing history?',
-      answer: 'No. The extension only accesses bandwidth metrics. We have zero interest in your browsing history or personal data.'
+      category: 'Privacy',
+      question: 'Do you use encryption?',
+      answer: 'Yes, we protect sensitive data with encryption. Security is a priority for us.'
     },
     {
       id: 15,
       category: 'Security',
-      question: 'Can the extension be hacked?',
-      answer: 'Our code is open source and regularly audited. The extension is regularly updated with security patches.'
+      question: 'Is my account secure?',
+      answer: 'We implement standard security practices to protect your account. Always use a strong, unique password.'
     },
     {
       id: 16,
       category: 'Security',
-      question: 'What permissions does the extension need?',
-      answer: 'The extension needs: network access (to send/receive data) and storage (to save your account info). That\'s it.'
+      question: 'Can I enable two-factor authentication?',
+      answer: 'Security features are being developed. Check your account settings for available security options.'
     },
     {
       id: 17,
-      category: 'Technical',
-      question: 'Will the extension slow down my computer?',
-      answer: 'No. It uses less than 5MB of RAM and under 0.5% CPU. Most users don\'t notice any performance impact.'
+      category: 'Support',
+      question: 'How do I contact support?',
+      answer: 'Email support@clearnetlabs.fun with any questions or issues. We\'re here to help!'
     },
     {
       id: 18,
-      category: 'Technical',
-      question: 'Can I run multiple instances?',
-      answer: 'Yes! Install on multiple devices and browsers to increase earnings. Each device mines independently.'
+      category: 'Support',
+      question: 'How long does support take to respond?',
+      answer: 'We aim to respond to support requests within 24 hours during business days.'
     },
     {
       id: 19,
-      category: 'Technical',
-      question: 'What if I close my browser?',
-      answer: 'Mining stops when you close the browser. Start mining again next time you open it. No earnings are lost.'
+      category: 'Support',
+      question: 'I forgot my password. How do I reset it?',
+      answer: 'On the login page, click "Forgot Password" and follow the reset instructions sent to your email.'
     },
     {
       id: 20,
-      category: 'Technical',
-      question: 'Do I need to be actively browsing?',
-      answer: 'No. The extension mines in the background even if you\'re not actively browsing, as long as the browser is open.'
+      category: 'Support',
+      question: 'Can I have multiple accounts?',
+      answer: 'One account per email address. This helps us maintain platform security and fair usage.'
     },
     {
       id: 21,
-      category: 'Troubleshooting',
-      question: 'Why aren\'t my earnings showing?',
-      answer: 'New accounts take 1-2 hours to fully sync. If after 2 hours earnings aren\'t showing, contact support.'
+      category: 'Legal',
+      question: 'Is this service legal?',
+      answer: 'We\'re building our platform in compliance with applicable laws. We recommend checking local regulations in your area.'
     },
     {
       id: 22,
-      category: 'Troubleshooting',
-      question: 'The extension stopped working. What do I do?',
-      answer: 'Try: 1) Disable/re-enable the extension, 2) Clear cache, 3) Reinstall the extension. Contact support if issues persist.'
+      category: 'Legal',
+      question: 'Do I need to pay taxes on crypto earnings?',
+      answer: 'Tax obligations depend on your local laws. Please consult with a tax professional about your specific situation.'
     },
     {
       id: 23,
-      category: 'Troubleshooting',
-      question: 'I forgot my password. How do I reset it?',
-      answer: 'On the login page, click "Forgot Password". Enter your email and follow the reset link sent to your inbox.'
-    },
-    {
-      id: 24,
-      category: 'Troubleshooting',
-      question: 'Can I have multiple accounts?',
-      answer: 'No. One account per email address. Creating multiple accounts violates terms of service and results in permanent ban.'
-    },
-    {
-      id: 25,
       category: 'Legal',
-      question: 'Is PEPETOR-MINER legal?',
-      answer: 'Yes, completely legal. We operate in full compliance with local regulations in 150+ countries.'
-    },
-    {
-      id: 26,
-      category: 'Legal',
-      question: 'Do I need to pay taxes on mining earnings?',
-      answer: 'That depends on your local tax laws. We recommend consulting with a tax professional about crypto earnings in your country.'
-    },
-    {
-      id: 27,
-      category: 'Legal',
-      question: 'What\'s your terms of service?',
-      answer: 'Check out our full Terms of Service on the website. Key points: no automation tools, no botting, one account per person.'
+      question: 'What are your terms of service?',
+      answer: 'Check our full Terms of Service on the website. Key points: no bot automation, fair use only, one account per person.'
     }
   ];
 
