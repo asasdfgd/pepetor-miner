@@ -12,19 +12,22 @@
   text-align: center;
   margin-bottom: 4rem;
   padding-bottom: 2rem;
-  border-bottom: 3px solid #10b981;
+  border-bottom: 3px solid var(--accent-red);
 }
 
 .guide-header h2 {
   font-size: 2.5rem;
-  color: #1f2937;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 0.5rem;
   font-weight: 700;
 }
 
 .guide-subtitle {
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--text-light);
   font-weight: 500;
 }
 
@@ -39,17 +42,18 @@
   display: flex;
   gap: 2rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   padding: 2.5rem;
   border-radius: 12px;
-  border-left: 5px solid #10b981;
+  border-left: 5px solid var(--accent-red);
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .guide-step:hover {
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 45, 85, 0.2);
+  border-left: 5px solid var(--accent-violet);
 }
 
 .step-number {
@@ -58,13 +62,13 @@
   justify-content: center;
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--gradient-primary);
   color: white;
   border-radius: 50%;
   font-size: 1.5rem;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 6px rgba(255, 45, 85, 0.4);
 }
 
 .step-content {
@@ -73,20 +77,20 @@
 
 .step-content h3 {
   font-size: 1.4rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 0.8rem;
   font-weight: 600;
 }
 
 .step-content p {
-  color: #4b5563;
+  color: var(--text-light);
   margin-bottom: 1rem;
   line-height: 1.6;
 }
 
 .step-content ul {
   list-style-position: inside;
-  color: #4b5563;
+  color: var(--text-light);
   line-height: 1.8;
   margin-bottom: 1rem;
 }
@@ -96,15 +100,15 @@
 }
 
 .info-box {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 8px;
   margin-top: 1rem;
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--accent-violet);
 }
 
 .info-box strong {
-  color: #1f2937;
+  color: var(--text-color);
   display: block;
   margin-bottom: 0.5rem;
 }
@@ -112,6 +116,7 @@
 .info-box ul {
   margin: 0;
   padding-left: 1.5rem;
+  color: var(--text-light);
 }
 
 .feature-list {
@@ -125,37 +130,38 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: #4b5563;
+  color: var(--text-light);
   padding: 0.5rem 0;
 }
 
 .feature-icon {
-  color: #10b981;
+  color: var(--accent-red);
   font-weight: bold;
   font-size: 1.1rem;
 }
 
 .dashboard-preview {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 8px;
   margin-top: 1rem;
-  border: 2px dashed #10b981;
+  border: 2px dashed var(--accent-red);
 }
 
 .dashboard-preview p {
   margin-bottom: 0.8rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-color);
 }
 
 .dashboard-preview ul {
   margin: 0;
   padding-left: 1.5rem;
+  color: var(--text-light);
 }
 
 .mining-controls {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 8px;
   margin-top: 1rem;
@@ -163,17 +169,18 @@
 
 .mining-note {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 0.8rem;
 }
 
 .mining-controls ul {
   margin: 0;
   padding-left: 1.5rem;
+  color: var(--text-light);
 }
 
 .reward-process {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 8px;
   margin-top: 1rem;
@@ -181,7 +188,7 @@
 
 .reward-process ol {
   padding-left: 2rem;
-  color: #4b5563;
+  color: var(--text-light);
   line-height: 1.8;
 }
 
@@ -192,14 +199,14 @@
 .requirements-section {
   margin-bottom: 4rem;
   padding: 2.5rem;
-  background: linear-gradient(135deg, #f0f9ff 0%, #f3f4f6 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  border: 2px solid #0284c7;
+  border: 2px solid var(--accent-purple);
 }
 
 .requirements-section h3 {
   font-size: 1.8rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -211,23 +218,23 @@
 }
 
 .requirement-card {
-  background: white;
+  background: var(--bg-secondary);
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-top: 4px solid #0284c7;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-top: 4px solid var(--accent-violet);
 }
 
 .requirement-card h4 {
   font-size: 1.2rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
 
 .requirement-card ul {
   list-style-position: inside;
-  color: #4b5563;
+  color: var(--text-light);
   line-height: 1.8;
   font-size: 0.95rem;
 }
@@ -239,14 +246,14 @@
 .earnings-section {
   margin-bottom: 4rem;
   padding: 2.5rem;
-  background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 5%, #f9fafb 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  border: 2px solid #f59e0b;
+  border: 2px solid var(--accent-red);
 }
 
 .earnings-section h3 {
   font-size: 1.8rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -259,18 +266,18 @@
 }
 
 .earnings-card {
-  background: white;
+  background: var(--bg-secondary);
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
-  border-top: 4px solid #f59e0b;
+  border-top: 4px solid var(--accent-red);
 }
 
 .earnings-card.premium {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: var(--gradient-primary);
   color: white;
-  border-top: 4px solid #047857;
+  border-top: 4px solid var(--primary-dark);
 }
 
 .earnings-card h4 {
@@ -280,7 +287,7 @@
 }
 
 .earnings-card:not(.premium) h4 {
-  color: #1f2937;
+  color: var(--text-color);
 }
 
 .earnings-value {
@@ -290,11 +297,11 @@
 }
 
 .earnings-card:not(.premium) .earnings-value {
-  color: #10b981;
+  color: var(--accent-red);
 }
 
 .earnings-card.premium .earnings-value {
-  color: #fbbf24;
+  color: #ffffff;
 }
 
 .earnings-detail {
@@ -303,15 +310,15 @@
 }
 
 .earnings-card:not(.premium) .earnings-detail {
-  color: #6b7280;
+  color: var(--text-light);
 }
 
 .earnings-note {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 8px;
-  border-left: 4px solid #f59e0b;
-  color: #d97706;
+  border-left: 4px solid var(--accent-red);
+  color: var(--accent-red);
   font-size: 0.95rem;
   line-height: 1.6;
 }
@@ -323,14 +330,14 @@
 .tips-section {
   margin-bottom: 2rem;
   padding: 2.5rem;
-  background: linear-gradient(135deg, #f5f3ff 0%, #f3f4f6 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-radius: 12px;
-  border: 2px solid #8b5cf6;
+  border: 2px solid var(--accent-purple);
 }
 
 .tips-section h3 {
   font-size: 1.8rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -342,18 +349,19 @@
 }
 
 .tip-card {
-  background: white;
+  background: var(--bg-secondary);
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-top: 4px solid #8b5cf6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-top: 4px solid var(--accent-violet);
   text-align: center;
   transition: all 0.3s ease;
 }
 
 .tip-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 6px 16px rgba(160, 61, 255, 0.3);
+  border-top: 4px solid var(--accent-red);
 }
 
 .tip-icon {
@@ -364,13 +372,13 @@
 
 .tip-card h4 {
   font-size: 1.1rem;
-  color: #1f2937;
+  color: var(--text-color);
   margin-bottom: 0.8rem;
   font-weight: 600;
 }
 
 .tip-card p {
-  color: #6b7280;
+  color: var(--text-light);
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
