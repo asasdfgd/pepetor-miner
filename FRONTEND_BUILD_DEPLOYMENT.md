@@ -13,7 +13,7 @@
 
 ### 1.1 Install Dependencies
 ```bash
-cd /Users/josephpietravalle/PEPETOR-MINER/apps/web
+cd apps/web
 npm install
 ```
 
@@ -103,6 +103,8 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
     }
 }
 ```
@@ -125,7 +127,7 @@ sudo systemctl restart nginx
 
 #### B.1 Create Dockerfile
 ```bash
-cd /Users/josephpietravalle/PEPETOR-MINER/apps/web
+cd apps/web
 cat > Dockerfile << 'EOF'
 # Build stage
 FROM node:18-alpine as builder
@@ -336,8 +338,37 @@ server {
     
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
     
-    # ... rest of config
+    root /var/www/pepetor-frontend;
+    index index.html;
+    
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css text/javascript application/json;
+    
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|gif|ico)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # Serve index.html for React Router
+    location / {
+        try_files $uri /index.html;
+    }
+    
+    # Proxy API requests to backend
+    location /api/ {
+        proxy_pass http://localhost:3001/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+    }
 }
 ```
 
@@ -377,7 +408,7 @@ du -sh /var/www/pepetor-frontend/dist/assets/*
 ### Update Process
 ```bash
 # 1. Build new version locally
-cd /Users/josephpietravalle/PEPETOR-MINER/apps/web
+cd apps/web
 git pull origin main  # Get latest code
 npm install           # Update dependencies
 npm run build         # Build
@@ -414,8 +445,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "apps/web/dist/*"
+          source: "apps/web/dist"
           target: "/var/www/pepetor-frontend"
+          strip_components: 3
 ```
 
 ---
@@ -484,8 +516,8 @@ curl -I https://your-domain.com
 curl https://your-domain.com | grep "react"
 
 # Check API connectivity
-curl https://your-domain.com/api/users
-# Should return: JSON response or CORS error (expected initially)
+curl https://your-domain.com/api/sessions/policy
+# Should return: JSON response with policy data
 
 # Check cache headers
 curl -I https://your-domain.com/assets/main*.js

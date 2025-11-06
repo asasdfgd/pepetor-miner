@@ -114,6 +114,7 @@ exports.submitSession = async (req, res) => {
     session.validationDetails.minBytesValid =
       !creditsResult.reasons.some((r) => r.includes('bytes'));
     session.validationDetails.replayCheckValid = true;
+    session.replayChecked = true;
 
     if (!creditsResult.valid) {
       session.validationError = creditsResult.reasons.join('; ');
@@ -250,11 +251,18 @@ exports.getUserSessions = async (req, res) => {
       success: true,
       count: sessions.length,
       data: sessions.map((session) => ({
+        _id: session._id,
         sessionId: session.sessionId,
         duration: session.getDuration(),
-        totalBytes: session.getTotalBytes(),
-        creditsGranted: session.creditsGranted,
+        bytesTransferred: session.getTotalBytes(),
+        creditsEarned: session.creditsGranted,
         isValid: session.isValid,
+        signatureValid: session.validationDetails.signatureValid,
+        heuristicsValid: session.validationDetails.minDurationValid && session.validationDetails.minBytesValid,
+        replayChecked: session.replayChecked,
+        validationError: session.validationError,
+        ipHash: session.ipHash || 'N/A',
+        timestamp: session.createdAt,
         createdAt: session.createdAt,
       })),
     });
