@@ -112,9 +112,15 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    
+    // Solana transaction signature for token transfer
+    tokenTransferSignature: {
+      type: String,
+      default: null,
+    },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

@@ -207,7 +207,7 @@ exports.refreshToken = async (req, res) => {
 // Logout user
 exports.logout = async (req, res) => {
   try {
-    const userId = req.user?.id; // Set by auth middleware
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(400).json({
@@ -216,7 +216,6 @@ exports.logout = async (req, res) => {
       });
     }
 
-    // Clear refresh token from database
     await User.findByIdAndUpdate(userId, { refreshToken: null });
 
     res.json({
@@ -227,6 +226,53 @@ exports.logout = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error during logout',
+      error: error.message,
+    });
+  }
+};
+
+exports.walletAuth = async (req, res) => {
+  try {
+    const { walletAddress, signature, message } = req.body;
+
+    if (!walletAddress) {
+      return res.status(400).json({
+        success: false,
+        message: 'Wallet address is required',
+      });
+    }
+
+    let user = await User.findOne({ walletAddress });
+
+    if (!user) {
+      user = new User({
+        walletAddress,
+        username: `user_${walletAddress.slice(0, 8)}`,
+      });
+    }
+
+    const { accessToken, refreshToken } = generateTokens(user._id);
+    user.refreshToken = refreshToken;
+    user.lastLogin = new Date();
+    await user.save();
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.refreshToken;
+
+    res.json({
+      success: true,
+      message: user.isNew ? 'User created and authenticated' : 'Login successful',
+      data: {
+        user: userResponse,
+        accessToken,
+        refreshToken,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error during wallet authentication',
       error: error.message,
     });
   }

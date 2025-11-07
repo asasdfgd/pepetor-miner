@@ -1,0 +1,36 @@
+{
+  "name": "PEPETOR",
+  "symbol": "PEPETOR",
+  "description": "The official token for PEPETOR Miner - Earn $PEPETOR by running Tor nodes and contributing to the decentralized internet.",
+  "image": "https://YOUR_DOMAIN/pepetor-logo.png",
+  "external_url": "https://clearnetlabs.fun",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Utility Token"
+    },
+    {
+      "trait_type": "Network",
+      "value": "Solana"
+    },
+    {
+      "trait_type": "Supply",
+      "value": "1,000,000,000"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://YOUR_DOMAIN/pepetor-logo.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "YOUR_WALLET_ADDRESS",
+        "share": 100
+      }
+    ]
+  }
+}

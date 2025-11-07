@@ -1,9 +1,11 @@
 const crypto = require('crypto');
 const Session = require('../models/Session');
 const Ledger = require('../models/Ledger');
+const User = require('../models/User');
 const { verifySessionSignature } = require('../utils/signatureVerification');
 const { calculateSessionCredits, getPolicy } = require('../utils/creditsPolicy');
 const { canonicalize } = require('@pepetor-miner/shared');
+const { getTokenService } = require('../services/tokenService');
 
 /**
  * Submit a signed session receipt
@@ -144,7 +146,46 @@ exports.submitSession = async (req, res) => {
     // Save session
     await session.save();
 
-    // Step 3: Update or create ledger entry
+    // Step 3: Get user wallet address
+    const user = await User.findOne({ walletAddress: client_pub });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User wallet not found. Please connect wallet first.',
+      });
+    }
+
+    // Step 4: Send $PEPETOR reward to user
+    const tokenService = getTokenService();
+    let tokenTransfer = null;
+    
+    try {
+      tokenTransfer = await tokenService.sendPepetorReward(
+        user.walletAddress,
+        creditsResult.creditsGranted
+      );
+      
+      session.tokenTransferSignature = tokenTransfer.signature;
+      await session.save();
+      
+    } catch (tokenError) {
+      console.error('Token transfer failed:', tokenError.message);
+      session.validationError = `Token transfer failed: ${tokenError.message}`;
+      await session.save();
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Session validated but token transfer failed',
+        error: tokenError.message,
+        session: {
+          sessionId: session._id,
+          creditsGranted: session.creditsGranted,
+        },
+      });
+    }
+
+    // Step 5: Update ledger for tracking
     let ledger = await Ledger.findOne({ clientPub: client_pub });
 
     if (!ledger) {
@@ -157,7 +198,7 @@ exports.submitSession = async (req, res) => {
         lastSessionAt: new Date(),
       });
     } else {
-      ledger.balance += creditsResult.creditsGranted;
+      ledger.balance += creditsResult.creditsGranted,
       ledger.totalSessionsSubmitted += 1;
       ledger.totalBytesTransferred += bytes_in + bytes_out;
       ledger.totalSessionDuration += (end_ts - start_ts) / 1000;
@@ -169,10 +210,13 @@ exports.submitSession = async (req, res) => {
     // Return success response
     res.status(201).json({
       success: true,
-      message: 'Session submitted and validated successfully',
+      message: 'Session submitted and $PEPETOR reward sent',
       session: {
         sessionId: session._id,
-        creditsGranted: session.creditsGranted,
+        pepetorEarned: tokenTransfer.netAmount,
+        feeCharged: tokenTransfer.fee,
+        transactionSignature: tokenTransfer.signature,
+        explorerUrl: tokenTransfer.explorerUrl,
         creditsBreakDown: creditsResult.breakDown,
         submittedAt: session.createdAt.toISOString(),
         dataBytes: session.canonicalBytes,
