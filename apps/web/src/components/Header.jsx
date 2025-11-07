@@ -52,6 +52,9 @@ function Header() {
                 <Link to="/dashboard" className="nav-link">
                   Dashboard
                 </Link>
+                <Link to="/deploy-token" className="nav-link">
+                  🚀 Deploy Token
+                </Link>
                 <Link to="/tor" className="nav-link">
                   🧅 Tor
                 </Link>

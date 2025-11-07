@@ -330,6 +330,47 @@ const DeployTokenPage = () => {
           Create your own mineable token on Solana in minutes
         </p>
 
+        <div className="instructions-card">
+          <h3>📖 How It Works</h3>
+          <div className="instructions-grid">
+            <div className="instruction-step">
+              <div className="step-number">1</div>
+              <div className="step-content">
+                <h4>Create Your Token</h4>
+                <p>Fill out the form below with your token details. Upload a logo (optional) to make your token stand out on wallets and exchanges.</p>
+              </div>
+            </div>
+            <div className="instruction-step">
+              <div className="step-number">2</div>
+              <div className="step-content">
+                <h4>Pay Deployment Fee</h4>
+                <p>Connect your Solana wallet and pay the deployment fee. Your token will be created on Solana mainnet with metadata uploaded to Arweave.</p>
+              </div>
+            </div>
+            <div className="instruction-step">
+              <div className="step-number">3</div>
+              <div className="step-content">
+                <h4>Receive Token & Wallets</h4>
+                <p>You'll receive your token mint address and 4 specialized wallets (Treasury, Rewards, Liquidity, Marketing) with tokens distributed automatically.</p>
+              </div>
+            </div>
+            <div className="instruction-step">
+              <div className="step-number">4</div>
+              <div className="step-content">
+                <h4>Enable Mining</h4>
+                <p>Use the PepeTor Miner to mine your token! Simply connect your wallet on the Dashboard, start mining, and earn your tokens through proof-of-work.</p>
+              </div>
+            </div>
+            <div className="instruction-step">
+              <div className="step-number">5</div>
+              <div className="step-content">
+                <h4>Create Liquidity (Optional)</h4>
+                <p>Follow the post-deployment guide to create an OpenBook market, add Raydium liquidity, and list on DexScreener for trading.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {pricing && (
           <div className="pricing-card">
             <h3>💰 Deployment Cost</h3>

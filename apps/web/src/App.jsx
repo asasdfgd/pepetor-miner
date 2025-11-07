@@ -32,12 +32,19 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/extension" element={<ExtensionPage />} />
           <Route path="/faq" element={<FaqPage />} />
-          <Route path="/deploy-token" element={<DeployTokenPage />} />
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deploy-token"
+            element={
+              <ProtectedRoute>
+                <DeployTokenPage />
               </ProtectedRoute>
             }
           />
