@@ -22,7 +22,7 @@ router.post('/start', async (req, res) => {
       return res.json({
         success: true,
         message: 'Tor is already running',
-        status: tor.getHealth(),
+        tor: tor.getHealth(),
       });
     }
 
@@ -32,15 +32,17 @@ router.post('/start', async (req, res) => {
     res.json({
       success: true,
       message: result.message,
-      status: tor.getHealth(),
+      tor: tor.getHealth(),
     });
 
   } catch (error) {
     console.error('[TorAPI] Error starting Tor:', error);
+    console.error('[TorAPI] Error stack:', error.stack);
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: error.message || 'Unknown error starting Tor',
       hint: 'Make sure Tor is installed: brew install tor (macOS) or apt-get install tor (Linux)',
+      details: error.stack,
     });
   }
 });

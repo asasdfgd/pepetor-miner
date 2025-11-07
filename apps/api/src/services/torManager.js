@@ -181,8 +181,9 @@ class TorManager extends EventEmitter {
    */
   async startTrafficMonitoring() {
     try {
+      console.log('[TOR] Attempting to start traffic monitor...');
       const result = await this.trafficMonitor.start();
-      console.log('[TOR] Traffic monitor started:', result);
+      console.log('[TOR] Traffic monitor started successfully:', result);
 
       // Listen for connection closes to record activity
       this.trafficMonitor.on('connection-closed', (connData) => {
@@ -200,7 +201,8 @@ class TorManager extends EventEmitter {
 
       return result;
     } catch (error) {
-      console.error('[TOR] Failed to start traffic monitor:', error);
+      console.warn('[TOR] Failed to start traffic monitor (non-fatal):', error.message);
+      console.warn('[TOR] Continuing without traffic monitoring - using simulation mode');
       // This is not fatal - fall back to simulation
       return null;
     }
