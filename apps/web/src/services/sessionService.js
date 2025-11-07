@@ -169,13 +169,16 @@ export const getBalance = async () => {
     const response = await api.get(`/sessions/balance?pubkey=${clientPub}`);
     return response.data || response;
   } catch (error) {
+    console.log('Balance fetch error:', error);
+    
     const isNotFound = 
       error.response?.status === 404 || 
       error.status === 404 ||
       error.success === false ||
       error.message?.includes('ledger') ||
       error.message?.includes('No ledger entry') ||
-      error.message?.includes('404');
+      error.message?.includes('404') ||
+      (typeof error === 'object' && error.message && error.message.includes('ledger'));
     
     if (isNotFound) {
       console.log('New client - no ledger entry yet. Starting with 0 balance.');

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import BalanceCard from '../components/BalanceCard';
-import SessionSubmitForm from '../components/SessionSubmitForm';
+import AutoMiner from '../components/AutoMiner';
 import SessionHistory from '../components/SessionHistory';
 import './DashboardPage.css';
 
@@ -10,7 +10,6 @@ function DashboardPage() {
   const [refreshSessions, setRefreshSessions] = useState(false);
 
   const handleSessionSubmitted = () => {
-    // Trigger refresh of session history and balance
     setRefreshSessions(!refreshSessions);
   };
 
@@ -19,13 +18,12 @@ function DashboardPage() {
       <div className="dashboard-page">
         <div className="dashboard-header">
           <h2>Welcome, {user?.fullName || user?.username}! 👋</h2>
-          <p>Your account is successfully authenticated</p>
+          <p>Start mining to earn credits automatically</p>
         </div>
 
-        {/* Session Receipts & Balance Section */}
         <div className="sessions-section">
           <BalanceCard />
-          <SessionSubmitForm onSessionSubmitted={handleSessionSubmitted} />
+          <AutoMiner onSessionSubmitted={handleSessionSubmitted} />
           <SessionHistory refreshTrigger={refreshSessions} />
         </div>
 

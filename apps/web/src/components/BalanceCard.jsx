@@ -32,7 +32,8 @@ function BalanceCard() {
         }
       } catch (err) {
         console.error('Error fetching balance:', err);
-        setError(err.message || 'Failed to fetch balance');
+        const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch balance');
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }

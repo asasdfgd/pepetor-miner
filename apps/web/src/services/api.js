@@ -29,9 +29,14 @@ const processQueue = (error, token = null) => {
 // Add request interceptor for auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const publicEndpoints = ['/sessions/submit', '/sessions/balance', '/sessions/by-client/list', '/sessions/policy', '/auth/login', '/auth/register', '/auth/refresh-token'];
+    const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
+    
+    if (!isPublicEndpoint) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -59,9 +64,12 @@ apiClient.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
-        return apiClient.post('/auth/refresh-token', { refreshToken })
+        return axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken }, {
+          headers: { 'Content-Type': 'application/json' }
+        })
           .then(response => {
-            const newToken = response.data?.accessToken || response.accessToken;
+            const responseData = response.data;
+            const newToken = responseData.data?.accessToken || responseData.accessToken;
             localStorage.setItem('authToken', newToken);
             apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -79,6 +87,7 @@ apiClient.interceptors.response.use(
       } else {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
+        window.location.href = '/login';
         return Promise.reject(error);
       }
     }

@@ -20,7 +20,8 @@ function SessionHistory({ refreshTrigger }) {
       setSessions(Array.isArray(data) ? data : data.sessions || []);
     } catch (err) {
       console.error('Error fetching sessions:', err);
-      setError(err.message || 'Failed to fetch sessions');
+      const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch sessions');
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
