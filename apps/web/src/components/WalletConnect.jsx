@@ -1,38 +1,50 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useEffect } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { walletAuth } from '../services/authService';
 import './WalletConnect.css';
 
 function WalletConnect() {
   const { publicKey, connected, disconnect } = useWallet();
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+  const hasAuthenticatedRef = useRef(false);
 
-  useEffect(() => {
-    if (connected && publicKey) {
-      handleWalletAuth();
+  const handleWalletAuth = useCallback(async () => {
+    if (!publicKey || !connected || hasAuthenticatedRef.current || isAuthenticated) {
+      return;
     }
-  }, [connected, publicKey]);
 
-  const handleWalletAuth = async () => {
     try {
+      hasAuthenticatedRef.current = true;
       const walletAddress = publicKey.toString();
       
       const response = await walletAuth(walletAddress);
       
       if (response.accessToken) {
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        
+        login(response.user, response.accessToken, response.refreshToken);
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Wallet auth failed:', error);
+      hasAuthenticatedRef.current = false;
       disconnect();
     }
-  };
+  }, [publicKey, connected, isAuthenticated, login, navigate, disconnect]);
+
+  useEffect(() => {
+    if (connected && publicKey && !isAuthenticated) {
+      handleWalletAuth();
+    }
+  }, [connected, publicKey, isAuthenticated, handleWalletAuth]);
+
+  useEffect(() => {
+    if (!connected) {
+      hasAuthenticatedRef.current = false;
+    }
+  }, [connected]);
 
   return (
     <div className="wallet-connect">
