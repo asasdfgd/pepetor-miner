@@ -12,7 +12,8 @@
     "apps/web",
     "apps/chrome-extension",
     "apps/tor-backend",
-    "packages/sdk"
+    "packages/sdk",
+    "packages/shared"
   ],
   "scripts": {
     "dev": "npm run dev --workspaces --if-present",

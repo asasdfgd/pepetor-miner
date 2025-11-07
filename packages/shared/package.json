@@ -1,0 +1,14 @@
+{
+  "name": "@pepetor-miner/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for PEPETOR-MINER",
+  "main": "index.cjs",
+  "module": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
+  "license": "MIT"
+}

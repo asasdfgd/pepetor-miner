@@ -61,7 +61,7 @@ apiClient.interceptors.response.use(
       if (refreshToken) {
         return apiClient.post('/auth/refresh-token', { refreshToken })
           .then(response => {
-            const newToken = response.accessToken;
+            const newToken = response.data?.accessToken || response.accessToken;
             localStorage.setItem('authToken', newToken);
             apiClient.defaults.headers.common.Authorization = `Bearer ${newToken}`;
             originalRequest.headers.Authorization = `Bearer ${newToken}`;

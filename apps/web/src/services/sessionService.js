@@ -1,5 +1,6 @@
 import api from './api';
 import nacl from 'tweetnacl';
+import { canonicalize } from '@pepetor-miner/shared';
 
 /**
  * Session Service - Handles cryptographic signing and session API calls
@@ -28,29 +29,6 @@ const fromBase64 = (base64String) => {
     bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes;
-};
-
-/**
- * Create canonical JSON with guaranteed key ordering
- * Must match backend's canonicalJSON for signature verification to work
- */
-const canonicalJSON = (obj) => {
-  const keys = Object.keys(obj).sort();
-  const pairs = keys.map(key => {
-    const value = obj[key];
-    let serializedValue;
-    if (typeof value === 'string') {
-      serializedValue = JSON.stringify(value);
-    } else if (typeof value === 'number') {
-      serializedValue = value.toString();
-    } else if (value === null) {
-      serializedValue = 'null';
-    } else {
-      serializedValue = JSON.stringify(value);
-    }
-    return `"${key}":${serializedValue}`;
-  });
-  return '{' + pairs.join(',') + '}';
 };
 
 /**
@@ -109,7 +87,7 @@ const signSessionData = (dataToSign, secretKey) => {
   };
   
   // Use canonical JSON (deterministic key ordering) to match backend verification
-  const messageJson = canonicalJSON(backendFormat);
+  const messageJson = canonicalize(backendFormat);
   console.log('🔐 Signing session data with canonical JSON:', messageJson);
   
   const messageBytes = new TextEncoder().encode(messageJson);
@@ -191,12 +169,12 @@ export const getBalance = async () => {
     const response = await api.get(`/sessions/balance?pubkey=${clientPub}`);
     return response.data || response;
   } catch (error) {
-    // If no ledger entry found (404), return default balance for new client
-    // The error could come in different formats depending on interceptor
     const isNotFound = 
       error.response?.status === 404 || 
       error.status === 404 ||
+      error.success === false ||
       error.message?.includes('ledger') ||
+      error.message?.includes('No ledger entry') ||
       error.message?.includes('404');
     
     if (isNotFound) {

@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pepetor-miner/shared": "file:../../packages/shared",
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.87.0",
     "bcryptjs": "^2.4.3",

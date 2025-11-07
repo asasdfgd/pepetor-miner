@@ -1,7 +1,9 @@
+const crypto = require('crypto');
 const Session = require('../models/Session');
 const Ledger = require('../models/Ledger');
 const { verifySessionSignature } = require('../utils/signatureVerification');
 const { calculateSessionCredits, getPolicy } = require('../utils/creditsPolicy');
+const { canonicalize } = require('@pepetor-miner/shared');
 
 /**
  * Submit a signed session receipt
@@ -87,8 +89,16 @@ exports.submitSession = async (req, res) => {
       signature: signature,
     });
 
-    // Step 1: Verify signature
+    // Step 0: Compute canonical hash and bytes
     const signedPayload = session.getSignedPayload();
+    const canonicalMessage = canonicalize(signedPayload);
+    const messageBytes = Buffer.from(canonicalMessage);
+    const canonicalHashB64 = crypto.createHash('sha256').update(messageBytes).digest('base64');
+    
+    session.canonicalHashB64 = canonicalHashB64;
+    session.canonicalBytes = messageBytes.length;
+
+    // Step 1: Verify signature
     const signatureValid = verifySessionSignature(
       signedPayload,
       signature,
@@ -164,6 +174,8 @@ exports.submitSession = async (req, res) => {
         sessionId: session._id,
         creditsGranted: session.creditsGranted,
         creditsBreakDown: creditsResult.breakDown,
+        submittedAt: session.createdAt.toISOString(),
+        dataBytes: session.canonicalBytes,
       },
       ledger: {
         clientPub: ledger.clientPub,

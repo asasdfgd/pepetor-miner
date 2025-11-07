@@ -50,6 +50,23 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Signature is required'],
     },
+
+    // IP hash (client identifier, optional)
+    ipHash: {
+      type: String,
+      default: null,
+    },
+
+    // Canonical JSON hash and byte length
+    canonicalHashB64: {
+      type: String,
+      index: true,
+      default: null,
+    },
+    canonicalBytes: {
+      type: Number,
+      default: 0,
+    },
     
     // Validation status
     isValid: {
