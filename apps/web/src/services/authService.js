@@ -89,6 +89,30 @@ const authService = {
       throw error;
     }
   },
+
+  // Wallet authentication
+  walletAuth: async (walletAddress, signature = null, message = null) => {
+    try {
+      const response = await api.post('/auth/wallet-auth', {
+        walletAddress,
+        signature,
+        message,
+      });
+      
+      if (response.success && response.data) {
+        return {
+          user: response.data.user,
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+        };
+      }
+      
+      throw new Error(response.message || 'Wallet authentication failed');
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default authService;
+export const { register, login, logout, refreshToken, getProfile, walletAuth } = authService;

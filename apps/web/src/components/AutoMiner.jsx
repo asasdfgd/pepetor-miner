@@ -63,10 +63,10 @@ function AutoMiner({ onSessionSubmitted }) {
 
       const response = await submitSession(sessionData);
       
-      if (response.success || response.credits !== undefined) {
-        const credits = response.credits || response.session?.creditsGranted || 0;
+      if (response.success) {
+        const pepetorEarned = response.session?.pepetorEarned || response.session?.creditsGranted || 0;
         setSessionCount(prev => prev + 1);
-        setTotalCreditsEarned(prev => prev + credits);
+        setTotalCreditsEarned(prev => prev + pepetorEarned);
         setLastError(null);
         
         if (onSessionSubmitted) {
@@ -141,7 +141,7 @@ function AutoMiner({ onSessionSubmitted }) {
           <span className="stat-value">{sessionCount}</span>
         </div>
         <div className="stat-box">
-          <span className="stat-label">Total Credits</span>
+          <span className="stat-label">Total $PEPETOR</span>
           <span className="stat-value credits">{totalCreditsEarned.toFixed(2)}</span>
         </div>
       </div>
@@ -194,8 +194,8 @@ function AutoMiner({ onSessionSubmitted }) {
         <p>💡 <strong>How it works:</strong></p>
         <ul>
           <li>Mining sessions run automatically every 30 minutes</li>
-          <li>Keep this tab open to earn credits passively</li>
-          <li>Credits are submitted automatically</li>
+          <li>Keep this tab open to earn $PEPETOR passively</li>
+          <li>$PEPETOR is sent directly to your wallet</li>
           <li>Close the tab to stop mining</li>
         </ul>
       </div>

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { getBalance, getClientPublicKey } from '../services/sessionService';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
+import { getBalance } from '../services/sessionService';
 import './BalanceCard.css';
 
 function BalanceCard() {
+  const { publicKey, connected } = useWallet();
   const [balance, setBalance] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [clientPub, setClientPub] = useState(null);
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -15,21 +18,50 @@ function BalanceCard() {
         setLoading(true);
         setError(null);
 
-        // Get client public key
-        const pub = getClientPublicKey();
-        setClientPub(pub);
+        if (!connected || !publicKey) {
+          setError('Please connect your wallet');
+          setLoading(false);
+          return;
+        }
 
-        // Fetch balance
-        const balanceData = await getBalance();
+        const rpcUrl = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+        const mintAddress = import.meta.env.VITE_PEPETOR_MINT_ADDRESS;
+
+        if (!mintAddress) {
+          setError('Token not configured');
+          setLoading(false);
+          return;
+        }
+
+        const connection = new Connection(rpcUrl, 'confirmed');
+        const mintPubkey = new PublicKey(mintAddress);
         
+        const tokenAccountAddress = await getAssociatedTokenAddress(
+          mintPubkey,
+          publicKey
+        );
+
+        try {
+          const tokenAccount = await getAccount(connection, tokenAccountAddress);
+          const tokenBalance = Number(tokenAccount.amount) / Math.pow(10, 9);
+          setBalance(tokenBalance);
+        } catch (err) {
+          if (err.message.includes('could not find')) {
+            setBalance(0);
+          } else {
+            throw err;
+          }
+        }
+
+        const balanceData = await getBalance();
         if (balanceData) {
-          setBalance(balanceData.balance || 0);
           setStats({
             totalSessions: balanceData.totalSessionsSubmitted || 0,
             bytesTransferred: balanceData.totalBytesTransferred || 0,
             totalDuration: balanceData.totalSessionDuration || 0,
           });
         }
+
       } catch (err) {
         console.error('Error fetching balance:', err);
         const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch balance');
@@ -40,10 +72,9 @@ function BalanceCard() {
     };
 
     fetchBalance();
-    // Refresh balance every 30 seconds
     const interval = setInterval(fetchBalance, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [publicKey, connected]);
 
   const formatBytes = (bytes) => {
     if (!bytes) return '0 B';
@@ -88,7 +119,7 @@ function BalanceCard() {
           <div className="balance-display">
             <div className="balance-amount">
               <span className="balance-value">{balance !== null ? balance.toFixed(2) : '0.00'}</span>
-              <span className="balance-unit">credits</span>
+              <span className="balance-unit">$PEPETOR</span>
             </div>
           </div>
 
@@ -110,20 +141,20 @@ function BalanceCard() {
           )}
 
           <div className="client-id">
-            <label>Your Client ID (Public Key):</label>
+            <label>Your Wallet Address:</label>
             <code className="client-pub-key">
-              {clientPub ? clientPub.substring(0, 16) + '...' + clientPub.substring(clientPub.length - 16) : 'loading...'}
+              {publicKey ? publicKey.toString().substring(0, 16) + '...' + publicKey.toString().substring(publicKey.toString().length - 16) : 'Not connected'}
             </code>
-            {clientPub && (
+            {publicKey && (
               <button
                 className="copy-btn"
                 onClick={() => {
-                  navigator.clipboard.writeText(clientPub);
-                  alert('Client ID copied to clipboard');
+                  navigator.clipboard.writeText(publicKey.toString());
+                  alert('Wallet address copied to clipboard');
                 }}
-                title="Copy full Client ID"
+                title="Copy full wallet address"
               >
-                📋 Copy Full ID
+                📋 Copy Address
               </button>
             )}
           </div>

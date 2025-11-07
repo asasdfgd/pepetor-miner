@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import WalletProvider from './contexts/WalletProvider';
 import { useExtensionBridge } from './hooks/useExtensionBridge';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -10,6 +11,7 @@ import DashboardPage from './pages/DashboardPage';
 import TorPage from './pages/TorPage';
 import ExtensionPage from './pages/ExtensionPage';
 import FaqPage from './pages/FaqPage';
+import DeployTokenPage from './pages/DeployTokenPage';
 import './App.css';
 
 /**
@@ -30,6 +32,7 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/extension" element={<ExtensionPage />} />
           <Route path="/faq" element={<FaqPage />} />
+          <Route path="/deploy-token" element={<DeployTokenPage />} />
           <Route
             path="/dashboard"
             element={
@@ -61,9 +64,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <WalletProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </WalletProvider>
     </Router>
   );
 }

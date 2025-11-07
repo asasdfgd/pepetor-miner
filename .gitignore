@@ -110,6 +110,14 @@ keys/
 private/
 secrets/
 
+# Solana wallets & token deployment
+.wallets/
+.solana-keypair.json
+.token-config.json
+apps/api/.wallets/
+apps/api/.solana-keypair.json
+apps/api/.token-config.json
+
 # Tor & Privacy
 .tor/
 onion/
