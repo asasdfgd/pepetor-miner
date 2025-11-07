@@ -1,19 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const tokenDeploymentController = require('../controllers/tokenDeploymentController');
-const { authenticateToken } = require('../middleware/authMiddleware');
+const { authenticate } = require('../middleware/authMiddleware');
 
 router.get('/price', tokenDeploymentController.getDeploymentPrice);
 
 router.post(
   '/deploy',
-  authenticateToken,
+  authenticate,
   tokenDeploymentController.uploadMiddleware,
   tokenDeploymentController.requestDeployment
 );
 
-router.get('/status/:deploymentId', authenticateToken, tokenDeploymentController.getDeploymentStatus);
+router.get('/status/:deploymentId', authenticate, tokenDeploymentController.getDeploymentStatus);
 
-router.get('/my-deployments', authenticateToken, tokenDeploymentController.getUserDeployments);
+router.get('/my-deployments', authenticate, tokenDeploymentController.getUserDeployments);
 
 module.exports = router;
