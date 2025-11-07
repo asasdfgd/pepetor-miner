@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
+import WalletConnect from './WalletConnect';
 import './Header.css';
 
 function Header() {
@@ -58,6 +59,7 @@ function Header() {
                 <Link to="/tor" className="nav-link">
                   🧅 Tor
                 </Link>
+                <WalletConnect />
                 <button onClick={handleLogout} className="btn-logout">
                   Logout
                 </button>
@@ -70,6 +72,7 @@ function Header() {
                 <Link to="/register" className="btn-primary-nav">
                   Register
                 </Link>
+                <WalletConnect />
               </>
             )}
           </nav>
