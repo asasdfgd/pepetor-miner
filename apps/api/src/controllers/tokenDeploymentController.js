@@ -56,6 +56,9 @@ exports.requestDeployment = async (req, res) => {
       allocations,
       createPool,
       poolLiquiditySOL,
+      website,
+      twitter,
+      walletAddress,
     } = req.body;
 
     if (!tokenName || !tokenSymbol || !paymentSignature) {
@@ -128,6 +131,9 @@ exports.requestDeployment = async (req, res) => {
       logoBuffer,
       createPool: createPool === 'true' || createPool === true,
       poolLiquiditySOL: poolLiquiditySOL ? parseFloat(poolLiquiditySOL) : 2,
+      website,
+      twitter,
+      walletAddress,
     });
 
     res.json({

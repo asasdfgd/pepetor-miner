@@ -76,6 +76,9 @@ class TokenDeploymentService {
       description = '',
       createPool = false,
       poolLiquiditySOL = 2,
+      website = '',
+      twitter = '',
+      walletAddress = '',
     } = config;
 
     console.log(`🚀 Deploying ${tokenName} (${tokenSymbol}) for ${ownerPublicKey}`);
@@ -165,6 +168,9 @@ class TokenDeploymentService {
         logoBuffer,
         deployer,
         totalSupply,
+        website,
+        twitter,
+        walletAddress,
       });
       console.log('✅ Metadata URI:', metadataUri);
     }
@@ -218,7 +224,7 @@ class TokenDeploymentService {
     };
   }
 
-  async uploadMetadata({ mint, tokenName, tokenSymbol, description, logoBuffer, deployer, totalSupply }) {
+  async uploadMetadata({ mint, tokenName, tokenSymbol, description, logoBuffer, deployer, totalSupply, website, twitter, walletAddress }) {
     const metaplex = Metaplex.make(this.connection)
       .use(keypairIdentity(deployer))
       .use(bundlrStorage({
@@ -267,6 +273,23 @@ class TokenDeploymentService {
         ],
       },
     };
+
+    if (website) {
+      metadata.external_url = website;
+    }
+
+    if (twitter || walletAddress) {
+      metadata.properties.links = {};
+      
+      if (twitter) {
+        const twitterHandle = twitter.startsWith('@') ? twitter.slice(1) : twitter.replace(/https?:\/\/(twitter|x)\.com\//, '');
+        metadata.properties.links.twitter = `https://x.com/${twitterHandle}`;
+      }
+      
+      if (walletAddress) {
+        metadata.properties.links.wallet = walletAddress;
+      }
+    }
 
     const metadataUri = await metaplex.storage().uploadJson(metadata);
 

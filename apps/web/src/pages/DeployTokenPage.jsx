@@ -18,6 +18,9 @@ const DeployTokenPage = () => {
     totalSupply: '1000000000',
     decimals: '9',
     description: '',
+    website: '',
+    twitter: '',
+    walletAddress: '',
   });
   
   const [logoFile, setLogoFile] = useState(null);
@@ -134,6 +137,18 @@ const DeployTokenPage = () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('paymentSignature', signature);
       formDataToSend.append('paymentMethod', 'SOL');
+      
+      if (formData.website) {
+        formDataToSend.append('website', formData.website);
+      }
+      
+      if (formData.twitter) {
+        formDataToSend.append('twitter', formData.twitter);
+      }
+      
+      if (formData.walletAddress) {
+        formDataToSend.append('walletAddress', formData.walletAddress);
+      }
       
       if (logoFile) {
         formDataToSend.append('logo', logoFile);
@@ -257,6 +272,9 @@ const DeployTokenPage = () => {
                     totalSupply: '1000000000',
                     decimals: '9',
                     description: '',
+                    website: '',
+                    twitter: '',
+                    walletAddress: '',
                   });
                   setLogoFile(null);
                   setLogoPreview(null);
@@ -451,6 +469,43 @@ const DeployTokenPage = () => {
               placeholder="Describe your token..."
               rows="4"
               maxLength={200}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="website">Website (optional)</label>
+            <input
+              type="url"
+              id="website"
+              name="website"
+              value={formData.website}
+              onChange={handleInputChange}
+              placeholder="https://yourproject.com"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="twitter">X (Twitter) Account (optional)</label>
+            <input
+              type="text"
+              id="twitter"
+              name="twitter"
+              value={formData.twitter}
+              onChange={handleInputChange}
+              placeholder="@yourproject or https://x.com/yourproject"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="walletAddress">Phantom Wallet Address (optional)</label>
+            <p className="input-hint">Your Solana wallet address for receiving tokens</p>
+            <input
+              type="text"
+              id="walletAddress"
+              name="walletAddress"
+              value={formData.walletAddress}
+              onChange={handleInputChange}
+              placeholder={publicKey ? publicKey.toString() : "Connect wallet or enter manually"}
             />
           </div>
 
