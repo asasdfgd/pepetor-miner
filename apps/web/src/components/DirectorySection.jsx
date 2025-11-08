@@ -19,14 +19,18 @@ function DirectorySection() {
     try {
       if (activeTab === 'users') {
         const response = await api.get('/users');
-        setUsers(response.data || []);
+        setUsers(Array.isArray(response.data) ? response.data : []);
       } else {
         const response = await api.get('/token-deployment/all');
-        setTokens(response.deployments || []);
+        setTokens(Array.isArray(response.deployments) ? response.deployments : []);
       }
     } catch (err) {
       console.error('Error fetching directory data:', err);
-      setError('Failed to load data');
+      if (activeTab === 'users') {
+        setUsers([]);
+      } else {
+        setTokens([]);
+      }
     } finally {
       setLoading(false);
     }

@@ -16,27 +16,66 @@ function BalanceCard() {
   const [selectedToken, setSelectedToken] = useState('SOL');
 
   useEffect(() => {
-    const fetchTokens = async () => {
+    const fetchTokensWithBalances = async () => {
+      if (!connected || !publicKey) {
+        setAvailableTokens([{ symbol: 'SOL', name: 'Solana', mintAddress: 'SOL', balance: 0 }]);
+        return;
+      }
+
       try {
+        const rpcUrl = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+        const connection = new Connection(rpcUrl, 'confirmed');
+
         const response = await api.get('/token-deployment/all');
-        const tokens = response.deployments || [];
-        setAvailableTokens([
-          { symbol: 'SOL', name: 'Solana', mintAddress: 'SOL' },
-          ...tokens.map(t => ({
-            symbol: t.tokenSymbol,
-            name: t.tokenName,
-            mintAddress: t.mintAddress
-          }))
-        ]);
+        const allTokens = response.deployments || [];
+        
+        const solBalance = await connection.getBalance(publicKey);
+        const tokensWithBalance = [
+          { 
+            symbol: 'SOL', 
+            name: 'Solana', 
+            mintAddress: 'SOL',
+            balance: solBalance / LAMPORTS_PER_SOL 
+          }
+        ];
+
+        for (const token of allTokens) {
+          try {
+            const mintPubkey = new PublicKey(token.mintAddress);
+            const tokenAccountAddress = await getAssociatedTokenAddress(
+              mintPubkey,
+              publicKey
+            );
+            
+            const tokenAccount = await getAccount(connection, tokenAccountAddress);
+            const tokenBalance = Number(tokenAccount.amount) / Math.pow(10, 9);
+            
+            if (tokenBalance > 0) {
+              tokensWithBalance.push({
+                symbol: token.tokenSymbol,
+                name: token.tokenName,
+                mintAddress: token.mintAddress,
+                balance: tokenBalance
+              });
+            }
+          } catch (err) {
+            if (!err.message.includes('could not find')) {
+              console.error(`Error checking balance for ${token.tokenSymbol}:`, err);
+            }
+          }
+        }
+
+        setAvailableTokens(tokensWithBalance);
       } catch (err) {
         console.error('Error fetching tokens:', err);
+        setAvailableTokens([{ symbol: 'SOL', name: 'Solana', mintAddress: 'SOL', balance: 0 }]);
       }
     };
-    fetchTokens();
-  }, []);
+    fetchTokensWithBalances();
+  }, [connected, publicKey]);
 
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchStats = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -47,37 +86,9 @@ function BalanceCard() {
           return;
         }
 
-        const rpcUrl = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
-        const connection = new Connection(rpcUrl, 'confirmed');
-
-        if (selectedToken === 'SOL') {
-          const solBalance = await connection.getBalance(publicKey);
-          setBalance(solBalance / LAMPORTS_PER_SOL);
-        } else {
-          const token = availableTokens.find(t => t.symbol === selectedToken);
-          if (!token || !token.mintAddress) {
-            setError('Invalid token selected');
-            setLoading(false);
-            return;
-          }
-
-          const mintPubkey = new PublicKey(token.mintAddress);
-          const tokenAccountAddress = await getAssociatedTokenAddress(
-            mintPubkey,
-            publicKey
-          );
-
-          try {
-            const tokenAccount = await getAccount(connection, tokenAccountAddress);
-            const tokenBalance = Number(tokenAccount.amount) / Math.pow(10, 9);
-            setBalance(tokenBalance);
-          } catch (err) {
-            if (err.message.includes('could not find')) {
-              setBalance(0);
-            } else {
-              throw err;
-            }
-          }
+        const token = availableTokens.find(t => t.symbol === selectedToken);
+        if (token) {
+          setBalance(token.balance || 0);
         }
 
         const balanceData = await getBalance();
@@ -90,16 +101,16 @@ function BalanceCard() {
         }
 
       } catch (err) {
-        console.error('Error fetching balance:', err);
-        const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch balance');
+        console.error('Error fetching stats:', err);
+        const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch stats');
         setError(errorMsg);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBalance();
-    const interval = setInterval(fetchBalance, 30000);
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, [publicKey, connected, selectedToken, availableTokens]);
 
@@ -136,7 +147,7 @@ function BalanceCard() {
       </div>
 
       <div className="token-selector">
-        <label>Select Token:</label>
+        <label>Your Tokens:</label>
         <select 
           value={selectedToken} 
           onChange={(e) => setSelectedToken(e.target.value)}
@@ -144,7 +155,7 @@ function BalanceCard() {
         >
           {availableTokens.map((token) => (
             <option key={token.symbol} value={token.symbol}>
-              {token.symbol} - {token.name}
+              {token.symbol} - {token.name} ({token.balance?.toFixed(4) || '0.0000'})
             </option>
           ))}
         </select>
