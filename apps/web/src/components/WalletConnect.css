@@ -5,20 +5,28 @@
 }
 
 .wallet-adapter-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-weight: 600 !important;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
+  font-size: 0.75rem !important;
+  height: auto !important;
+  line-height: 1.4 !important;
 }
 
 .wallet-adapter-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .wallet-adapter-button-trigger {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.wallet-adapter-icon {
+  width: 16px !important;
+  height: 16px !important;
 }
