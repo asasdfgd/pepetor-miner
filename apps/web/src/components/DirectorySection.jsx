@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import api from '../services/api';
 import './DirectorySection.css';
@@ -6,6 +7,7 @@ import './DirectorySection.css';
 const SOCKET_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:3001';
 
 function DirectorySection() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('tokens');
   const [users, setUsers] = useState([]);
   const [tokens, setTokens] = useState([]);
@@ -152,6 +154,12 @@ function DirectorySection() {
                     {token.description && (
                       <p className="token-description">{token.description}</p>
                     )}
+                    <button 
+                      className="trade-button"
+                      onClick={() => navigate(`/trade/${token.mintAddress}`)}
+                    >
+                      📈 Trade
+                    </button>
                   </div>
                 ))}
               </div>

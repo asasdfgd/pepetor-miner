@@ -90,6 +90,10 @@ const DeployTokenPage = () => {
     if (!publicKey || !pricing) return null;
 
     try {
+      if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
+        throw new Error('Treasury wallet not configured. Please contact support.');
+      }
+
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
       const transaction = new Transaction().add(

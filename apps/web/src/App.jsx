@@ -13,6 +13,7 @@ import ExtensionPage from './pages/ExtensionPage';
 import FaqPage from './pages/FaqPage';
 import DeployTokenPage from './pages/DeployTokenPage';
 import TableViewPage from './pages/TableViewPage';
+import TokenTradingPage from './pages/TokenTradingPage';
 import './App.css';
 
 /**
@@ -34,6 +35,7 @@ function AppContent() {
           <Route path="/extension" element={<ExtensionPage />} />
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/tokens" element={<TableViewPage />} />
+          <Route path="/trade/:mintAddress" element={<TokenTradingPage />} />
           <Route
             path="/dashboard"
             element={
