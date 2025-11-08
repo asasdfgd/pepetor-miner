@@ -20,7 +20,7 @@ const { Market } = require('@openbook-dex/openbook');
 const fs = require('fs');
 const path = require('path');
 
-const DEPLOYMENT_PRICE_SOL = 2.5;
+const DEPLOYMENT_PRICE_SOL = 0.3;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
 const TREASURY_WALLET = process.env.TREASURY_WALLET_ADDRESS;
 

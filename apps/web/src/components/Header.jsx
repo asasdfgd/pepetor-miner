@@ -37,6 +37,9 @@ function Header() {
           <nav className="nav-menu">
             {!isAuthenticated && (
               <>
+                <Link to="/tokens" className="nav-link">
+                  🪙 Tokens
+                </Link>
                 <Link to="/extension" className="nav-link">
                   Extension
                 </Link>
@@ -52,6 +55,9 @@ function Header() {
                 </div>
                 <Link to="/dashboard" className="nav-link">
                   Dashboard
+                </Link>
+                <Link to="/tokens" className="nav-link">
+                  🪙 Tokens
                 </Link>
                 <Link to="/deploy-token" className="nav-link">
                   🚀 Deploy Token

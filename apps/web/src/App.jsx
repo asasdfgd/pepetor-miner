@@ -12,6 +12,7 @@ import TorPage from './pages/TorPage';
 import ExtensionPage from './pages/ExtensionPage';
 import FaqPage from './pages/FaqPage';
 import DeployTokenPage from './pages/DeployTokenPage';
+import TableViewPage from './pages/TableViewPage';
 import './App.css';
 
 /**
@@ -32,6 +33,7 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/extension" element={<ExtensionPage />} />
           <Route path="/faq" element={<FaqPage />} />
+          <Route path="/tokens" element={<TableViewPage />} />
           <Route
             path="/dashboard"
             element={
