@@ -3,6 +3,7 @@ import { submitSession } from '../services/sessionService';
 import './AutoMiner.css';
 
 const SESSION_DURATION_MS = 30 * 60 * 1000;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 function AutoMiner({ onSessionSubmitted }) {
   const [mining, setMining] = useState(false);
@@ -12,6 +13,9 @@ function AutoMiner({ onSessionSubmitted }) {
   const [totalCreditsEarned, setTotalCreditsEarned] = useState(0);
   const [currentSessionBytes, setCurrentSessionBytes] = useState(0);
   const [lastError, setLastError] = useState(null);
+  const [availableTokens, setAvailableTokens] = useState([]);
+  const [selectedToken, setSelectedToken] = useState(null);
+  const [loadingTokens, setLoadingTokens] = useState(true);
   
   const miningIntervalRef = useRef(null);
   const tickIntervalRef = useRef(null);
@@ -106,10 +110,51 @@ function AutoMiner({ onSessionSubmitted }) {
   };
 
   useEffect(() => {
+    fetchAvailableTokens();
     return () => {
       stopMining();
     };
   }, []);
+
+  const fetchAvailableTokens = async () => {
+    try {
+      setLoadingTokens(true);
+      const response = await fetch(`${API_BASE_URL}/api/token-deployment/all?limit=100`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch tokens');
+      }
+
+      const data = await response.json();
+      const tokens = data.deployments || [];
+      
+      const pepetorToken = {
+        _id: 'pepetor',
+        tokenName: 'PEPETOR',
+        tokenSymbol: 'PEPETOR',
+        mintAddress: 'native',
+        logoUrl: null,
+        isPrimary: true,
+      };
+      
+      setAvailableTokens([pepetorToken, ...tokens]);
+      setSelectedToken(pepetorToken);
+    } catch (error) {
+      console.error('Error fetching tokens:', error);
+      const pepetorToken = {
+        _id: 'pepetor',
+        tokenName: 'PEPETOR',
+        tokenSymbol: 'PEPETOR',
+        mintAddress: 'native',
+        logoUrl: null,
+        isPrimary: true,
+      };
+      setAvailableTokens([pepetorToken]);
+      setSelectedToken(pepetorToken);
+    } finally {
+      setLoadingTokens(false);
+    }
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -135,13 +180,47 @@ function AutoMiner({ onSessionSubmitted }) {
         </div>
       </div>
 
+      <div className="token-selector-section">
+        <label className="token-selector-label">Mining Token</label>
+        <div className="token-selector-wrapper">
+          <select
+            className="token-selector"
+            value={selectedToken?._id || ''}
+            onChange={(e) => {
+              const token = availableTokens.find(t => t._id === e.target.value);
+              setSelectedToken(token);
+            }}
+            disabled={mining || loadingTokens}
+          >
+            {loadingTokens ? (
+              <option>Loading tokens...</option>
+            ) : (
+              availableTokens.map((token) => (
+                <option key={token._id} value={token._id}>
+                  {token.tokenSymbol} - {token.tokenName}
+                  {token.isPrimary ? ' (Primary)' : ''}
+                </option>
+              ))
+            )}
+          </select>
+          {selectedToken?.logoUrl && (
+            <img 
+              src={selectedToken.logoUrl} 
+              alt={selectedToken.tokenSymbol}
+              className="token-selector-logo"
+              onError={(e) => e.target.style.display = 'none'}
+            />
+          )}
+        </div>
+      </div>
+
       <div className="miner-stats">
         <div className="stat-box">
           <span className="stat-label">Sessions Completed</span>
           <span className="stat-value">{sessionCount}</span>
         </div>
         <div className="stat-box">
-          <span className="stat-label">Total $PEPETOR</span>
+          <span className="stat-label">Total ${selectedToken?.tokenSymbol || 'PEPETOR'}</span>
           <span className="stat-value credits">{totalCreditsEarned.toFixed(2)}</span>
         </div>
       </div>
@@ -194,8 +273,8 @@ function AutoMiner({ onSessionSubmitted }) {
         <p>💡 <strong>How it works:</strong></p>
         <ul>
           <li>Mining sessions run automatically every 30 minutes</li>
-          <li>Keep this tab open to earn $PEPETOR passively</li>
-          <li>$PEPETOR is sent directly to your wallet</li>
+          <li>Keep this tab open to earn ${selectedToken?.tokenSymbol || 'tokens'} passively</li>
+          <li>${selectedToken?.tokenSymbol || 'Tokens'} sent directly to your wallet</li>
           <li>Close the tab to stop mining</li>
         </ul>
       </div>
