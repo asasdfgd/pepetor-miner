@@ -1,6 +1,8 @@
 console.log('🚀 [APP START] Loading Express modules...');
 
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -181,11 +183,42 @@ const startServer = async () => {
 
     // Start Express server on all interfaces for Docker/Fly.io compatibility
     console.log('🚀 Starting Express server...');
-    const server = app.listen(PORT, '0.0.0.0', () => {
+    const server = http.createServer(app);
+    
+    const io = new Server(server, {
+      cors: {
+        origin: allowedOrigins,
+        methods: ['GET', 'POST'],
+        credentials: true
+      }
+    });
+
+    global.io = io;
+
+    io.on('connection', (socket) => {
+      console.log(`🔌 Client connected: ${socket.id}`);
+      
+      socket.on('disconnect', () => {
+        console.log(`🔌 Client disconnected: ${socket.id}`);
+      });
+
+      socket.on('subscribe:users', () => {
+        socket.join('users');
+        console.log(`📡 Client ${socket.id} subscribed to users`);
+      });
+
+      socket.on('subscribe:tokens', () => {
+        socket.join('tokens');
+        console.log(`📡 Client ${socket.id} subscribed to tokens`);
+      });
+    });
+    
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`\n✅ Backend server is running on 0.0.0.0:${PORT}`);
       console.log(`📝 API Documentation: http://localhost:${PORT}/api`);
       console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
-      console.log(`👥 Users Endpoint: http://localhost:${PORT}/api/users\n`);
+      console.log(`👥 Users Endpoint: http://localhost:${PORT}/api/users`);
+      console.log(`🔌 WebSocket server is running\n`);
     });
 
     server.on('error', (error) => {

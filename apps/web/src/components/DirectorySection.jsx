@@ -1,28 +1,69 @@
 import { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 import api from '../services/api';
 import './DirectorySection.css';
+
+const SOCKET_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:3001';
 
 function DirectorySection() {
   const [activeTab, setActiveTab] = useState('tokens');
   const [users, setUsers] = useState([]);
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL);
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('🔌 Connected to WebSocket');
+    });
+
+    newSocket.on('user:update', (update) => {
+      console.log('📡 User update:', update);
+      fetchData();
+    });
+
+    newSocket.on('token:update', (update) => {
+      console.log('📡 Token update:', update);
+      fetchData();
+    });
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      if (activeTab === 'users') {
+        socket.emit('subscribe:users');
+      } else {
+        socket.emit('subscribe:tokens');
+      }
+    }
+  }, [activeTab, socket]);
 
   useEffect(() => {
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, page]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       if (activeTab === 'users') {
-        const response = await api.get('/users');
+        const response = await api.get(`/users?page=${page}&limit=20`);
         console.log('Users response:', response);
         setUsers(Array.isArray(response.data) ? response.data : []);
+        setTotalPages(response.totalPages || 1);
       } else {
-        const response = await api.get('/token-deployment/all');
+        const response = await api.get(`/token-deployment/all?page=${page}&limit=20`);
         console.log('Tokens response:', response);
         setTokens(Array.isArray(response.deployments) ? response.deployments : []);
+        setTotalPages(response.totalPages || 1);
       }
     } catch (err) {
       console.error('Directory fetch error:', err);
@@ -147,6 +188,28 @@ function DirectorySection() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+        
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="pagination-btn"
+            >
+              ← Previous
+            </button>
+            <span className="pagination-info">
+              Page {page} of {totalPages}
+            </span>
+            <button 
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="pagination-btn"
+            >
+              Next →
+            </button>
           </div>
         )}
       </div>

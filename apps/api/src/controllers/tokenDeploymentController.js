@@ -272,15 +272,26 @@ exports.getUserDeployments = async (req, res) => {
 
 exports.getAllDeployments = async (req, res) => {
   try {
-    const deployments = await DeployedToken.find({ status: 'deployed' })
-      .select('owner tokenName tokenSymbol mintAddress logoUrl description deployedAt createdAt')
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [deployments, total] = await Promise.all([
+      DeployedToken.find({ status: 'deployed' })
+        .select('owner tokenName tokenSymbol mintAddress logoUrl description deployedAt createdAt')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      DeployedToken.countDocuments({ status: 'deployed' })
+    ]);
 
     res.json({
       success: true,
       count: deployments.length,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
       deployments: deployments.map(d => ({
         id: d._id,
         owner: d.owner,
