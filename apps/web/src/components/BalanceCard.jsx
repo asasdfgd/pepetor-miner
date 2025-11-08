@@ -10,15 +10,16 @@ function BalanceCard() {
   const { publicKey, connected } = useWallet();
   const [balance, setBalance] = useState(null);
   const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [availableTokens, setAvailableTokens] = useState([]);
+  const [availableTokens, setAvailableTokens] = useState([{ symbol: 'SOL', name: 'Solana', mintAddress: 'SOL', balance: 0 }]);
   const [selectedToken, setSelectedToken] = useState('SOL');
 
   useEffect(() => {
     const fetchTokensWithBalances = async () => {
       if (!connected || !publicKey) {
         setAvailableTokens([{ symbol: 'SOL', name: 'Solana', mintAddress: 'SOL', balance: 0 }]);
+        setBalance(0);
         return;
       }
 
@@ -26,9 +27,6 @@ function BalanceCard() {
         const rpcUrl = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
         const connection = new Connection(rpcUrl, 'confirmed');
 
-        const response = await api.get('/token-deployment/all');
-        const allTokens = response.deployments || [];
-        
         const solBalance = await connection.getBalance(publicKey);
         const tokensWithBalance = [
           { 
@@ -39,36 +37,48 @@ function BalanceCard() {
           }
         ];
 
-        for (const token of allTokens) {
-          try {
-            const mintPubkey = new PublicKey(token.mintAddress);
-            const tokenAccountAddress = await getAssociatedTokenAddress(
-              mintPubkey,
-              publicKey
-            );
-            
-            const tokenAccount = await getAccount(connection, tokenAccountAddress);
-            const tokenBalance = Number(tokenAccount.amount) / Math.pow(10, 9);
-            
-            if (tokenBalance > 0) {
-              tokensWithBalance.push({
-                symbol: token.tokenSymbol,
-                name: token.tokenName,
-                mintAddress: token.mintAddress,
-                balance: tokenBalance
-              });
-            }
-          } catch (err) {
-            if (!err.message.includes('could not find')) {
-              console.error(`Error checking balance for ${token.tokenSymbol}:`, err);
-            }
-          }
-        }
-
         setAvailableTokens(tokensWithBalance);
+        setBalance(solBalance / LAMPORTS_PER_SOL);
+
+        Promise.race([
+          api.get('/token-deployment/all'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]).then(async (response) => {
+          const allTokens = response.deployments || [];
+          
+          const tokenChecks = allTokens.map(async (token) => {
+            try {
+              const mintPubkey = new PublicKey(token.mintAddress);
+              const tokenAccountAddress = await getAssociatedTokenAddress(
+                mintPubkey,
+                publicKey
+              );
+              
+              const tokenAccount = await getAccount(connection, tokenAccountAddress);
+              const tokenBalance = Number(tokenAccount.amount) / Math.pow(10, 9);
+              
+              if (tokenBalance > 0) {
+                return {
+                  symbol: token.tokenSymbol,
+                  name: token.tokenName,
+                  mintAddress: token.mintAddress,
+                  balance: tokenBalance
+                };
+              }
+            } catch (err) {
+              return null;
+            }
+            return null;
+          });
+
+          const results = await Promise.all(tokenChecks);
+          const validTokens = results.filter(t => t !== null);
+          
+          setAvailableTokens([tokensWithBalance[0], ...validTokens]);
+        }).catch(() => {});
+
       } catch (err) {
         console.error('Error fetching tokens:', err);
-        setAvailableTokens([{ symbol: 'SOL', name: 'Solana', mintAddress: 'SOL', balance: 0 }]);
       }
     };
     fetchTokensWithBalances();
@@ -76,22 +86,22 @@ function BalanceCard() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      if (!connected || !publicKey) {
+        setStats({ totalSessions: 0, bytesTransferred: 0, totalDuration: 0 });
+        return;
+      }
+
+      const token = availableTokens.find(t => t.symbol === selectedToken);
+      if (token) {
+        setBalance(token.balance || 0);
+      }
+
       try {
-        setLoading(true);
-        setError(null);
-
-        if (!connected || !publicKey) {
-          setError('Please connect your wallet');
-          setLoading(false);
-          return;
-        }
-
-        const token = availableTokens.find(t => t.symbol === selectedToken);
-        if (token) {
-          setBalance(token.balance || 0);
-        }
-
-        const balanceData = await getBalance();
+        const balanceData = await Promise.race([
+          getBalance(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+        ]);
+        
         if (balanceData) {
           setStats({
             totalSessions: balanceData.totalSessionsSubmitted || 0,
@@ -99,13 +109,8 @@ function BalanceCard() {
             totalDuration: balanceData.totalSessionDuration || 0,
           });
         }
-
       } catch (err) {
-        console.error('Error fetching stats:', err);
-        const errorMsg = err.message || err.error || (typeof err === 'string' ? err : 'Failed to fetch stats');
-        setError(errorMsg);
-      } finally {
-        setLoading(false);
+        setStats({ totalSessions: 0, bytesTransferred: 0, totalDuration: 0 });
       }
     };
 
@@ -161,17 +166,13 @@ function BalanceCard() {
         </select>
       </div>
 
-      {loading ? (
-        <div className="loading">Loading balance...</div>
-      ) : error ? (
-        <div className="error">
-          <strong>Error:</strong> {error}
-        </div>
+      {!connected || !publicKey ? (
+        <div className="error">Please connect your wallet</div>
       ) : (
         <>
           <div className="balance-display">
             <div className="balance-amount">
-              <span className="balance-value">{balance !== null ? balance.toFixed(4) : '0.00'}</span>
+              <span className="balance-value">{balance !== null ? balance.toFixed(4) : '0.0000'}</span>
               <span className="balance-unit">${selectedToken}</span>
             </div>
           </div>
@@ -196,20 +197,18 @@ function BalanceCard() {
           <div className="client-id">
             <label>Your Wallet Address:</label>
             <code className="client-pub-key">
-              {publicKey ? publicKey.toString().substring(0, 16) + '...' + publicKey.toString().substring(publicKey.toString().length - 16) : 'Not connected'}
+              {publicKey.toString().substring(0, 16) + '...' + publicKey.toString().substring(publicKey.toString().length - 16)}
             </code>
-            {publicKey && (
-              <button
-                className="copy-btn"
-                onClick={() => {
-                  navigator.clipboard.writeText(publicKey.toString());
-                  alert('Wallet address copied to clipboard');
-                }}
-                title="Copy full wallet address"
-              >
-                📋 Copy Address
-              </button>
-            )}
+            <button
+              className="copy-btn"
+              onClick={() => {
+                navigator.clipboard.writeText(publicKey.toString());
+                alert('Wallet address copied to clipboard');
+              }}
+              title="Copy full wallet address"
+            >
+              📋 Copy Address
+            </button>
           </div>
         </>
       )}

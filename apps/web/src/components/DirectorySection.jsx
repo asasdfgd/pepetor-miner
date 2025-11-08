@@ -6,8 +6,7 @@ function DirectorySection() {
   const [activeTab, setActiveTab] = useState('tokens');
   const [users, setUsers] = useState([]);
   const [tokens, setTokens] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -15,17 +14,21 @@ function DirectorySection() {
 
   const fetchData = async () => {
     setLoading(true);
-    setError(null);
     try {
       if (activeTab === 'users') {
-        const response = await api.get('/users');
+        const response = await Promise.race([
+          api.get('/users'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]);
         setUsers(Array.isArray(response.data) ? response.data : []);
       } else {
-        const response = await api.get('/token-deployment/all');
+        const response = await Promise.race([
+          api.get('/token-deployment/all'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        ]);
         setTokens(Array.isArray(response.deployments) ? response.deployments : []);
       }
     } catch (err) {
-      console.error('Error fetching directory data:', err);
       if (activeTab === 'users') {
         setUsers([]);
       } else {
@@ -73,8 +76,6 @@ function DirectorySection() {
       <div className="directory-content">
         {loading ? (
           <div className="directory-loading">Loading...</div>
-        ) : error ? (
-          <div className="directory-error">{error}</div>
         ) : activeTab === 'tokens' ? (
           <div className="directory-list">
             {tokens.length === 0 ? (
