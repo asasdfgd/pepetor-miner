@@ -91,6 +91,15 @@ function DirectorySection() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
+  const formatEmail = (email) => {
+    if (!email) return 'N/A';
+    const [username, domain] = email.split('@');
+    if (!domain) return email;
+    const visibleChars = Math.max(1, Math.ceil(username.length * 0.3));
+    const maskedPart = '*'.repeat(Math.max(3, username.length - visibleChars));
+    return `${username.slice(0, visibleChars)}${maskedPart}@${domain}`;
+  };
+
   return (
     <div className="directory-section">
       <div className="directory-header">
@@ -169,7 +178,7 @@ function DirectorySection() {
                     {users.map((user) => (
                       <tr key={user._id}>
                         <td className="user-username">{user.username}</td>
-                        <td className="user-email">{user.email || 'N/A'}</td>
+                        <td className="user-email">{formatEmail(user.email)}</td>
                         <td className="mono">{formatWallet(user.walletAddress)}</td>
                         <td>
                           <span className={`badge badge-${user.role}`}>
