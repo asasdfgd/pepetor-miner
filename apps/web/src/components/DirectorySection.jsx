@@ -16,19 +16,16 @@ function DirectorySection() {
     setLoading(true);
     try {
       if (activeTab === 'users') {
-        const response = await Promise.race([
-          api.get('/users'),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        ]);
+        const response = await api.get('/users');
+        console.log('Users response:', response);
         setUsers(Array.isArray(response.data) ? response.data : []);
       } else {
-        const response = await Promise.race([
-          api.get('/token-deployment/all'),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        ]);
+        const response = await api.get('/token-deployment/all');
+        console.log('Tokens response:', response);
         setTokens(Array.isArray(response.deployments) ? response.deployments : []);
       }
     } catch (err) {
+      console.error('Directory fetch error:', err);
       if (activeTab === 'users') {
         setUsers([]);
       } else {
