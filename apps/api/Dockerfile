@@ -22,6 +22,7 @@ COPY apps/web/package*.json ./apps/web/
 # Copy actual source code
 COPY apps/api ./apps/api
 COPY apps/web/dist ./apps/web/dist
+COPY packages ./packages
 
 # Install dependencies for all workspaces (will be symlinked)
 RUN echo "🔧 Installing dependencies..." && \
