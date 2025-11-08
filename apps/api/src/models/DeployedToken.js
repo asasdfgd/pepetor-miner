@@ -4,7 +4,6 @@ const deployedTokenSchema = new mongoose.Schema({
   owner: {
     type: String,
     required: true,
-    index: true,
   },
   tokenName: {
     type: String,
@@ -26,15 +25,12 @@ const deployedTokenSchema = new mongoose.Schema({
   },
   mintAddress: {
     type: String,
-    required: true,
   },
   treasuryWallet: {
     type: String,
-    required: true,
   },
   rewardsWallet: {
     type: String,
-    required: true,
   },
   liquidityWallet: String,
   marketingWallet: String,
