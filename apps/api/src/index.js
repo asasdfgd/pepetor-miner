@@ -106,8 +106,8 @@ app.get('/api', (req, res) => {
 // Mount auth routes (public)
 app.use('/api/auth', authRoutes);
 
-// Mount user routes (protected)
-app.use('/api/users', authenticate, userRoutes);
+// Mount user routes (public for directory)
+app.use('/api/users', userRoutes);
 
 // Mount session routes (public - signature verification is done in controller)
 app.use('/api/sessions', sessionRoutes);

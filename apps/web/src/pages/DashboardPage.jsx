@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import BalanceCard from '../components/BalanceCard';
 import AutoMiner from '../components/AutoMiner';
 import SessionHistory from '../components/SessionHistory';
+import DirectorySection from '../components/DirectorySection';
 import './DashboardPage.css';
 
 function DashboardPage() {
@@ -46,6 +47,8 @@ function DashboardPage() {
             </div>
           </div>
         </div>
+
+        <DirectorySection />
       </div>
     </div>
   );

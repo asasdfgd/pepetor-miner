@@ -29,7 +29,7 @@ const processQueue = (error, token = null) => {
 // Add request interceptor for auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const publicEndpoints = ['/sessions/submit', '/sessions/balance', '/sessions/by-client/list', '/sessions/policy', '/auth/login', '/auth/register', '/auth/refresh-token'];
+    const publicEndpoints = ['/sessions/submit', '/sessions/balance', '/sessions/by-client/list', '/sessions/policy', '/auth/login', '/auth/register', '/auth/refresh-token', '/users', '/token-deployment/all'];
     const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
     
     if (!isPublicEndpoint) {

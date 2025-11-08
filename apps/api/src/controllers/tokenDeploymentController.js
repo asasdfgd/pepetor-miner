@@ -267,3 +267,34 @@ exports.getUserDeployments = async (req, res) => {
     });
   }
 };
+
+exports.getAllDeployments = async (req, res) => {
+  try {
+    const deployments = await DeployedToken.find({ status: 'deployed' })
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    res.json({
+      success: true,
+      count: deployments.length,
+      deployments: deployments.map(d => ({
+        id: d._id,
+        owner: d.owner,
+        tokenName: d.tokenName,
+        tokenSymbol: d.tokenSymbol,
+        mintAddress: d.mintAddress,
+        logoUrl: d.logoUrl,
+        description: d.description,
+        deployedAt: d.deployedAt,
+        createdAt: d.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Error getting all deployments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get deployments',
+      error: error.message,
+    });
+  }
+};

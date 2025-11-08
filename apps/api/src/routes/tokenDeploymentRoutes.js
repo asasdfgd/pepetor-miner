@@ -16,4 +16,6 @@ router.get('/status/:deploymentId', authenticate, tokenDeploymentController.getD
 
 router.get('/my-deployments', authenticate, tokenDeploymentController.getUserDeployments);
 
+router.get('/all', tokenDeploymentController.getAllDeployments);
+
 module.exports = router;
