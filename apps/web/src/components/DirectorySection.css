@@ -1,8 +1,8 @@
 .directory-section {
-  background: white;
+  background: linear-gradient(135deg, #1a1625 0%, #2d1b4e 100%);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   margin-top: 24px;
 }
 
@@ -17,8 +17,9 @@
 
 .directory-header h3 {
   margin: 0;
-  color: #1a1a1a;
+  color: #ffffff;
   font-size: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .directory-tabs {
@@ -28,8 +29,9 @@
 
 .tab-button {
   padding: 8px 16px;
-  border: 2px solid #e0e0e0;
-  background: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
@@ -38,14 +40,15 @@
 }
 
 .tab-button:hover {
-  border-color: #4caf50;
-  background: #f5f5f5;
+  border-color: #9c27b0;
+  background: rgba(156, 39, 176, 0.2);
 }
 
 .tab-button.active {
-  background: #4caf50;
+  background: linear-gradient(135deg, #9c27b0 0%, #673ab7 100%);
   color: white;
-  border-color: #4caf50;
+  border-color: #9c27b0;
+  box-shadow: 0 2px 8px rgba(156, 39, 176, 0.4);
 }
 
 .directory-content {
@@ -57,12 +60,12 @@
 .directory-empty {
   text-align: center;
   padding: 48px 24px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1rem;
 }
 
 .directory-error {
-  color: #f44336;
+  color: #ff6b6b;
 }
 
 .tokens-grid {
@@ -72,17 +75,18 @@
 }
 
 .token-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
   padding: 20px;
   border-radius: 12px;
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .token-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
 }
 
 .token-header {
@@ -153,27 +157,27 @@
 }
 
 .users-table th {
-  background: #f5f5f5;
+  background: rgba(0, 0, 0, 0.3);
   padding: 12px;
   text-align: left;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e0e0e0;
+  color: #ffffff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .users-table td {
   padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
-  color: #333;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .users-table tr:hover {
-  background: #f9f9f9;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .user-username {
   font-weight: 600;
-  color: #4caf50;
+  color: #9c27b0;
 }
 
 .mono {
@@ -188,33 +192,35 @@
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: capitalize;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .badge-admin {
-  background: #f44336;
+  background: linear-gradient(135deg, #ff1744 0%, #f50057 100%);
   color: white;
 }
 
 .badge-moderator {
-  background: #ff9800;
+  background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);
   color: white;
 }
 
 .badge-user {
-  background: #2196f3;
+  background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
   color: white;
 }
 
 .status-badge {
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .status-badge.active {
-  color: #4caf50;
+  color: #66ff66;
 }
 
 .status-badge.inactive {
-  color: #f44336;
+  color: #ff6b6b;
 }
 
 @media (max-width: 768px) {
