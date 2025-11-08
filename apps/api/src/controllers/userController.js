@@ -3,7 +3,11 @@ const User = require('../models/User');
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find()
+      .select('-password -refreshToken')
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
     res.json({
       success: true,
       count: users.length,

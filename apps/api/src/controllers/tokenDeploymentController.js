@@ -242,8 +242,10 @@ exports.getUserDeployments = async (req, res) => {
     }
 
     const deployments = await DeployedToken.find({ owner })
+      .select('tokenName tokenSymbol mintAddress status deployedAt createdAt')
       .sort({ createdAt: -1 })
-      .limit(50);
+      .limit(50)
+      .lean();
 
     res.json({
       success: true,
@@ -271,8 +273,10 @@ exports.getUserDeployments = async (req, res) => {
 exports.getAllDeployments = async (req, res) => {
   try {
     const deployments = await DeployedToken.find({ status: 'deployed' })
+      .select('owner tokenName tokenSymbol mintAddress logoUrl description deployedAt createdAt')
       .sort({ createdAt: -1 })
-      .limit(100);
+      .limit(100)
+      .lean();
 
     res.json({
       success: true,

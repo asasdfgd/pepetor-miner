@@ -27,7 +27,6 @@ const deployedTokenSchema = new mongoose.Schema({
   mintAddress: {
     type: String,
     required: true,
-    unique: true,
   },
   treasuryWallet: {
     type: String,
