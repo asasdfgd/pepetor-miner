@@ -126,7 +126,7 @@ function DirectorySection() {
                     {users.map((user) => (
                       <tr key={user._id}>
                         <td className="user-username">{user.username}</td>
-                        <td>{user.email || 'N/A'}</td>
+                        <td className="user-email">{user.email || 'N/A'}</td>
                         <td className="mono">{formatWallet(user.walletAddress)}</td>
                         <td>
                           <span className={`badge badge-${user.role}`}>
