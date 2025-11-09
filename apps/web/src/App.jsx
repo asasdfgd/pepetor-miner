@@ -14,6 +14,8 @@ import FaqPage from './pages/FaqPage';
 import DeployTokenPage from './pages/DeployTokenPage';
 import TableViewPage from './pages/TableViewPage';
 import TokenTradingPage from './pages/TokenTradingPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import './App.css';
 
 /**
@@ -36,6 +38,8 @@ function AppContent() {
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/tokens" element={<TableViewPage />} />
           <Route path="/trade/:mintAddress" element={<TokenTradingPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route
             path="/dashboard"
             element={
@@ -65,7 +69,27 @@ function AppContent() {
 
       <footer className="app-footer">
         <div className="container">
-          <p>Powered by PepeTor Miner</p>
+          <div className="footer-content">
+            <div className="footer-brand">
+              <p>Powered by PepeTor Miner</p>
+              <p className="footer-tagline">Privacy-First Token Creation & Mining</p>
+            </div>
+            
+            <div className="footer-links">
+              <a href="/terms" className="footer-link">Terms of Service</a>
+              <span className="footer-separator">•</span>
+              <a href="/privacy" className="footer-link">Privacy Policy</a>
+              <span className="footer-separator">•</span>
+              <a href="https://github.com/asasdfgd/pepetor-miner" target="_blank" rel="noopener noreferrer" className="footer-link">
+                Open Source
+              </a>
+            </div>
+            
+            <div className="footer-disclaimer">
+              <p>⚠️ Disclaimer: ClearNetLabs is a decentralized token creation platform. Users are solely responsible for tokens they create. Not financial advice. DYOR.</p>
+              <p className="footer-risk">Cryptocurrency investments carry risk. Only invest what you can afford to lose.</p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
