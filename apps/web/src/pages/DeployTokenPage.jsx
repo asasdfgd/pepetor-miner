@@ -380,29 +380,69 @@ const DeployTokenPage = () => {
               <span>{deploymentStatus.totalSupply.toLocaleString()} tokens</span>
             </div>
 
-            <div className="next-steps">
-              <h3>📋 Next Steps (Manual Setup):</h3>
-              <ol>
-                <li>✅ Token deployed on Solana {deploymentStatus.network}</li>
-                <li>✅ Metadata uploaded to Arweave (if logo provided)</li>
-                <li>📊 Create OpenBook Market at <a href="https://openbookdex.com" target="_blank" rel="noopener noreferrer">openbookdex.com</a> or <a href="https://dexlab.space" target="_blank" rel="noopener noreferrer">dexlab.space</a></li>
-                <li>💧 Add liquidity on <a href="https://raydium.io/liquidity/create/" target="_blank" rel="noopener noreferrer">Raydium</a> (requires Market ID from step 3)</li>
-                <li>🔒 Lock LP tokens for community trust</li>
-                <li>📈 Your token will auto-list on DexScreener once pool is created</li>
-              </ol>
-              <p className="info-text">💡 Use your Liquidity Wallet (below) to add tokens to the pool</p>
-            </div>
+            {deploymentStatus.marketId && deploymentStatus.poolAddress ? (
+              <div className="next-steps success">
+                <h3>🎉 Fully Automated Deployment Complete!</h3>
+                <ul className="checklist">
+                  <li>✅ Token deployed on Solana {deploymentStatus.network}</li>
+                  <li>✅ Metadata uploaded to Arweave</li>
+                  <li>✅ OpenBook Market created (ID: {deploymentStatus.marketId})</li>
+                  <li>✅ Raydium liquidity pool created</li>
+                  <li>✅ Token will auto-list on DexScreener within 5-10 minutes</li>
+                </ul>
+                <p className="info-text">🔗 View trading: <a href={`https://raydium.io/liquidity/increase/?mode=add&pool_id=${deploymentStatus.poolAddress}`} target="_blank" rel="noopener noreferrer">Raydium Pool</a></p>
+              </div>
+            ) : (
+              <div className="next-steps">
+                <h3>📋 Next Steps - Complete Liquidity Setup:</h3>
+                <ol>
+                  <li>✅ Token deployed on Solana {deploymentStatus.network}</li>
+                  <li>✅ Metadata uploaded to Arweave (if logo provided)</li>
+                  <li>📊 Import your <strong>Liquidity Wallet</strong> private key to Phantom (see below)</li>
+                  <li>💰 Send some SOL to the Liquidity Wallet for fees (~0.5 SOL)</li>
+                  <li>🌊 Go to <a href="https://raydium.io/liquidity/create/" target="_blank" rel="noopener noreferrer">Raydium</a> and create a liquidity pool</li>
+                  <li>🔒 Lock LP tokens on <a href="https://www.streamflow.finance/" target="_blank" rel="noopener noreferrer">Streamflow</a> for community trust</li>
+                  <li>📈 Your token will auto-list on DexScreener once pool is created</li>
+                </ol>
+                <p className="warning-text">⚠️ You'll need ~0.5 SOL in Liquidity Wallet for OpenBook Market creation (~0.4 SOL) + gas fees</p>
+              </div>
+            )}
 
             <div className="import-wallet-guide">
-              <h3>💼 Import Wallets to Phantom</h3>
-              <p className="info-text">To access your tokens in Phantom Wallet, import each wallet's private key:</p>
-              <ol className="import-steps">
-                <li>Open Phantom Wallet → Click Settings (⚙️) → Add / Connect Wallet</li>
-                <li>Select "Import Private Key"</li>
-                <li>Copy one of the private keys below and paste it</li>
-                <li>Your tokens will appear in that wallet!</li>
-              </ol>
-              <p className="warning-text">💡 Tip: Import all wallets to have full control of your token supply</p>
+              <h3>💼 How to Use Phantom for Liquidity</h3>
+              <div className="guide-section">
+                <h4>Step 1: Import Your Liquidity Wallet</h4>
+                <ol className="import-steps">
+                  <li>Open Phantom Wallet → Click Settings (⚙️) → Add / Connect Wallet</li>
+                  <li>Select "Import Private Key"</li>
+                  <li>Copy the <strong>Liquidity Wallet Private Key</strong> above and paste it</li>
+                  <li>Your tokens will appear in that wallet!</li>
+                  <li>Send ~0.5 SOL to this wallet for OpenBook/Raydium fees</li>
+                </ol>
+              </div>
+              
+              <div className="guide-section">
+                <h4>Step 2: Create Liquidity on Raydium</h4>
+                <ol className="import-steps">
+                  <li>Make sure you're on the Liquidity Wallet in Phantom</li>
+                  <li>Go to <a href="https://raydium.io/liquidity/create/" target="_blank" rel="noopener noreferrer">Raydium Create Pool</a></li>
+                  <li>Connect your Phantom wallet</li>
+                  <li>Select your token and SOL as the pair</li>
+                  <li>Add your desired liquidity amounts</li>
+                  <li>Confirm the transaction in Phantom</li>
+                </ol>
+              </div>
+              
+              <div className="guide-section">
+                <h4>📦 Access All Your Tokens</h4>
+                <p className="info-text">Import each wallet below to access different portions of your token supply:</p>
+                <ul>
+                  <li><strong>Treasury Wallet:</strong> Main reserve (20%)</li>
+                  <li><strong>Rewards Wallet:</strong> For airdrops & mining rewards (30%)</li>
+                  <li><strong>Liquidity Wallet:</strong> For DEX liquidity (20%)</li>
+                  <li><strong>Marketing Wallet:</strong> For marketing expenses (15%)</li>
+                </ul>
+              </div>
             </div>
 
             <div className="actions">

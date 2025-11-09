@@ -16,7 +16,9 @@ const {
   AuthorityType,
 } = require('@solana/spl-token');
 const { Metaplex, keypairIdentity, irysStorage } = require('@metaplex-foundation/js');
-const { Market } = require('@openbook-dex/openbook');
+const { MarketV2 } = require('@openbook-dex/openbook');
+const BN = require('bn.js');
+const { Raydium, TxVersion, parseTokenAccountResp } = require('@raydium-io/raydium-sdk-v2');
 const fs = require('fs');
 const path = require('path');
 
@@ -321,25 +323,106 @@ class TokenDeploymentService {
   }
 
   async createOpenBookMarket({ baseMint, deployer, decimals }) {
-    console.log('⚠️  OpenBook Market creation requires manual setup');
-    console.log('   1. Go to https://openbookdex.com or https://dexlab.space');
-    console.log(`   2. Create market for token: ${baseMint.toString()}`);
-    console.log('   3. Quote currency: SOL (Wrapped SOL)');
-    console.log('   4. Save the Market ID for Raydium pool creation');
-    
-    return null;
+    try {
+      const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
+      
+      const lotSize = 1;
+      const tickSize = 0.01;
+      
+      const market = await MarketV2.makeCreateMarketInstructionSimple({
+        connection: this.connection,
+        wallet: deployer.publicKey,
+        baseInfo: {
+          mint: baseMint,
+          decimals: decimals,
+        },
+        quoteInfo: {
+          mint: WSOL_MINT,
+          decimals: 9,
+        },
+        lotSize: lotSize,
+        tickSize: tickSize,
+        dexProgramId: new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX'),
+        makeTxVersion: TxVersion.V0,
+      });
+
+      const tx = new Transaction();
+      tx.add(...market.innerTransactions[0].instructions);
+      tx.feePayer = deployer.publicKey;
+      tx.recentBlockhash = (await this.connection.getLatestBlockhash()).blockhash;
+      
+      const signature = await this.connection.sendTransaction(tx, [deployer]);
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      
+      console.log('✅ OpenBook Market Created:', market.address.marketId.toString());
+      
+      return market.address.marketId.toString();
+    } catch (error) {
+      console.error('OpenBook Market creation failed:', error);
+      console.log('⚠️  Falling back to manual setup');
+      console.log('   1. Go to https://openbookdex.com or https://dexlab.space');
+      console.log(`   2. Create market for token: ${baseMint.toString()}`);
+      console.log('   3. Quote currency: SOL (Wrapped SOL)');
+      return null;
+    }
   }
 
   async createRaydiumPool({ marketId, baseMint, liquidityWallet, deployer, liquiditySOL, decimals }) {
-    console.log('⚠️  Raydium Pool creation requires manual setup');
-    console.log('   1. First create an OpenBook Market ID (see above)');
-    console.log('   2. Go to https://raydium.io/liquidity/create/');
-    console.log(`   3. Base Token: ${baseMint.toString()}`);
-    console.log('   4. Enter your Market ID');
-    console.log(`   5. Add ${liquiditySOL} SOL + corresponding tokens as liquidity`);
-    console.log('   6. Consider locking LP tokens for trust');
-    
-    return null;
+    try {
+      if (!marketId) {
+        throw new Error('Market ID required for Raydium pool creation');
+      }
+
+      const raydium = await Raydium.load({
+        connection: this.connection,
+        owner: deployer,
+        disableFeatureCheck: true,
+        disableLoadToken: false,
+      });
+
+      const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
+      
+      const baseAmount = new BN(1000000).mul(new BN(10).pow(new BN(decimals)));
+      const quoteAmount = new BN(liquiditySOL * LAMPORTS_PER_SOL);
+
+      const { execute, extInfo } = await raydium.liquidity.createPool({
+        programId: new PublicKey('675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'),
+        marketInfo: {
+          marketId: new PublicKey(marketId),
+          programId: new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX'),
+        },
+        baseMintInfo: {
+          mint: baseMint,
+          decimals: decimals,
+        },
+        quoteMintInfo: {
+          mint: WSOL_MINT,
+          decimals: 9,
+        },
+        baseAmount,
+        quoteAmount,
+        startTime: new BN(Math.floor(Date.now() / 1000)),
+        ownerInfo: {
+          useSOLBalance: true,
+        },
+        txVersion: TxVersion.V0,
+      });
+
+      const { txId } = await execute({ sendAndConfirm: true });
+      
+      console.log('✅ Raydium Pool Created:', extInfo.address.poolId.toString());
+      console.log('   Transaction:', txId);
+      
+      return extInfo.address.poolId.toString();
+    } catch (error) {
+      console.error('Raydium Pool creation failed:', error);
+      console.log('⚠️  Falling back to manual setup');
+      console.log('   1. Go to https://raydium.io/liquidity/create/');
+      console.log(`   2. Base Token: ${baseMint.toString()}`);
+      console.log(`   3. Market ID: ${marketId}`);
+      console.log(`   4. Add ${liquiditySOL} SOL + corresponding tokens as liquidity`);
+      return null;
+    }
   }
 
   getDefaultAllocations() {
