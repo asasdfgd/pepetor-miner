@@ -130,6 +130,45 @@ function HomePage() {
         </div>
       </section>
 
+      {/* About Section */}
+      <section className="about-section">
+        <div className="container">
+          <h2 className="section-title">About the Creator</h2>
+          <div className="about-content">
+            <div className="about-story">
+              <div className="about-header">
+                <h3>Giuseppe Pietravalle</h3>
+                <p className="about-age">Age: 17</p>
+                <a 
+                  href="https://x.com/clearnetmoney" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="about-social"
+                >
+                  <span className="social-icon">𝕏</span> @clearnetmoney
+                </a>
+              </div>
+              <div className="about-text">
+                <p>
+                  I lost my job and found myself scanning the internet for ways to make money. 
+                  I started trading meme coins—that didn't go too well. Then it hit me...
+                </p>
+                <p className="about-highlight">
+                  What if there could be a platform that allows users to <strong>trade tokens and mine them as well</strong>?
+                </p>
+                <p>
+                  That's how ClearNetLabs was born. A place where anyone can create their own token, 
+                  mine crypto, and trade—all in one platform. No gatekeepers, no barriers, just pure opportunity.
+                </p>
+                <p className="about-mission">
+                  🚀 Built by a 17-year-old who turned setbacks into innovation. Join the revolution.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="final-cta">
         <div className="container">
