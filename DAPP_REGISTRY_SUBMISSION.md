@@ -4,70 +4,49 @@ This document provides instructions for submitting ClearNetLabs to various dApp 
 
 ---
 
-## 1. Solana dApp Registry (Official)
+## 1. Blowfish Security (Phantom's Security Provider)
 
-**Repository**: https://github.com/solana-labs/dapp-list
+**Website**: https://blowfish.xyz
 
-### Submission Steps:
-
-1. **Fork the repository**:
-   ```bash
-   git clone https://github.com/solana-labs/dapp-list.git
-   cd dapp-list
-   ```
-
-2. **Create your dApp entry** in `src/dapps.json`:
-   ```json
-   {
-     "name": "ClearNetLabs",
-     "url": "https://clearnetlabs.fun",
-     "logo": "https://brown-glamorous-crane-421.mypinata.cloud/ipfs/bafybeicqq3g3o57pdm7wesrlrjw5b77a5n2nzems32qcmodmspfbgbha44",
-     "description": "Privacy-first Solana token creation platform. Create custom SPL tokens in minutes with no coding required.",
-     "category": "DeFi",
-     "tags": ["token-creation", "solana", "defi", "web3"],
-     "chain": "solana",
-     "twitter": "https://x.com/clearnetmoney",
-     "github": "https://github.com/asasdfgd/pepetor-miner"
-   }
-   ```
-
-3. **Submit Pull Request**:
-   - Branch name: `add-clearnetlabs`
-   - Title: "Add ClearNetLabs - Solana Token Creation Platform"
-   - Description: Brief overview of the platform
-
-4. **Wait for Review**: Solana Foundation typically reviews within 1-2 weeks.
-
----
-
-## 2. CertiK Skynet (Security Monitoring)
-
-**Website**: https://skynet.certik.com
+Phantom wallet uses Blowfish to scan transactions and flag malicious dApps. Getting verified by Blowfish will prevent security warnings in Phantom.
 
 ### Submission Steps:
 
-1. Visit https://skynet.certik.com/projects/submit
-2. Fill out the form:
-   - **Project Name**: ClearNetLabs
-   - **URL**: https://clearnetlabs.fun
-   - **Chain**: Solana
-   - **Category**: DeFi / Token Launchpad
-   - **Description**: Privacy-first token creation platform
-   - **Contact Email**: qeradad2@gmail.com
+1. **Contact Blowfish directly**:
+   - Email: support@blowfish.xyz
+   - Subject: "dApp Whitelist Request - ClearNetLabs"
 
-3. **Optional**: Request security audit (paid service)
-4. **Free Tier**: CertiK Skynet provides basic security monitoring for free
+2. **Email Template**:
+   ```
+   Hello Blowfish Team,
 
-### Badge Integration (After Approval):
-```html
-<a href="https://skynet.certik.com/projects/clearnetlabs">
-  <img src="https://skynet.certik.com/badge/clearnetlabs" alt="CertiK Security Score" />
-</a>
-```
+   I'm requesting whitelisting for ClearNetLabs (https://clearnetlabs.fun), 
+   a legitimate Solana token creation platform.
+
+   Project Details:
+   - Name: ClearNetLabs
+   - URL: https://clearnetlabs.fun
+   - Purpose: Privacy-first SPL token creation
+   - GitHub: https://github.com/asasdfgd/pepetor-miner (Open Source)
+   - Security: Uses official @solana/wallet-adapter-react
+   - Terms: https://clearnetlabs.fun/terms
+   - Privacy: https://clearnetlabs.fun/privacy
+
+   Our platform only requests user signatures for legitimate token deployment 
+   transactions. We use standard Solana wallet-adapter libraries.
+
+   Thank you for your consideration.
+
+   Best regards,
+   Joseph Pietravalle
+   qeradad2@gmail.com
+   ```
+
+3. **Wait for Review**: Typically 1-2 weeks
 
 ---
 
-## 3. Phantom Wallet Trust List
+## 2. Phantom Wallet Trust List
 
 **Contact**: https://phantom.app/developer
 
@@ -107,6 +86,33 @@ This document provides instructions for submitting ClearNetLabs to various dApp 
    - Screenshot of homepage
    - Link to Terms & Privacy pages
    - Link to GitHub repository
+
+---
+
+## 3. CertiK Skynet (Security Monitoring)
+
+**Website**: https://skynet.certik.com
+
+### Submission Steps:
+
+1. Visit https://skynet.certik.com/projects/submit
+2. Fill out the form:
+   - **Project Name**: ClearNetLabs
+   - **URL**: https://clearnetlabs.fun
+   - **Chain**: Solana
+   - **Category**: DeFi / Token Launchpad
+   - **Description**: Privacy-first token creation platform
+   - **Contact Email**: qeradad2@gmail.com
+
+3. **Optional**: Request security audit (paid service)
+4. **Free Tier**: CertiK Skynet provides basic security monitoring for free
+
+### Badge Integration (After Approval):
+```html
+<a href="https://skynet.certik.com/projects/clearnetlabs">
+  <img src="https://skynet.certik.com/badge/clearnetlabs" alt="CertiK Security Score" />
+</a>
+```
 
 ---
 
@@ -212,7 +218,7 @@ After approval from security platforms, add badges to your footer:
 
 ## 10. Monitoring & Compliance Checklist
 
-- [ ] Submit to Solana dApp Registry
+- [ ] Submit to Blowfish Security for verification
 - [ ] Request Phantom wallet whitelist
 - [ ] Request Solflare wallet whitelist
 - [ ] Submit to CertiK Skynet
@@ -230,7 +236,7 @@ After approval from security platforms, add badges to your footer:
 
 | Action | Timeline |
 |--------|----------|
-| Solana dApp Registry | 1-2 weeks |
+| Blowfish Verification | 1-2 weeks |
 | Phantom Whitelist | 1-3 weeks |
 | CertiK Submission | Immediate (monitoring starts) |
 | DappRadar Listing | 1-2 weeks |
