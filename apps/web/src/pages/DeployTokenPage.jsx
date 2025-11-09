@@ -50,6 +50,7 @@ const DeployTokenPage = () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}`);
       const data = await response.json();
+      console.log('API pricing response:', data);
       if (data.success) {
         setPricing(data);
       }
