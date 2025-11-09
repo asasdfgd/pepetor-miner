@@ -20,7 +20,7 @@ const { Market } = require('@openbook-dex/openbook');
 const fs = require('fs');
 const path = require('path');
 
-const DEPLOYMENT_PRICE_USD = 10;
+const DEPLOYMENT_PRICE_SOL = 0.073;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
 const TREASURY_WALLET = process.env.TREASURY_WALLET_ADDRESS;
 
@@ -357,9 +357,7 @@ class TokenDeploymentService {
       return DEPLOYMENT_PRICE_PEPETOR;
     }
     
-    const solPrice = await this.fetchSOLPrice();
-    const priceInSOL = DEPLOYMENT_PRICE_USD / solPrice;
-    return parseFloat(priceInSOL.toFixed(4));
+    return DEPLOYMENT_PRICE_SOL;
   }
 }
 
