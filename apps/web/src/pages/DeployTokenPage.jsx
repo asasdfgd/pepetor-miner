@@ -96,7 +96,13 @@ const DeployTokenPage = () => {
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
-      const transaction = new Transaction().add(
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      
+      const transaction = new Transaction({
+        feePayer: publicKey,
+        blockhash,
+        lastValidBlockHeight,
+      }).add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: treasuryPubkey,
@@ -104,8 +110,16 @@ const DeployTokenPage = () => {
         })
       );
 
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, 'confirmed');
+      const signature = await sendTransaction(transaction, connection, {
+        skipPreflight: false,
+        maxRetries: 3,
+      });
+      
+      await connection.confirmTransaction({
+        signature,
+        blockhash,
+        lastValidBlockHeight,
+      }, 'processed');
       
       return signature;
     } catch (error) {
