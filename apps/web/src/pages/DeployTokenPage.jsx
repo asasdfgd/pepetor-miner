@@ -21,6 +21,7 @@ const DeployTokenPage = () => {
     website: '',
     twitter: '',
     walletAddress: '',
+    liquidityAmount: '1',
   });
   
   const [logoFile, setLogoFile] = useState(null);
@@ -45,9 +46,9 @@ const DeployTokenPage = () => {
     }
   }, [deploymentId]);
 
-  const fetchPricing = async () => {
+  const fetchPricing = async (liquidityAmount = formData.liquidityAmount) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}`);
       const data = await response.json();
       if (data.success) {
         setPricing(data);
@@ -63,6 +64,10 @@ const DeployTokenPage = () => {
       ...prev,
       [name]: value,
     }));
+    
+    if (name === 'liquidityAmount') {
+      fetchPricing(value);
+    }
   };
 
   const handleLogoChange = (e) => {
@@ -106,7 +111,7 @@ const DeployTokenPage = () => {
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: treasuryPubkey,
-          lamports: pricing.price * LAMPORTS_PER_SOL,
+          lamports: Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL),
         })
       );
 
@@ -155,6 +160,12 @@ const DeployTokenPage = () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('paymentSignature', signature);
       formDataToSend.append('paymentMethod', 'SOL');
+      
+      const liquidityAmount = parseFloat(formData.liquidityAmount) || 0;
+      if (liquidityAmount > 0) {
+        formDataToSend.append('createPool', 'true');
+        formDataToSend.append('poolLiquiditySOL', liquidityAmount.toString());
+      }
       
       if (formData.website) {
         formDataToSend.append('website', formData.website);
@@ -382,15 +393,29 @@ const DeployTokenPage = () => {
 
             {deploymentStatus.marketId && deploymentStatus.poolAddress ? (
               <div className="next-steps success">
-                <h3>🎉 Fully Automated Deployment Complete!</h3>
+                <h3>🎉 Token Launched on DEX!</h3>
+                <div className="success-banner">
+                  <p className="fire-emoji">🔥🔥🔥</p>
+                  <p className="success-message">LP Tokens Burned - Liquidity Locked Forever!</p>
+                  <p className="success-submessage">Just like pump.fun - your liquidity is permanently locked</p>
+                </div>
                 <ul className="checklist">
                   <li>✅ Token deployed on Solana {deploymentStatus.network}</li>
                   <li>✅ Metadata uploaded to Arweave</li>
                   <li>✅ OpenBook Market created (ID: {deploymentStatus.marketId})</li>
                   <li>✅ Raydium liquidity pool created</li>
-                  <li>✅ Token will auto-list on DexScreener within 5-10 minutes</li>
+                  <li>🔥 LP tokens burned (can't be recovered)</li>
+                  <li>✅ Trading live on Raydium</li>
+                  <li>✅ Auto-listing on DexScreener (5-10 min)</li>
                 </ul>
-                <p className="info-text">🔗 View trading: <a href={`https://raydium.io/liquidity/increase/?mode=add&pool_id=${deploymentStatus.poolAddress}`} target="_blank" rel="noopener noreferrer">Raydium Pool</a></p>
+                <div className="trading-links">
+                  <a href={`https://raydium.io/swap/?inputCurrency=sol&outputCurrency=${deploymentStatus.mintAddress}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    🔗 Trade on Raydium
+                  </a>
+                  <a href={`https://dexscreener.com/solana/${deploymentStatus.mintAddress}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    📊 View on DexScreener
+                  </a>
+                </div>
               </div>
             ) : (
               <div className="next-steps">
@@ -482,6 +507,7 @@ const DeployTokenPage = () => {
                     website: '',
                     twitter: '',
                     walletAddress: '',
+                    liquidityAmount: '1',
                   });
                   setLogoFile(null);
                   setLogoPreview(null);
@@ -598,11 +624,18 @@ const DeployTokenPage = () => {
 
         {pricing && (
           <div className="pricing-card">
-            <h3>💰 Deployment Cost</h3>
+            <h3>💰 Total Cost</h3>
             <div className="price">
-              <span className="amount">{pricing.price} SOL</span>
-              <span className="usd">~${pricing.priceUSD || '10.00'} USD</span>
+              <span className="amount">{pricing.totalPrice} SOL</span>
+              <span className="usd">~${pricing.priceUSD || '0.00'} USD</span>
             </div>
+            {pricing.breakdown && (
+              <div className="price-breakdown">
+                {pricing.breakdown.map((line, i) => (
+                  <p key={i} className="breakdown-line">{line}</p>
+                ))}
+              </div>
+            )}
             <p className="note">{pricing.note}</p>
             <p className="sol-price-info">Current SOL Price: ${pricing.solPrice?.toFixed(2) || '...'}</p>
           </div>
@@ -665,6 +698,39 @@ const DeployTokenPage = () => {
                 max="9"
               />
             </div>
+          </div>
+
+          <div className="form-group liquidity-group">
+            <label htmlFor="liquidityAmount">
+              🚀 Instant Launch Liquidity (SOL)
+            </label>
+            <p className="input-hint">
+              💡 Add liquidity to auto-create Raydium pool. Set to 0 to deploy without liquidity.
+              <br />
+              🔥 LP tokens will be burned (liquidity locked forever, like pump.fun)
+            </p>
+            <input
+              type="number"
+              id="liquidityAmount"
+              name="liquidityAmount"
+              value={formData.liquidityAmount}
+              onChange={handleInputChange}
+              placeholder="1.0"
+              min="0"
+              step="0.1"
+            />
+            {parseFloat(formData.liquidityAmount) > 0 && pricing && (
+              <div className="liquidity-breakdown">
+                <p><strong>💰 Cost Breakdown:</strong></p>
+                <ul>
+                  <li>Deployment: {pricing.deploymentPrice} SOL</li>
+                  <li>Liquidity: {pricing.liquidityAmount} SOL</li>
+                  <li>OpenBook Market: {pricing.marketCreationCost} SOL</li>
+                  <li><strong>Total: {pricing.totalPrice} SOL (~${pricing.priceUSD} USD)</strong></li>
+                </ul>
+                <p className="info-text">✅ Your token will be tradeable instantly on Raydium!</p>
+              </div>
+            )}
           </div>
 
           <div className="form-group">
@@ -752,7 +818,17 @@ const DeployTokenPage = () => {
               <li>✅ 4 specialized wallets (Treasury, Rewards, Liquidity, Marketing)</li>
               <li>✅ Configurable token allocations</li>
               <li>✅ Mint authority revoked (immutable supply)</li>
-              <li>✅ Ready for Raydium listing</li>
+              {parseFloat(formData.liquidityAmount) > 0 ? (
+                <>
+                  <li>✅ OpenBook market created automatically</li>
+                  <li>✅ Raydium liquidity pool created</li>
+                  <li>🔥 LP tokens burned (liquidity locked forever)</li>
+                  <li>✅ Instant trading on DEX</li>
+                  <li>✅ Auto-listed on DexScreener</li>
+                </>
+              ) : (
+                <li>✅ Ready for manual liquidity setup</li>
+              )}
               <li>✅ Full ownership & control</li>
             </ul>
           </div>
@@ -773,7 +849,9 @@ const DeployTokenPage = () => {
               className="btn btn-primary btn-deploy"
               disabled={deploying || !pricing}
             >
-              {deploying ? 'Deploying...' : `Deploy Token (${pricing?.price || '...'} SOL)`}
+              {deploying ? 'Deploying...' : parseFloat(formData.liquidityAmount) > 0 
+                ? `🚀 Launch on DEX (${pricing?.totalPrice || '...'} SOL)` 
+                : `Deploy Token (${pricing?.totalPrice || '...'} SOL)`}
             </button>
           )}
         </form>

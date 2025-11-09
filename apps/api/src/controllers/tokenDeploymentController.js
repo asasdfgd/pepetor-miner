@@ -19,24 +19,39 @@ exports.uploadMiddleware = upload.single('logo');
 
 exports.getDeploymentPrice = async (req, res) => {
   try {
-    const { paymentMethod = 'SOL' } = req.query;
+    const { paymentMethod = 'SOL', liquidityAmount = 0 } = req.query;
     
-    const price = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
     
-    const priceUSD = paymentMethod === 'SOL' ? price * solPrice : null;
+    const liquidity = parseFloat(liquidityAmount) || 0;
+    const marketCreationCost = liquidity > 0 ? 0.4 : 0;
+    const totalPrice = deploymentPrice + liquidity + marketCreationCost;
+    
+    const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
     
     res.json({
       success: true,
       paymentMethod,
-      price,
+      deploymentPrice,
+      liquidityAmount: liquidity,
+      marketCreationCost,
+      totalPrice,
       priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
       solPrice,
       treasuryWallet,
+      breakdown: liquidity > 0 ? [
+        `Deployment: ${deploymentPrice} SOL`,
+        `Liquidity: ${liquidity} SOL`,
+        `OpenBook Market: ${marketCreationCost} SOL`,
+        `Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`,
+      ] : null,
       note: paymentMethod === 'PEPETOR' 
         ? 'PEPETOR payment coming soon after mainnet launch'
-        : `${price} SOL (~$${priceUSD.toFixed(2)} USD at current price)`,
+        : liquidity > 0
+          ? `Instant DEX launch with ${liquidity} SOL liquidity (LP tokens will be burned)`
+          : `Token deployment only - add liquidity manually later`,
     });
   } catch (error) {
     console.error('Error getting deployment price:', error);
@@ -175,6 +190,8 @@ async function deployTokenAsync(deploymentId, config) {
       liquidityKeypair: result.liquidityKeypair,
       marketingKeypair: result.marketingKeypair,
       metadataUri: result.metadataUri,
+      marketId: result.marketId,
+      poolAddress: result.poolAddress,
       deploymentSignature: result.deploymentSignature,
       deployedAt: new Date(),
     });
@@ -229,6 +246,8 @@ exports.getDeploymentStatus = async (req, res) => {
         rewardsKeypair: deployment.rewardsKeypair,
         liquidityKeypair: deployment.liquidityKeypair,
         marketingKeypair: deployment.marketingKeypair,
+        marketId: deployment.marketId,
+        poolAddress: deployment.poolAddress,
         deployedAt: deployment.deployedAt,
         network: deployment.network,
       },

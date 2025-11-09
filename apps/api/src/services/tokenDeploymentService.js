@@ -14,6 +14,7 @@ const {
   TOKEN_PROGRAM_ID,
   setAuthority,
   AuthorityType,
+  createBurnInstruction,
 } = require('@solana/spl-token');
 const { Metaplex, keypairIdentity, irysStorage } = require('@metaplex-foundation/js');
 const { MarketV2 } = require('@openbook-dex/openbook');
@@ -412,6 +413,38 @@ class TokenDeploymentService {
       
       console.log('✅ Raydium Pool Created:', extInfo.address.poolId.toString());
       console.log('   Transaction:', txId);
+      
+      console.log('🔥 Burning LP tokens (locking liquidity forever)...');
+      try {
+        const lpMint = extInfo.address.lpMint;
+        const deployerLpAccount = await getOrCreateAssociatedTokenAccount(
+          this.connection,
+          deployer,
+          lpMint,
+          deployer.publicKey
+        );
+        
+        const lpBalance = (await this.connection.getTokenAccountBalance(deployerLpAccount.address)).value.amount;
+        
+        if (parseInt(lpBalance) > 0) {
+          const burnTx = new Transaction().add(
+            createBurnInstruction(
+              deployerLpAccount.address,
+              lpMint,
+              deployer.publicKey,
+              lpBalance
+            )
+          );
+          
+          const burnSig = await this.connection.sendTransaction(burnTx, [deployer]);
+          await this.connection.confirmTransaction(burnSig, 'confirmed');
+          
+          console.log('✅ LP Tokens Burned - Liquidity Locked Forever!');
+          console.log('   Burn Transaction:', burnSig);
+        }
+      } catch (burnError) {
+        console.error('⚠️  LP burn failed (non-critical):', burnError.message);
+      }
       
       return extInfo.address.poolId.toString();
     } catch (error) {
