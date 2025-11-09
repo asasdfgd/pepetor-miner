@@ -367,14 +367,16 @@ const DeployTokenPage = () => {
             </div>
 
             <div className="next-steps">
-              <h3>📋 Next Steps:</h3>
+              <h3>📋 Next Steps (Manual Setup):</h3>
               <ol>
                 <li>✅ Token deployed on Solana {deploymentStatus.network}</li>
-                <li>Upload logo and metadata (coming soon)</li>
-                <li>Create Raydium liquidity pool</li>
-                <li>Lock LP tokens</li>
-                <li>List on DexScreener</li>
+                <li>✅ Metadata uploaded to Arweave (if logo provided)</li>
+                <li>📊 Create OpenBook Market at <a href="https://openbookdex.com" target="_blank" rel="noopener noreferrer">openbookdex.com</a> or <a href="https://dexlab.space" target="_blank" rel="noopener noreferrer">dexlab.space</a></li>
+                <li>💧 Add liquidity on <a href="https://raydium.io/liquidity/create/" target="_blank" rel="noopener noreferrer">Raydium</a> (requires Market ID from step 3)</li>
+                <li>🔒 Lock LP tokens for community trust</li>
+                <li>📈 Your token will auto-list on DexScreener once pool is created</li>
               </ol>
+              <p className="info-text">💡 Use your Liquidity Wallet (below) to add tokens to the pool</p>
             </div>
 
             <div className="import-wallet-guide">
@@ -533,8 +535,8 @@ const DeployTokenPage = () => {
             <div className="instruction-step">
               <div className="step-number">5</div>
               <div className="step-content">
-                <h4>Create Liquidity (Optional)</h4>
-                <p>Follow the post-deployment guide to create an OpenBook market, add Raydium liquidity, and list on DexScreener for trading.</p>
+                <h4>Create Liquidity (Manual - Post-Deployment)</h4>
+                <p>After deployment, you'll receive step-by-step instructions to create an OpenBook market and add Raydium liquidity using your generated wallets. This enables trading on DEXs and auto-listing on DexScreener.</p>
               </div>
             </div>
           </div>

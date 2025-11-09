@@ -15,7 +15,7 @@ const {
   setAuthority,
   AuthorityType,
 } = require('@solana/spl-token');
-const { Metaplex, keypairIdentity, bundlrStorage } = require('@metaplex-foundation/js');
+const { Metaplex, keypairIdentity, irysStorage } = require('@metaplex-foundation/js');
 const { Market } = require('@openbook-dex/openbook');
 const fs = require('fs');
 const path = require('path');
@@ -251,10 +251,10 @@ class TokenDeploymentService {
   async uploadMetadata({ mint, tokenName, tokenSymbol, description, logoBuffer, deployer, totalSupply, website, twitter, walletAddress }) {
     const metaplex = Metaplex.make(this.connection)
       .use(keypairIdentity(deployer))
-      .use(bundlrStorage({
+      .use(irysStorage({
         address: this.network === 'mainnet-beta' 
-          ? 'https://node1.bundlr.network' 
-          : 'https://devnet.bundlr.network',
+          ? 'https://node1.irys.xyz' 
+          : 'https://devnet.irys.xyz',
         providerUrl: process.env.SOLANA_RPC_URL || clusterApiUrl(this.network),
         timeout: 60000,
       }));
@@ -317,67 +317,27 @@ class TokenDeploymentService {
 
     const metadataUri = await metaplex.storage().uploadJson(metadata);
 
-    try {
-      await metaplex.nfts().create({
-        uri: metadataUri,
-        name: tokenName,
-        sellerFeeBasisPoints: 0,
-        symbol: tokenSymbol,
-        creators: [
-          {
-            address: deployer.publicKey,
-            share: 100,
-          },
-        ],
-        isMutable: true,
-        maxSupply: null,
-        useNewMint: new PublicKey(mint),
-      });
-    } catch (error) {
-      console.warn('⚠️  Metadata account creation skipped:', error.message);
-    }
-
     return metadataUri;
   }
 
   async createOpenBookMarket({ baseMint, deployer, decimals }) {
-    const OPENBOOK_PROGRAM_ID = new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX');
-    const quoteMint = new PublicKey('So11111111111111111111111111111111111111112');
-
-    const minOrderSize = 1;
-    const tickSize = 0.00001;
-
-    const marketKeypair = Keypair.generate();
-
-    const tx = new Transaction();
+    console.log('⚠️  OpenBook Market creation requires manual setup');
+    console.log('   1. Go to https://openbookdex.com or https://dexlab.space');
+    console.log(`   2. Create market for token: ${baseMint.toString()}`);
+    console.log('   3. Quote currency: SOL (Wrapped SOL)');
+    console.log('   4. Save the Market ID for Raydium pool creation');
     
-    const rentExemption = await this.connection.getMinimumBalanceForRentExemption(
-      Market.getLayout(OPENBOOK_PROGRAM_ID).span
-    );
-
-    tx.add(
-      SystemProgram.createAccount({
-        fromPubkey: deployer.publicKey,
-        newAccountPubkey: marketKeypair.publicKey,
-        lamports: rentExemption,
-        space: Market.getLayout(OPENBOOK_PROGRAM_ID).span,
-        programId: OPENBOOK_PROGRAM_ID,
-      })
-    );
-
-    await this.connection.sendTransaction(tx, [deployer, marketKeypair]);
-
-    return marketKeypair.publicKey.toString();
+    return null;
   }
 
   async createRaydiumPool({ marketId, baseMint, liquidityWallet, deployer, liquiditySOL, decimals }) {
-    const quoteMint = new PublicKey('So11111111111111111111111111111111111111112');
-    
-    console.log('⚠️  Pool creation requires manual setup via Raydium UI');
-    console.log('   1. Go to https://raydium.io/liquidity/create/');
-    console.log(`   2. Base Token: ${baseMint.toString()}`);
-    console.log(`   3. Market ID: ${marketId}`);
-    console.log(`   4. Add ${liquiditySOL} SOL liquidity`);
+    console.log('⚠️  Raydium Pool creation requires manual setup');
+    console.log('   1. First create an OpenBook Market ID (see above)');
+    console.log('   2. Go to https://raydium.io/liquidity/create/');
+    console.log(`   3. Base Token: ${baseMint.toString()}`);
+    console.log('   4. Enter your Market ID');
+    console.log(`   5. Add ${liquiditySOL} SOL + corresponding tokens as liquidity`);
+    console.log('   6. Consider locking LP tokens for trust');
     
     return null;
   }
