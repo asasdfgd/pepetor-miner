@@ -25,16 +25,18 @@ exports.getDeploymentPrice = async (req, res) => {
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
     
+    const priceUSD = paymentMethod === 'SOL' ? price * solPrice : null;
+    
     res.json({
       success: true,
       paymentMethod,
       price,
-      priceUSD: paymentMethod === 'SOL' ? 10 : null,
+      priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
       solPrice,
       treasuryWallet,
       note: paymentMethod === 'PEPETOR' 
         ? 'PEPETOR payment coming soon after mainnet launch'
-        : `$10 USD worth of SOL at current price ($${solPrice.toFixed(2)})`,
+        : `${price} SOL (~$${priceUSD.toFixed(2)} USD at current price)`,
     });
   } catch (error) {
     console.error('Error getting deployment price:', error);
