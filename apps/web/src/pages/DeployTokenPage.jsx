@@ -100,12 +100,15 @@ const DeployTokenPage = () => {
     if (!publicKey || !pricing) return null;
 
     try {
+      console.log('Pricing object:', pricing);
+      console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
+      
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
       }
 
-      if (typeof pricing.totalPrice !== 'number' || isNaN(pricing.totalPrice)) {
-        throw new Error('Invalid pricing. Please refresh and try again.');
+      if (typeof pricing.totalPrice !== 'number' || isNaN(pricing.totalPrice) || pricing.totalPrice <= 0) {
+        throw new Error(`Invalid pricing: ${pricing.totalPrice}. Please refresh and try again.`);
       }
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
