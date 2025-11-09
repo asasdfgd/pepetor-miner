@@ -104,7 +104,7 @@ const DeployTokenPage = () => {
         throw new Error('Treasury wallet not configured. Please contact support.');
       }
 
-      if (!pricing.totalPrice || isNaN(pricing.totalPrice) || pricing.totalPrice <= 0) {
+      if (typeof pricing.totalPrice !== 'number' || isNaN(pricing.totalPrice)) {
         throw new Error('Invalid pricing. Please refresh and try again.');
       }
 
