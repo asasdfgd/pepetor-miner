@@ -138,7 +138,6 @@ function HomePage() {
             <div className="about-story">
               <div className="about-header">
                 <h3>Giuseppe Pietravalle</h3>
-                <p className="about-age">Age: 17</p>
                 <a 
                   href="https://x.com/clearnetmoney" 
                   target="_blank" 
