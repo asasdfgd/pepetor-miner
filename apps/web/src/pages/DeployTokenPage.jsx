@@ -66,7 +66,12 @@ const DeployTokenPage = () => {
     }));
     
     if (name === 'liquidityAmount') {
-      fetchPricing(value);
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        fetchPricing(value);
+      } else if (value === '' || value === '0') {
+        fetchPricing('0');
+      }
     }
   };
 
@@ -97,6 +102,10 @@ const DeployTokenPage = () => {
     try {
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
+      }
+
+      if (!pricing.totalPrice || isNaN(pricing.totalPrice) || pricing.totalPrice <= 0) {
+        throw new Error('Invalid pricing. Please refresh and try again.');
       }
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
