@@ -137,7 +137,7 @@ function HomePage() {
           <div className="about-content">
             <div className="about-story">
               <div className="about-header">
-                <h3>Giuseppe Pietravalle</h3>
+                <h3>Joseph Pietravalle</h3>
                 <a 
                   href="https://x.com/clearnetmoney" 
                   target="_blank" 
@@ -149,7 +149,7 @@ function HomePage() {
               </div>
               <div className="about-text">
                 <p>
-                  I lost my job and found myself scanning the internet for ways to make money. 
+                  I left my job and found myself scanning the internet for ways to make money. 
                   I started trading meme coins—that didn't go too well. Then it hit me...
                 </p>
                 <p className="about-highlight">
