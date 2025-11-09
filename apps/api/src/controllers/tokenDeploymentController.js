@@ -21,17 +21,20 @@ exports.getDeploymentPrice = async (req, res) => {
   try {
     const { paymentMethod = 'SOL' } = req.query;
     
-    const price = tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const price = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
     
     res.json({
       success: true,
       paymentMethod,
       price,
+      priceUSD: paymentMethod === 'SOL' ? 10 : null,
+      solPrice,
       treasuryWallet,
       note: paymentMethod === 'PEPETOR' 
         ? 'PEPETOR payment coming soon after mainnet launch'
-        : 'Send SOL to treasury wallet, then submit deployment request',
+        : `$10 USD worth of SOL at current price ($${solPrice.toFixed(2)})`,
     });
   } catch (error) {
     console.error('Error getting deployment price:', error);
@@ -87,7 +90,7 @@ exports.requestDeployment = async (req, res) => {
       });
     }
 
-    const expectedAmount = tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const expectedAmount = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     
     const paymentValid = await tokenDeploymentService.verifyPayment(
       paymentSignature,
@@ -165,6 +168,10 @@ async function deployTokenAsync(deploymentId, config) {
       rewardsWallet: result.rewardsWallet,
       liquidityWallet: result.liquidityWallet,
       marketingWallet: result.marketingWallet,
+      treasuryKeypair: result.treasuryKeypair,
+      rewardsKeypair: result.rewardsKeypair,
+      liquidityKeypair: result.liquidityKeypair,
+      marketingKeypair: result.marketingKeypair,
       metadataUri: result.metadataUri,
       deploymentSignature: result.deploymentSignature,
       deployedAt: new Date(),
@@ -216,6 +223,10 @@ exports.getDeploymentStatus = async (req, res) => {
         rewardsWallet: deployment.rewardsWallet,
         liquidityWallet: deployment.liquidityWallet,
         marketingWallet: deployment.marketingWallet,
+        treasuryKeypair: deployment.treasuryKeypair,
+        rewardsKeypair: deployment.rewardsKeypair,
+        liquidityKeypair: deployment.liquidityKeypair,
+        marketingKeypair: deployment.marketingKeypair,
         deployedAt: deployment.deployedAt,
         network: deployment.network,
       },

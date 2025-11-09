@@ -20,7 +20,7 @@ const { Market } = require('@openbook-dex/openbook');
 const fs = require('fs');
 const path = require('path');
 
-const DEPLOYMENT_PRICE_SOL = 0.3;
+const DEPLOYMENT_PRICE_USD = 10;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
 const TREASURY_WALLET = process.env.TREASURY_WALLET_ADDRESS;
 
@@ -31,6 +31,26 @@ class TokenDeploymentService {
       'confirmed'
     );
     this.network = process.env.SOLANA_NETWORK || 'mainnet-beta';
+    this.solPriceCache = { price: null, timestamp: 0 };
+  }
+
+  async fetchSOLPrice() {
+    const now = Date.now();
+    if (this.solPriceCache.price && (now - this.solPriceCache.timestamp < 60000)) {
+      return this.solPriceCache.price;
+    }
+
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+      const data = await response.json();
+      const price = data.solana?.usd || 200;
+      
+      this.solPriceCache = { price, timestamp: now };
+      return price;
+    } catch (error) {
+      console.error('Failed to fetch SOL price, using fallback:', error);
+      return 200;
+    }
   }
 
   async verifyPayment(signature, expectedAmount, paymentMethod = 'SOL') {
@@ -216,6 +236,10 @@ class TokenDeploymentService {
       rewardsWallet: wallets.rewards.publicKey.toString(),
       liquidityWallet: wallets.liquidity.publicKey.toString(),
       marketingWallet: wallets.marketing.publicKey.toString(),
+      treasuryKeypair: Array.from(wallets.treasury.secretKey),
+      rewardsKeypair: Array.from(wallets.rewards.secretKey),
+      liquidityKeypair: Array.from(wallets.liquidity.secretKey),
+      marketingKeypair: Array.from(wallets.marketing.secretKey),
       walletsPath: walletsDir,
       metadataUri,
       marketId,
@@ -368,11 +392,14 @@ class TokenDeploymentService {
     };
   }
 
-  getDeploymentPrice(paymentMethod = 'SOL') {
+  async getDeploymentPrice(paymentMethod = 'SOL') {
     if (paymentMethod === 'PEPETOR') {
       return DEPLOYMENT_PRICE_PEPETOR;
     }
-    return DEPLOYMENT_PRICE_SOL;
+    
+    const solPrice = await this.fetchSOLPrice();
+    const priceInSOL = DEPLOYMENT_PRICE_USD / solPrice;
+    return parseFloat(priceInSOL.toFixed(4));
   }
 }
 

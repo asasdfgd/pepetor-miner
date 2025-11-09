@@ -205,6 +205,72 @@ const DeployTokenPage = () => {
     }
   };
 
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text);
+    alert(`${type} copied to clipboard!`);
+  };
+
+  const addTokenToWallet = async () => {
+    if (!window.solana || !deploymentStatus?.mintAddress) return;
+    
+    try {
+      await window.solana.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'SPL',
+          options: {
+            address: deploymentStatus.mintAddress,
+            symbol: deploymentStatus.tokenSymbol,
+            decimals: deploymentStatus.decimals || 9,
+          },
+        },
+      });
+      alert('Token added to Phantom wallet!');
+    } catch (error) {
+      console.error('Failed to add token:', error);
+      alert('Failed to add token to wallet. Please add it manually using the mint address.');
+    }
+  };
+
+  const downloadWallets = () => {
+    if (!deploymentStatus) return;
+    
+    const walletsData = {
+      tokenName: deploymentStatus.tokenName,
+      tokenSymbol: deploymentStatus.tokenSymbol,
+      mintAddress: deploymentStatus.mintAddress,
+      network: deploymentStatus.network,
+      wallets: {
+        treasury: {
+          publicKey: deploymentStatus.treasuryWallet,
+          privateKey: deploymentStatus.treasuryKeypair,
+        },
+        rewards: {
+          publicKey: deploymentStatus.rewardsWallet,
+          privateKey: deploymentStatus.rewardsKeypair,
+        },
+        liquidity: {
+          publicKey: deploymentStatus.liquidityWallet,
+          privateKey: deploymentStatus.liquidityKeypair,
+        },
+        marketing: {
+          publicKey: deploymentStatus.marketingWallet,
+          privateKey: deploymentStatus.marketingKeypair,
+        },
+      },
+    };
+    
+    const blob = new Blob([JSON.stringify(walletsData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${deploymentStatus.tokenSymbol}-wallets.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (deploymentStatus && deploymentStatus.status === 'deployed') {
     return (
       <div className="deploy-token-page">
@@ -218,26 +284,81 @@ const DeployTokenPage = () => {
               <label>Mint Address:</label>
               <code>{deploymentStatus.mintAddress}</code>
               <button 
-                onClick={() => navigator.clipboard.writeText(deploymentStatus.mintAddress)}
+                onClick={() => copyToClipboard(deploymentStatus.mintAddress, 'Mint address')}
                 className="copy-btn"
               >
                 Copy
               </button>
             </div>
 
-            <div className="detail-item">
-              <label>Treasury Wallet:</label>
-              <code>{deploymentStatus.treasuryWallet}</code>
-            </div>
+            <div className="wallet-keypairs-section">
+              <h3>🔑 Your Wallet Keypairs (Access Your Tokens)</h3>
+              <p className="warning-text">⚠️ IMPORTANT: Save these private keys! These wallets contain all your token supply.</p>
+              <p className="info-text">💡 Import these wallets into Phantom to access and manage your tokens.</p>
+              
+              <div className="keypair-item">
+                <label>Treasury Wallet:</label>
+                <div className="keypair-details">
+                  <div className="keypair-row">
+                    <span className="keypair-label">Public Key:</span>
+                    <code>{deploymentStatus.treasuryWallet}</code>
+                    <button onClick={() => copyToClipboard(deploymentStatus.treasuryWallet, 'Treasury public key')} className="copy-btn">Copy</button>
+                  </div>
+                  <div className="keypair-row">
+                    <span className="keypair-label">Private Key:</span>
+                    <code className="private-key">[{deploymentStatus.treasuryKeypair?.join(',')}]</code>
+                    <button onClick={() => copyToClipboard(JSON.stringify(deploymentStatus.treasuryKeypair), 'Treasury private key')} className="copy-btn">Copy</button>
+                  </div>
+                </div>
+              </div>
 
-            <div className="detail-item">
-              <label>Rewards Wallet:</label>
-              <code>{deploymentStatus.rewardsWallet}</code>
-            </div>
+              <div className="keypair-item">
+                <label>Rewards Wallet:</label>
+                <div className="keypair-details">
+                  <div className="keypair-row">
+                    <span className="keypair-label">Public Key:</span>
+                    <code>{deploymentStatus.rewardsWallet}</code>
+                    <button onClick={() => copyToClipboard(deploymentStatus.rewardsWallet, 'Rewards public key')} className="copy-btn">Copy</button>
+                  </div>
+                  <div className="keypair-row">
+                    <span className="keypair-label">Private Key:</span>
+                    <code className="private-key">[{deploymentStatus.rewardsKeypair?.join(',')}]</code>
+                    <button onClick={() => copyToClipboard(JSON.stringify(deploymentStatus.rewardsKeypair), 'Rewards private key')} className="copy-btn">Copy</button>
+                  </div>
+                </div>
+              </div>
 
-            <div className="detail-item">
-              <label>Liquidity Wallet:</label>
-              <code>{deploymentStatus.liquidityWallet}</code>
+              <div className="keypair-item">
+                <label>Liquidity Wallet:</label>
+                <div className="keypair-details">
+                  <div className="keypair-row">
+                    <span className="keypair-label">Public Key:</span>
+                    <code>{deploymentStatus.liquidityWallet}</code>
+                    <button onClick={() => copyToClipboard(deploymentStatus.liquidityWallet, 'Liquidity public key')} className="copy-btn">Copy</button>
+                  </div>
+                  <div className="keypair-row">
+                    <span className="keypair-label">Private Key:</span>
+                    <code className="private-key">[{deploymentStatus.liquidityKeypair?.join(',')}]</code>
+                    <button onClick={() => copyToClipboard(JSON.stringify(deploymentStatus.liquidityKeypair), 'Liquidity private key')} className="copy-btn">Copy</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="keypair-item">
+                <label>Marketing Wallet:</label>
+                <div className="keypair-details">
+                  <div className="keypair-row">
+                    <span className="keypair-label">Public Key:</span>
+                    <code>{deploymentStatus.marketingWallet}</code>
+                    <button onClick={() => copyToClipboard(deploymentStatus.marketingWallet, 'Marketing public key')} className="copy-btn">Copy</button>
+                  </div>
+                  <div className="keypair-row">
+                    <span className="keypair-label">Private Key:</span>
+                    <code className="private-key">[{deploymentStatus.marketingKeypair?.join(',')}]</code>
+                    <button onClick={() => copyToClipboard(JSON.stringify(deploymentStatus.marketingKeypair), 'Marketing private key')} className="copy-btn">Copy</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="detail-item">
@@ -256,12 +377,38 @@ const DeployTokenPage = () => {
               </ol>
             </div>
 
+            <div className="import-wallet-guide">
+              <h3>💼 Import Wallets to Phantom</h3>
+              <p className="info-text">To access your tokens in Phantom Wallet, import each wallet's private key:</p>
+              <ol className="import-steps">
+                <li>Open Phantom Wallet → Click Settings (⚙️) → Add / Connect Wallet</li>
+                <li>Select "Import Private Key"</li>
+                <li>Copy one of the private keys below and paste it</li>
+                <li>Your tokens will appear in that wallet!</li>
+              </ol>
+              <p className="warning-text">💡 Tip: Import all wallets to have full control of your token supply</p>
+            </div>
+
             <div className="actions">
+              <button 
+                onClick={addTokenToWallet}
+                className="btn btn-primary"
+              >
+                🔔 Add Token to Phantom
+              </button>
+
+              <button 
+                onClick={downloadWallets}
+                className="btn btn-primary"
+              >
+                💾 Download All Wallets
+              </button>
+              
               <a
                 href={`https://solscan.io/token/${deploymentStatus.mintAddress}?cluster=${deploymentStatus.network}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-secondary"
               >
                 View on Solscan
               </a>
@@ -398,9 +545,10 @@ const DeployTokenPage = () => {
             <h3>💰 Deployment Cost</h3>
             <div className="price">
               <span className="amount">{pricing.price} SOL</span>
-              <span className="usd">~${(pricing.price * 200).toFixed(2)} USD</span>
+              <span className="usd">~${pricing.priceUSD || '10.00'} USD</span>
             </div>
             <p className="note">{pricing.note}</p>
+            <p className="sol-price-info">Current SOL Price: ${pricing.solPrice?.toFixed(2) || '...'}</p>
           </div>
         )}
 

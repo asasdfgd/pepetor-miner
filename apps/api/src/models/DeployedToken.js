@@ -34,6 +34,18 @@ const deployedTokenSchema = new mongoose.Schema({
   },
   liquidityWallet: String,
   marketingWallet: String,
+  treasuryKeypair: {
+    type: [Number],
+  },
+  rewardsKeypair: {
+    type: [Number],
+  },
+  liquidityKeypair: {
+    type: [Number],
+  },
+  marketingKeypair: {
+    type: [Number],
+  },
   description: String,
   logoUrl: String,
   metadataUri: String,
