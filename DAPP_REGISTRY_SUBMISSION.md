@@ -46,46 +46,29 @@ Phantom wallet uses Blowfish to scan transactions and flag malicious dApps. Gett
 
 ---
 
-## 2. Phantom Wallet Trust List
+## 2. Phantom Domain Review Team
 
-**Contact**: https://phantom.app/developer
+**Documentation**: https://docs.phantom.com/developer-powertools/domain-and-transaction-warnings  
+**Domain Review Form**: https://docs.google.com/forms/d/1JgIxdmolgh_80xMfQKBKx9-QPC7LRdN6LHpFFW8BlKM/viewform
 
 ### Submission Steps:
 
-1. Email: developer@phantom.app
-2. **Subject**: "Whitelist Request - ClearNetLabs (clearnetlabs.fun)"
-3. **Email Body**:
-   ```
-   Hello Phantom Team,
+1. **Review your transactions first**:
+   - Ensure transactions have only ONE signer (Phantom must sign first)
+   - If multiple signers needed, use `signTransaction` (not `signAndSendTransaction`)
+   - Simulate transactions with `sigVerify: false` before submission
+   - Split large transactions or use Address Lookup Tables if needed
 
-   I'm requesting whitelisting for ClearNetLabs (https://clearnetlabs.fun), 
-   a legitimate Solana token creation platform.
+2. **Submit Domain Review Form**: https://docs.google.com/forms/d/1JgIxdmolgh_80xMfQKBKx9-QPC7LRdN6LHpFFW8BlKM/viewform
 
-   Project Details:
-   - Name: ClearNetLabs / PepeTor Miner
-   - URL: https://clearnetlabs.fun
-   - Purpose: Privacy-first SPL token creation
-   - GitHub: https://github.com/asasdfgd/pepetor-miner (Open Source)
-   - Security: Uses official @solana/wallet-adapter
-   - Terms of Service: https://clearnetlabs.fun/terms
-   - Privacy Policy: https://clearnetlabs.fun/privacy
+3. **Form Details**:
+   - **Domain**: clearnetlabs.fun
+   - **Description**: Privacy-first Solana token creation platform
+   - **Why requesting review**: Legitimate dApp using official @solana/wallet-adapter-react
+   - **GitHub**: https://github.com/asasdfgd/pepetor-miner
+   - **Additional info**: Open source project with Terms/Privacy policy. Uses standard Solana transaction patterns.
 
-   Our platform uses standard Solana wallet-adapter libraries and only requests 
-   user signatures for legitimate token deployment transactions. We do NOT 
-   auto-drain wallets or use misleading practices.
-
-   Thank you for your consideration.
-
-   Best regards,
-   Joseph Pietravalle
-   Email: qeradad2@gmail.com
-   Twitter: @clearnetmoney
-   ```
-
-4. **Attach**:
-   - Screenshot of homepage
-   - Link to Terms & Privacy pages
-   - Link to GitHub repository
+**Note**: Phantom also uses Blowfish for security scanning (see Section 1).
 
 ---
 
