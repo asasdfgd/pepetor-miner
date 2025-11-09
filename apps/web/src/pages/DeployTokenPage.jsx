@@ -716,8 +716,8 @@ const DeployTokenPage = () => {
               value={formData.liquidityAmount}
               onChange={handleInputChange}
               placeholder="1.0"
-              min="0"
-              step="0.1"
+              min="0.01"
+              step="0.01"
             />
             {parseFloat(formData.liquidityAmount) > 0 && pricing && (
               <div className="liquidity-breakdown">
