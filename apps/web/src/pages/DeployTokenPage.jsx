@@ -22,6 +22,7 @@ const DeployTokenPage = () => {
     twitter: '',
     walletAddress: '',
     liquidityAmount: '1',
+    useBondingCurve: true,
   });
   
   const [logoFile, setLogoFile] = useState(null);
@@ -38,6 +39,10 @@ const DeployTokenPage = () => {
   }, []);
 
   useEffect(() => {
+    fetchPricing();
+  }, [formData.useBondingCurve]);
+
+  useEffect(() => {
     if (deploymentId) {
       const interval = setInterval(() => {
         checkDeploymentStatus();
@@ -48,7 +53,8 @@ const DeployTokenPage = () => {
 
   const fetchPricing = async (liquidityAmount = formData.liquidityAmount) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}`);
+      const useBondingCurve = formData.useBondingCurve || false;
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}`);
       const data = await response.json();
       console.log('API pricing response:', data);
       if (data.success) {
@@ -173,11 +179,14 @@ const DeployTokenPage = () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('paymentSignature', signature);
       formDataToSend.append('paymentMethod', 'SOL');
+      formDataToSend.append('useBondingCurve', formData.useBondingCurve.toString());
       
-      const liquidityAmount = parseFloat(formData.liquidityAmount) || 0;
-      if (liquidityAmount > 0) {
-        formDataToSend.append('createPool', 'true');
-        formDataToSend.append('poolLiquiditySOL', liquidityAmount.toString());
+      if (!formData.useBondingCurve) {
+        const liquidityAmount = parseFloat(formData.liquidityAmount) || 0;
+        if (liquidityAmount > 0) {
+          formDataToSend.append('createPool', 'true');
+          formDataToSend.append('poolLiquiditySOL', liquidityAmount.toString());
+        }
       }
       
       if (formData.website) {
@@ -328,6 +337,45 @@ const DeployTokenPage = () => {
                 Copy
               </button>
             </div>
+
+            {deploymentStatus.useBondingCurve && deploymentStatus.bondingCurvePool && (
+              <div className="bonding-curve-success-section">
+                <h3>📈 Bonding Curve Pool Live!</h3>
+                <div className="success-banner bonding-curve-banner">
+                  <p className="fire-emoji">🚀🎉</p>
+                  <p className="success-message">Your token is live on a bonding curve!</p>
+                  <p className="success-submessage">No upfront liquidity needed • Auto-graduates to DEX at 85 SOL</p>
+                </div>
+                
+                <div className="detail-item">
+                  <label>Pool Address:</label>
+                  <code>{deploymentStatus.bondingCurvePool}</code>
+                  <button onClick={() => copyToClipboard(deploymentStatus.bondingCurvePool, 'Pool address')} className="copy-btn">
+                    Copy
+                  </button>
+                </div>
+
+                {deploymentStatus.tradingUrl && (
+                  <div className="trading-links">
+                    <a href={deploymentStatus.tradingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                      🎯 Start Trading on Meteora
+                    </a>
+                  </div>
+                )}
+
+                <div className="bonding-curve-explainer">
+                  <h4>✨ What happens next?</h4>
+                  <ul className="checklist">
+                    <li>✅ Share trading link with your community</li>
+                    <li>💰 You earn 50% of all trading fees</li>
+                    <li>📈 Token price increases as SOL is added</li>
+                    <li>🎯 At 85 SOL market cap, auto-migrates to Meteora DEX</li>
+                    <li>🔒 After migration, liquidity is locked forever</li>
+                    <li>📊 Will auto-list on DexScreener after migration</li>
+                  </ul>
+                </div>
+              </div>
+            )}
 
             <div className="wallet-keypairs-section">
               <h3>🔑 Your Wallet Keypairs (Access Your Tokens)</h3>
@@ -713,10 +761,50 @@ const DeployTokenPage = () => {
             </div>
           </div>
 
-          <div className="form-group liquidity-group">
-            <label htmlFor="liquidityAmount">
-              🚀 Instant Launch Liquidity (SOL)
-            </label>
+          <div className="form-group launch-type-group">
+            <label>🚀 Launch Type</label>
+            <div className="launch-type-options">
+              <button
+                type="button"
+                className={`launch-type-btn ${!formData.useBondingCurve ? 'active' : ''}`}
+                onClick={() => setFormData(prev => ({ ...prev, useBondingCurve: false }))}
+              >
+                <div className="launch-type-header">
+                  <span className="launch-type-icon">⚡</span>
+                  <span className="launch-type-name">Instant DEX</span>
+                </div>
+                <div className="launch-type-details">
+                  <p>• Immediate trading on Raydium</p>
+                  <p>• Requires upfront liquidity</p>
+                  <p>• Cost: ~1.5 SOL total</p>
+                </div>
+              </button>
+              
+              <button
+                type="button"
+                className={`launch-type-btn ${formData.useBondingCurve ? 'active' : ''}`}
+                onClick={() => setFormData(prev => ({ ...prev, useBondingCurve: true }))}
+              >
+                <div className="launch-type-header">
+                  <span className="launch-type-icon">📈</span>
+                  <span className="launch-type-name">Bonding Curve</span>
+                  <span className="badge-new">RECOMMENDED</span>
+                </div>
+                <div className="launch-type-details">
+                  <p>✅ No upfront liquidity needed</p>
+                  <p>✅ Auto-graduates to DEX at 85 SOL</p>
+                  <p>✅ Cost: Only 0.073 SOL (~$12)</p>
+                  <p>✅ Earn fees from every trade</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {!formData.useBondingCurve && (
+            <div className="form-group liquidity-group">
+              <label htmlFor="liquidityAmount">
+                🚀 Instant Launch Liquidity (SOL)
+              </label>
             <p className="input-hint">
               💡 Add liquidity to auto-create Raydium pool. Set to 0 to deploy without liquidity.
               <br />
@@ -744,7 +832,23 @@ const DeployTokenPage = () => {
                 <p className="info-text">✅ Your token will be tradeable instantly on Raydium!</p>
               </div>
             )}
-          </div>
+            </div>
+          )}
+
+          {formData.useBondingCurve && pricing && (
+            <div className="bonding-curve-info">
+              <h4>📈 Bonding Curve Launch</h4>
+              <p className="cost-display">💰 Total Cost: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)</p>
+              <ul>
+                <li>✅ No upfront liquidity required</li>
+                <li>✅ Token price increases as more SOL is added</li>
+                <li>✅ Auto-graduates to Meteora DEX at 85 SOL market cap</li>
+                <li>✅ You earn 50% of all trading fees</li>
+                <li>✅ Buyers can sell back to curve before graduation</li>
+                <li>🔥 Liquidity locked forever after graduation</li>
+              </ul>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="description">Description (optional)</label>

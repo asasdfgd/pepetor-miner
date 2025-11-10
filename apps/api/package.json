@@ -20,6 +20,7 @@
   "dependencies": {
     "@metaplex-foundation/js": "^0.20.1",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@meteora-ag/dynamic-bonding-curve-sdk": "^1.4.6",
     "@openbook-dex/openbook": "^0.0.9",
     "@pepetor-miner/shared": "file:../../packages/shared",
     "@raydium-io/raydium-sdk-v2": "^0.2.30-alpha",

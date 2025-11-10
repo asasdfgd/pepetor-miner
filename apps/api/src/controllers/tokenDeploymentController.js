@@ -19,11 +19,37 @@ exports.uploadMiddleware = upload.single('logo');
 
 exports.getDeploymentPrice = async (req, res) => {
   try {
-    const { paymentMethod = 'SOL', liquidityAmount = 0 } = req.query;
+    const { paymentMethod = 'SOL', liquidityAmount = 0, useBondingCurve = 'false' } = req.query;
     
     const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
+    
+    const isBondingCurve = useBondingCurve === 'true';
+    
+    if (isBondingCurve) {
+      const totalPrice = deploymentPrice;
+      const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
+      
+      return res.json({
+        success: true,
+        paymentMethod,
+        deploymentPrice,
+        liquidityAmount: 0,
+        marketCreationCost: 0,
+        totalPrice,
+        priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
+        solPrice,
+        treasuryWallet,
+        launchType: 'bonding_curve',
+        breakdown: [
+          `Deployment: ${deploymentPrice} SOL`,
+          `Bonding Curve Pool: Free`,
+          `Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`,
+        ],
+        note: 'Token launches on bonding curve - no upfront liquidity needed. Auto-graduates to DEX at 85 SOL market cap.',
+      });
+    }
     
     const liquidity = parseFloat(liquidityAmount) || 0;
     const marketCreationCost = liquidity > 0 ? 0.4 : 0;
@@ -41,6 +67,7 @@ exports.getDeploymentPrice = async (req, res) => {
       priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
       solPrice,
       treasuryWallet,
+      launchType: 'traditional',
       breakdown: liquidity > 0 ? [
         `Deployment: ${deploymentPrice} SOL`,
         `Liquidity: ${liquidity} SOL`,
@@ -79,6 +106,9 @@ exports.requestDeployment = async (req, res) => {
       website,
       twitter,
       walletAddress,
+      useBondingCurve,
+      bondingCurveInitialMC,
+      bondingCurveMigrationMC,
     } = req.body;
 
     if (!tokenName || !tokenSymbol || !paymentSignature) {
@@ -154,6 +184,9 @@ exports.requestDeployment = async (req, res) => {
       website,
       twitter,
       walletAddress,
+      useBondingCurve: useBondingCurve === 'true' || useBondingCurve === true,
+      bondingCurveInitialMC: bondingCurveInitialMC ? parseFloat(bondingCurveInitialMC) : 30,
+      bondingCurveMigrationMC: bondingCurveMigrationMC ? parseFloat(bondingCurveMigrationMC) : 85,
     });
 
     res.json({
@@ -193,6 +226,12 @@ async function deployTokenAsync(deploymentId, config) {
       marketId: result.marketId,
       poolAddress: result.poolAddress,
       deploymentSignature: result.deploymentSignature,
+      useBondingCurve: result.useBondingCurve,
+      bondingCurvePool: result.bondingCurvePool,
+      bondingCurveConfig: result.bondingCurveConfig,
+      bondingCurveInitialMC: result.bondingCurveInitialMC,
+      bondingCurveMigrationMC: result.bondingCurveMigrationMC,
+      tradingUrl: result.tradingUrl,
       deployedAt: new Date(),
     }, { new: true });
 

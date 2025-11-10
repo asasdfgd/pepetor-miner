@@ -20,6 +20,7 @@ const userRoutes = require('./routes/userRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const torRoutes = require('./routes/torRoutes');
 const tokenDeploymentRoutes = require('./routes/tokenDeploymentRoutes');
+const bondingCurveRoutes = require('./routes/bondingCurveRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
 
 console.log('🚀 [APP START] All modules loaded successfully');
@@ -132,6 +133,9 @@ app.use('/api/tor', torRoutes);
 
 // Mount token deployment routes
 app.use('/api/token-deployment', tokenDeploymentRoutes);
+
+// Mount bonding curve routes
+app.use('/api/bonding-curve', bondingCurveRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

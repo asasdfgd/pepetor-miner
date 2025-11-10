@@ -73,6 +73,40 @@ const deployedTokenSchema = new mongoose.Schema({
     enum: ['mainnet-beta', 'devnet'],
     default: 'mainnet-beta',
   },
+  marketId: String,
+  poolAddress: String,
+  useBondingCurve: {
+    type: Boolean,
+    default: false,
+  },
+  bondingCurvePool: {
+    type: String,
+    default: null,
+  },
+  bondingCurveConfig: {
+    type: String,
+    default: null,
+  },
+  bondingCurveInitialMC: {
+    type: Number,
+    default: 30,
+  },
+  bondingCurveMigrationMC: {
+    type: Number,
+    default: 85,
+  },
+  tradingUrl: {
+    type: String,
+    default: null,
+  },
+  isMigrated: {
+    type: Boolean,
+    default: false,
+  },
+  migratedPoolAddress: {
+    type: String,
+    default: null,
+  },
   deployedAt: Date,
   expiresAt: Date,
 }, {

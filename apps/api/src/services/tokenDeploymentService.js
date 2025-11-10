@@ -22,6 +22,7 @@ const BN = require('bn.js');
 const { Raydium, TxVersion, parseTokenAccountResp } = require('@raydium-io/raydium-sdk-v2');
 const fs = require('fs');
 const path = require('path');
+const bondingCurveService = require('./bondingCurveService');
 
 const DEPLOYMENT_PRICE_SOL = 0.073;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
@@ -102,6 +103,9 @@ class TokenDeploymentService {
       website = '',
       twitter = '',
       walletAddress = '',
+      useBondingCurve = false,
+      bondingCurveInitialMC = 30,
+      bondingCurveMigrationMC = 85,
     } = config;
 
     console.log(`🚀 Deploying ${tokenName} (${tokenSymbol}) for ${ownerPublicKey}`);
@@ -200,8 +204,31 @@ class TokenDeploymentService {
 
     let marketId = null;
     let poolAddress = null;
+    let bondingCurvePool = null;
+    let bondingCurveConfig = null;
+    let tradingUrl = null;
 
-    if (createPool) {
+    if (useBondingCurve) {
+      console.log('🎢 Creating Meteora Bonding Curve pool...');
+      const bondingCurveResult = await bondingCurveService.createConfigAndPool({
+        tokenName,
+        tokenSymbol,
+        tokenMint: mint,
+        totalSupply,
+        deployer,
+        poolCreator: wallets.treasury,
+        initialMarketCap: bondingCurveInitialMC,
+        migrationMarketCap: bondingCurveMigrationMC,
+        metadataUri: metadataUri || '',
+      });
+
+      bondingCurvePool = bondingCurveResult.poolAddress;
+      bondingCurveConfig = bondingCurveResult.configAddress;
+      tradingUrl = bondingCurveResult.tradingUrl;
+
+      console.log('✅ Bonding Curve Pool:', bondingCurvePool);
+      console.log('✅ Trading URL:', tradingUrl);
+    } else if (createPool) {
       console.log('🏪 Creating OpenBook Market ID...');
       marketId = await this.createOpenBookMarket({
         baseMint: mint,
@@ -248,6 +275,12 @@ class TokenDeploymentService {
       marketId,
       poolAddress,
       deploymentSignature: 'deployed',
+      useBondingCurve,
+      bondingCurvePool,
+      bondingCurveConfig,
+      bondingCurveInitialMC,
+      bondingCurveMigrationMC,
+      tradingUrl,
     };
   }
 
