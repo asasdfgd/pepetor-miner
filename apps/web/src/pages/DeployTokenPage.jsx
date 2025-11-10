@@ -739,7 +739,7 @@ const DeployTokenPage = () => {
                   <li>Deployment: {pricing.deploymentPrice} SOL</li>
                   <li>Liquidity: {pricing.liquidityAmount} SOL</li>
                   <li>OpenBook Market: {pricing.marketCreationCost} SOL</li>
-                  <li><strong>Total: {pricing.totalPrice} SOL (~${pricing.priceUSD} USD)</strong></li>
+                  <li><strong>Total: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)</strong></li>
                 </ul>
                 <p className="info-text">✅ Your token will be tradeable instantly on Raydium!</p>
               </div>
@@ -863,8 +863,8 @@ const DeployTokenPage = () => {
               disabled={deploying || !pricing}
             >
               {deploying ? 'Deploying...' : parseFloat(formData.liquidityAmount) > 0 
-                ? `🚀 Launch on DEX (${pricing?.totalPrice || '...'} SOL)` 
-                : `Deploy Token (${pricing?.totalPrice || '...'} SOL)`}
+                ? `🚀 Launch on DEX (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)` 
+                : `Deploy Token (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)`}
             </button>
           )}
         </form>
