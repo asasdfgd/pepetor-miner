@@ -21,6 +21,7 @@ const sessionRoutes = require('./routes/sessionRoutes');
 const torRoutes = require('./routes/torRoutes');
 const tokenDeploymentRoutes = require('./routes/tokenDeploymentRoutes');
 const bondingCurveRoutes = require('./routes/bondingCurveRoutes');
+const liquidityCommitmentRoutes = require('./routes/liquidityCommitmentRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
 
 console.log('🚀 [APP START] All modules loaded successfully');
@@ -137,6 +138,9 @@ app.use('/api/token-deployment', tokenDeploymentRoutes);
 // Mount bonding curve routes
 app.use('/api/bonding-curve', bondingCurveRoutes);
 
+// Mount liquidity commitment routes
+app.use('/api/liquidity-commitment', liquidityCommitmentRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
@@ -183,6 +187,9 @@ const startServer = async () => {
     const dbConnection = await connectDB();
     if (dbConnection) {
       console.log('📊 Database connected and ready');
+      
+      const migrationMonitor = require('./services/migrationMonitorService');
+      await migrationMonitor.start();
     }
 
     // Start Express server on all interfaces for Docker/Fly.io compatibility
@@ -239,12 +246,16 @@ const startServer = async () => {
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('\n\n⏹️  Shutting down server gracefully...');
+  const migrationMonitor = require('./services/migrationMonitorService');
+  await migrationMonitor.stop();
   await disconnectDB();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   console.log('\n\n⏹️  Shutting down server gracefully...');
+  const migrationMonitor = require('./services/migrationMonitorService');
+  await migrationMonitor.stop();
   await disconnectDB();
   process.exit(0);
 });

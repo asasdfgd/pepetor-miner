@@ -1,12 +1,15 @@
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
 import WalletConnect from './WalletConnect';
+import TutorialModal from './TutorialModal';
 import './Header.css';
 
 function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -16,6 +19,10 @@ function Header() {
     }
     logout();
     navigate('/');
+  };
+
+  const handleShowTutorial = () => {
+    setShowTutorial(true);
   };
 
   return (
@@ -46,6 +53,9 @@ function Header() {
                 <Link to="/faq" className="nav-link">
                   FAQ
                 </Link>
+                <button onClick={handleShowTutorial} className="nav-link tutorial-btn">
+                  🎓 Tutorial
+                </button>
               </>
             )}
             {isAuthenticated ? (
@@ -65,6 +75,9 @@ function Header() {
                 <Link to="/tor" className="nav-link">
                   🧅 Tor
                 </Link>
+                <button onClick={handleShowTutorial} className="nav-link tutorial-btn">
+                  🎓 Tutorial
+                </button>
                 <WalletConnect />
                 <button onClick={handleLogout} className="btn-logout">
                   Logout
@@ -84,6 +97,8 @@ function Header() {
           </nav>
         </div>
       </div>
+      
+      {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
     </header>
   );
 }

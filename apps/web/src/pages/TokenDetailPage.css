@@ -1,0 +1,212 @@
+.token-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  padding: 40px 20px;
+}
+
+.token-detail-page .container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.loading {
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+  padding: 60px 20px;
+}
+
+.error-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+}
+
+.error-box h2 {
+  color: #fca5a5;
+  margin-bottom: 24px;
+}
+
+.back-link {
+  display: inline-block;
+  color: #a78bfa;
+  text-decoration: none;
+  margin-bottom: 24px;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #8b5cf6;
+}
+
+.token-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.token-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.token-title h1 {
+  font-size: 32px;
+  color: #fff;
+  margin: 0 0 8px 0;
+}
+
+.token-symbol {
+  font-size: 20px;
+  color: #a78bfa;
+  margin: 0;
+  font-weight: 600;
+}
+
+.token-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.info-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.info-value {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.info-value.monospace {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.status-badge.deployed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.status-badge.pending {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.status-badge.failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.token-description {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.token-description h3 {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.token-description p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.token-links {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.link-button {
+  padding: 12px 24px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 8px;
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.link-button:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .token-detail-page {
+    padding: 20px 12px;
+  }
+
+  .token-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .token-title h1 {
+    font-size: 24px;
+  }
+
+  .token-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .token-links {
+    flex-direction: column;
+  }
+
+  .link-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

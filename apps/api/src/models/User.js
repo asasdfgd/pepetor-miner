@@ -174,6 +174,12 @@ const userSchema = new mongoose.Schema(
       txHash: String,
       date: Date,
     }],
+    
+    // Tutorial
+    hasSeenTutorial: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields

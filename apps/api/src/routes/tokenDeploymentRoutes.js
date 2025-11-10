@@ -19,4 +19,6 @@ router.get('/my-deployments', authenticate, tokenDeploymentController.getUserDep
 
 router.get('/all', cacheMiddleware('tokens', 30), tokenDeploymentController.getAllDeployments);
 
+router.get('/token/:mintAddress', tokenDeploymentController.getTokenByMint);
+
 module.exports = router;

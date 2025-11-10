@@ -14,6 +14,7 @@ import FaqPage from './pages/FaqPage';
 import DeployTokenPage from './pages/DeployTokenPage';
 import TableViewPage from './pages/TableViewPage';
 import TokenTradingPage from './pages/TokenTradingPage';
+import TokenDetailPage from './pages/TokenDetailPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import './App.css';
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/extension" element={<ExtensionPage />} />
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/tokens" element={<TableViewPage />} />
+          <Route path="/token/:mintAddress" element={<TokenDetailPage />} />
           <Route path="/trade/:mintAddress" element={<TokenTradingPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

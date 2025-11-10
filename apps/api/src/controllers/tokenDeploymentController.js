@@ -400,3 +400,30 @@ exports.getAllDeployments = async (req, res) => {
     });
   }
 };
+
+exports.getTokenByMint = async (req, res) => {
+  try {
+    const { mintAddress } = req.params;
+
+    const token = await DeployedToken.findOne({ mintAddress }).lean();
+
+    if (!token) {
+      return res.status(404).json({
+        success: false,
+        message: 'Token not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      token,
+    });
+  } catch (error) {
+    console.error('Error getting token by mint:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get token',
+      error: error.message,
+    });
+  }
+};

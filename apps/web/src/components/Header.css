@@ -162,6 +162,24 @@
   box-shadow: 0 0 25px rgba(255, 45, 85, 0.5);
 }
 
+.tutorial-btn {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  cursor: pointer;
+  color: #a78bfa;
+}
+
+.tutorial-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #8b5cf6;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.tutorial-btn::after {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;

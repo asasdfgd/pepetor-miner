@@ -9,5 +9,6 @@ router.post('/login', authController.login);
 router.post('/wallet-auth', authController.walletAuth);
 router.post('/refresh-token', authController.refreshToken);
 router.post('/logout', authenticate, authController.logout);
+router.post('/tutorial-seen', authenticate, authController.markTutorialSeen);
 
 module.exports = router;

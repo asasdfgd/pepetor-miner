@@ -48,6 +48,12 @@ export function AuthProvider({ children }) {
     setError(null);
   }, []);
 
+  const updateUser = useCallback((updatedUserData) => {
+    const updatedUser = { ...user, ...updatedUserData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }, [user]);
+
   const value = {
     user,
     loading,
@@ -56,6 +62,7 @@ export function AuthProvider({ children }) {
     logout,
     setAuthError,
     clearError,
+    updateUser,
     isAuthenticated: !!user,
   };
 

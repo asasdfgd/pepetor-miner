@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import './HomePage.css';
@@ -7,6 +8,7 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      
       {/* Hero Section */}
       <section className="hero">
         <div className="container">

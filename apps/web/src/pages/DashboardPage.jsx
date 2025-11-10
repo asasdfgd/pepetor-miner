@@ -1,15 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import BalanceCard from '../components/BalanceCard';
 import AutoMiner from '../components/AutoMiner';
 import SessionHistory from '../components/SessionHistory';
 import DirectorySection from '../components/DirectorySection';
 import MiningStats from '../components/MiningStats';
+import TutorialModal from '../components/TutorialModal';
 import './DashboardPage.css';
 
 function DashboardPage() {
   const { user } = useAuth();
   const [refreshSessions, setRefreshSessions] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    if (user && user.hasSeenTutorial === false) {
+      setTimeout(() => setShowTutorial(true), 500);
+    }
+  }, [user]);
 
   const handleSessionSubmitted = () => {
     setRefreshSessions(!refreshSessions);
@@ -17,6 +25,8 @@ function DashboardPage() {
 
   return (
     <div className="container">
+      {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+      
       <div className="dashboard-page">
         <div className="dashboard-header">
           <h2>Welcome, {user?.fullName || user?.username}! 👋</h2>
