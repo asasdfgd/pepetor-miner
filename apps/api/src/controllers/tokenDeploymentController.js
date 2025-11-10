@@ -19,7 +19,7 @@ exports.uploadMiddleware = upload.single('logo');
 
 exports.getDeploymentPrice = async (req, res) => {
   try {
-    const { paymentMethod = 'SOL', liquidityAmount = 0, useBondingCurve = 'false' } = req.query;
+    const { paymentMethod = 'SOL', liquidityAmount = 0, useBondingCurve = 'false', initialPurchaseAmount = 0 } = req.query;
     
     const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
@@ -28,8 +28,20 @@ exports.getDeploymentPrice = async (req, res) => {
     const isBondingCurve = useBondingCurve === 'true';
     
     if (isBondingCurve) {
-      const totalPrice = deploymentPrice;
+      const initialPurchase = parseFloat(initialPurchaseAmount) || 0;
+      const totalPrice = deploymentPrice + initialPurchase;
       const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
+      
+      const breakdown = [
+        `Deployment: ${deploymentPrice} SOL`,
+        `Bonding Curve Pool: Free`,
+      ];
+      
+      if (initialPurchase > 0) {
+        breakdown.push(`Initial Buy: ${initialPurchase} SOL`);
+      }
+      
+      breakdown.push(`Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`);
       
       return res.json({
         success: true,
@@ -37,17 +49,16 @@ exports.getDeploymentPrice = async (req, res) => {
         deploymentPrice,
         liquidityAmount: 0,
         marketCreationCost: 0,
+        initialPurchaseAmount: initialPurchase,
         totalPrice,
         priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
         solPrice,
         treasuryWallet,
         launchType: 'bonding_curve',
-        breakdown: [
-          `Deployment: ${deploymentPrice} SOL`,
-          `Bonding Curve Pool: Free`,
-          `Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`,
-        ],
-        note: 'Token launches on bonding curve - no upfront liquidity needed. Auto-graduates to DEX at 85 SOL market cap.',
+        breakdown,
+        note: initialPurchase > 0 
+          ? `Token launches on bonding curve with ${initialPurchase} SOL initial buy. Auto-graduates to DEX at 85 SOL market cap.`
+          : 'Token launches on bonding curve - no upfront liquidity needed. Auto-graduates to DEX at 85 SOL market cap.',
       });
     }
     
@@ -109,6 +120,7 @@ exports.requestDeployment = async (req, res) => {
       useBondingCurve,
       bondingCurveInitialMC,
       bondingCurveMigrationMC,
+      initialPurchaseAmount,
     } = req.body;
 
     if (!tokenName || !tokenSymbol || !paymentSignature) {
@@ -137,7 +149,9 @@ exports.requestDeployment = async (req, res) => {
       });
     }
 
-    const expectedAmount = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
+    const initialPurchase = initialPurchaseAmount ? parseFloat(initialPurchaseAmount) : 0;
+    const expectedAmount = deploymentPrice + initialPurchase;
     
     const paymentValid = await tokenDeploymentService.verifyPayment(
       paymentSignature,
@@ -187,6 +201,7 @@ exports.requestDeployment = async (req, res) => {
       useBondingCurve: useBondingCurve === 'true' || useBondingCurve === true,
       bondingCurveInitialMC: bondingCurveInitialMC ? parseFloat(bondingCurveInitialMC) : 30,
       bondingCurveMigrationMC: bondingCurveMigrationMC ? parseFloat(bondingCurveMigrationMC) : 85,
+      initialPurchaseAmount: initialPurchaseAmount ? parseFloat(initialPurchaseAmount) : 0,
     });
 
     res.json({

@@ -23,6 +23,7 @@ const DeployTokenPage = () => {
     walletAddress: '',
     liquidityAmount: '1',
     useBondingCurve: true,
+    initialPurchaseAmount: '0',
   });
   
   const [logoFile, setLogoFile] = useState(null);
@@ -51,10 +52,10 @@ const DeployTokenPage = () => {
     }
   }, [deploymentId]);
 
-  const fetchPricing = async (liquidityAmount = formData.liquidityAmount) => {
+  const fetchPricing = async (liquidityAmount = formData.liquidityAmount, initialPurchaseAmount = formData.initialPurchaseAmount) => {
     try {
       const useBondingCurve = formData.useBondingCurve || false;
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}&initialPurchaseAmount=${initialPurchaseAmount || 0}`);
       const data = await response.json();
       console.log('API pricing response:', data);
       if (data.success) {
@@ -75,9 +76,18 @@ const DeployTokenPage = () => {
     if (name === 'liquidityAmount') {
       const numValue = parseFloat(value);
       if (!isNaN(numValue) && numValue >= 0) {
-        fetchPricing(value);
+        fetchPricing(value, formData.initialPurchaseAmount);
       } else if (value === '' || value === '0') {
-        fetchPricing('0');
+        fetchPricing('0', formData.initialPurchaseAmount);
+      }
+    }
+    
+    if (name === 'initialPurchaseAmount') {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        fetchPricing(formData.liquidityAmount, value);
+      } else if (value === '' || value === '0') {
+        fetchPricing(formData.liquidityAmount, '0');
       }
     }
   };
@@ -180,6 +190,13 @@ const DeployTokenPage = () => {
       formDataToSend.append('paymentSignature', signature);
       formDataToSend.append('paymentMethod', 'SOL');
       formDataToSend.append('useBondingCurve', formData.useBondingCurve.toString());
+      
+      if (formData.useBondingCurve) {
+        const initialPurchase = parseFloat(formData.initialPurchaseAmount) || 0;
+        if (initialPurchase > 0) {
+          formDataToSend.append('initialPurchaseAmount', initialPurchase.toString());
+        }
+      }
       
       if (!formData.useBondingCurve) {
         const liquidityAmount = parseFloat(formData.liquidityAmount) || 0;
@@ -835,19 +852,51 @@ const DeployTokenPage = () => {
             </div>
           )}
 
-          {formData.useBondingCurve && pricing && (
-            <div className="bonding-curve-info">
-              <h4>📈 Bonding Curve Launch</h4>
-              <p className="cost-display">💰 Total Cost: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)</p>
-              <ul>
-                <li>✅ No upfront liquidity required</li>
-                <li>✅ Token price increases as more SOL is added</li>
-                <li>✅ Auto-graduates to Meteora DEX at 85 SOL market cap</li>
-                <li>✅ You earn 50% of all trading fees</li>
-                <li>✅ Buyers can sell back to curve before graduation</li>
-                <li>🔥 Liquidity locked forever after graduation</li>
-              </ul>
-            </div>
+          {formData.useBondingCurve && (
+            <>
+              <div className="form-group">
+                <label htmlFor="initialPurchaseAmount">
+                  💰 Buy Your Own Tokens (Optional)
+                </label>
+                <p className="input-hint">
+                  💡 Optional but recommended! Buying coins helps protect from snipers and shows commitment.
+                  <br />
+                  💸 Set to 0 to skip initial purchase.
+                </p>
+                <input
+                  type="number"
+                  id="initialPurchaseAmount"
+                  name="initialPurchaseAmount"
+                  value={formData.initialPurchaseAmount}
+                  onChange={handleInputChange}
+                  placeholder="0"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              
+              {pricing && (
+                <div className="bonding-curve-info">
+                  <h4>📈 Bonding Curve Launch</h4>
+                  <p className="cost-display">💰 Total Cost: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)</p>
+                  {pricing.breakdown && (
+                    <div className="price-breakdown">
+                      {pricing.breakdown.map((line, i) => (
+                        <p key={i} className="breakdown-line">{line}</p>
+                      ))}
+                    </div>
+                  )}
+                  <ul>
+                    <li>✅ No upfront liquidity required</li>
+                    <li>✅ Token price increases as more SOL is added</li>
+                    <li>✅ Auto-graduates to Meteora DEX at 85 SOL market cap</li>
+                    <li>✅ You earn 50% of all trading fees</li>
+                    <li>✅ Buyers can sell back to curve before graduation</li>
+                    <li>🔥 Liquidity locked forever after graduation</li>
+                  </ul>
+                </div>
+              )}
+            </>
           )}
 
           <div className="form-group">

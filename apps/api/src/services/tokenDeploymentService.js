@@ -106,6 +106,7 @@ class TokenDeploymentService {
       useBondingCurve = false,
       bondingCurveInitialMC = 30,
       bondingCurveMigrationMC = 85,
+      initialPurchaseAmount = 0,
     } = config;
 
     console.log(`🚀 Deploying ${tokenName} (${tokenSymbol}) for ${ownerPublicKey}`);
@@ -228,6 +229,39 @@ class TokenDeploymentService {
 
       console.log('✅ Bonding Curve Pool:', bondingCurvePool);
       console.log('✅ Trading URL:', tradingUrl);
+
+      if (initialPurchaseAmount > 0) {
+        console.log(`💰 Executing initial purchase: ${initialPurchaseAmount} SOL for creator...`);
+        try {
+          const amountInLamports = Math.floor(initialPurchaseAmount * LAMPORTS_PER_SOL);
+          
+          const treasuryBalance = await this.connection.getBalance(wallets.treasury.publicKey);
+          if (treasuryBalance < amountInLamports + 0.01 * LAMPORTS_PER_SOL) {
+            throw new Error('Insufficient balance in treasury for initial purchase');
+          }
+
+          const quote = await bondingCurveService.getSwapQuote({
+            poolAddress: bondingCurvePool,
+            amountIn: amountInLamports.toString(),
+            swapBaseForQuote: false,
+          });
+
+          const swapResult = await bondingCurveService.executeSwap({
+            poolAddress: bondingCurvePool,
+            amountIn: amountInLamports.toString(),
+            minimumAmountOut: quote.minimumAmountOut,
+            swapBaseForQuote: false,
+            userPublicKey: wallets.treasury.publicKey.toString(),
+            userKeypair: wallets.treasury,
+          });
+
+          console.log('✅ Initial purchase completed:', swapResult.signature);
+          console.log(`   Tokens received by creator: ${parseInt(quote.amountOut) / Math.pow(10, decimals)}`);
+          console.log(`   Tokens sent to: ${wallets.treasury.publicKey.toString()}`);
+        } catch (error) {
+          console.error('⚠️ Initial purchase failed (pool still created):', error.message);
+        }
+      }
     } else if (createPool) {
       console.log('🏪 Creating OpenBook Market ID...');
       marketId = await this.createOpenBookMarket({
