@@ -54,6 +54,126 @@ const userSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
+    
+    // Mining & Rewards
+    pendingRewards: {
+      type: Number,
+      default: 0,
+    },
+    totalPepetorEarned: {
+      type: Number,
+      default: 0,
+    },
+    claimedRewards: {
+      type: Number,
+      default: 0,
+    },
+    lastRewardClaim: {
+      type: Date,
+      default: null,
+    },
+    lastClaimTx: {
+      type: String,
+      default: null,
+    },
+    solanaWallet: {
+      type: String,
+      default: null,
+    },
+    
+    // Mining Sessions
+    miningSessions: [{
+      startTime: Date,
+      duration: Number,
+      reward: Number,
+      bytesTransferred: Number,
+      peerId: String,
+      isTorMode: { type: Boolean, default: false },
+      luckyBlockHit: { type: Boolean, default: false },
+      luckyBlockAmount: { type: Number, default: 0 },
+    }],
+    
+    // Streak System
+    currentStreak: {
+      type: Number,
+      default: 0,
+    },
+    longestStreak: {
+      type: Number,
+      default: 0,
+    },
+    lastMiningDate: {
+      type: Date,
+      default: null,
+    },
+    lastActivityTime: {
+      type: Date,
+      default: null,
+    },
+    
+    // Level & XP System
+    level: {
+      type: Number,
+      default: 1,
+      min: 1,
+      max: 4,
+    },
+    xp: {
+      type: Number,
+      default: 0,
+    },
+    
+    // Daily Tracking
+    dailyEarnings: {
+      type: Number,
+      default: 0,
+    },
+    dailyEarningsResetDate: {
+      type: Date,
+      default: null,
+    },
+    
+    // Staking
+    stakingBalance: {
+      type: Number,
+      default: 0,
+    },
+    
+    // Referrals
+    referrals: {
+      type: Number,
+      default: 0,
+    },
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    referralCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    referralBonuses: [{
+      referredUserId: mongoose.Schema.Types.ObjectId,
+      bonus: Number,
+      date: Date,
+    }],
+    
+    // Task Rewards
+    tasksCompleted: [{
+      taskType: String,
+      reward: Number,
+      completedAt: Date,
+    }],
+    
+    // Claim History
+    claimHistory: [{
+      amount: Number,
+      wallet: String,
+      txHash: String,
+      date: Date,
+    }],
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields

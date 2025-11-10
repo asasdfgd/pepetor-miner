@@ -4,6 +4,7 @@ import BalanceCard from '../components/BalanceCard';
 import AutoMiner from '../components/AutoMiner';
 import SessionHistory from '../components/SessionHistory';
 import DirectorySection from '../components/DirectorySection';
+import MiningStats from '../components/MiningStats';
 import './DashboardPage.css';
 
 function DashboardPage() {
@@ -19,8 +20,10 @@ function DashboardPage() {
       <div className="dashboard-page">
         <div className="dashboard-header">
           <h2>Welcome, {user?.fullName || user?.username}! 👋</h2>
-          <p>Start mining to earn credits automatically</p>
+          <p>Start mining to earn PEPETOR with bonuses and multipliers!</p>
         </div>
+
+        <MiningStats />
 
         <div className="sessions-section">
           <BalanceCard />

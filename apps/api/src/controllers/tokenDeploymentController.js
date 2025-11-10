@@ -178,7 +178,7 @@ async function deployTokenAsync(deploymentId, config) {
   try {
     const result = await tokenDeploymentService.deployCustomToken(config);
 
-    await DeployedToken.findByIdAndUpdate(deploymentId, {
+    const deployment = await DeployedToken.findByIdAndUpdate(deploymentId, {
       status: 'deployed',
       mintAddress: result.mintAddress,
       treasuryWallet: result.treasuryWallet,
@@ -194,11 +194,27 @@ async function deployTokenAsync(deploymentId, config) {
       poolAddress: result.poolAddress,
       deploymentSignature: result.deploymentSignature,
       deployedAt: new Date(),
-    });
+    }, { new: true });
 
     console.log(`✅ Token deployed successfully: ${result.mintAddress}`);
     if (result.metadataUri) {
       console.log(`📤 Metadata uploaded: ${result.metadataUri}`);
+    }
+
+    // Award task reward: +100 PEPETOR for token creation
+    try {
+      const rewardService = require('../services/rewardService');
+      const User = require('../models/User');
+      
+      // Find user by wallet address
+      const user = await User.findOne({ walletAddress: deployment.owner });
+      if (user) {
+        await rewardService.awardTaskReward(user._id, 'tokenCreation');
+        console.log(`🎁 Awarded 100 PEPETOR token creation reward to ${user.username}`);
+      }
+    } catch (rewardError) {
+      console.error('Failed to award token creation reward:', rewardError);
+      // Don't fail deployment if reward fails
     }
   } catch (error) {
     console.error('Error deploying token:', error);

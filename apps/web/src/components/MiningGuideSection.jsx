@@ -163,23 +163,23 @@ function MiningGuideSection() {
         <div className="earnings-grid">
           <div className="earnings-card">
             <h4>Base Earnings</h4>
-            <p className="earnings-value">0.05 – 0.25 $PEPETOR/hour</p>
-            <p className="earnings-detail">Example: 6 hrs/day ≈ 0.3 – 1.5 $PEPETOR daily</p>
+            <p className="earnings-value">0.0015 PEPETOR/min</p>
+            <p className="earnings-detail">0.09 PEPETOR/hour, up to 100 PEPETOR/day</p>
           </div>
           <div className="earnings-card">
-            <h4>Boosted Rewards</h4>
-            <p className="earnings-value">2x – 5x Multiplier</p>
-            <p className="earnings-detail">Via staking and referrals</p>
+            <h4>Uptime Bonuses</h4>
+            <p className="earnings-value">1.1x – 1.5x</p>
+            <p className="earnings-detail">1hr=1.1x, 8hr=1.25x, 24hr=1.5x</p>
           </div>
           <div className="earnings-card">
-            <h4>Standard APY</h4>
-            <p className="earnings-value">20% – 45% APY</p>
-            <p className="earnings-detail">Based on uptime & token value</p>
+            <h4>Streak Bonuses</h4>
+            <p className="earnings-value">+10% to +50%</p>
+            <p className="earnings-detail">3-day=+10%, 7-day=+25%, 30-day=+50%</p>
           </div>
           <div className="earnings-card premium">
-            <h4>Premium APY</h4>
-            <p className="earnings-value">60% – 120%+ APY</p>
-            <p className="earnings-detail">Includes referrals & multipliers</p>
+            <h4>Maximum Multipliers</h4>
+            <p className="earnings-value">Up to 4x+</p>
+            <p className="earnings-detail">Level 4 (2x) + Staking (+50%) + Streaks</p>
           </div>
         </div>
         <div className="earnings-note">

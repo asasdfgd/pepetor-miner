@@ -261,6 +261,70 @@ router.post('/verify-wallet', requireAuth, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/rewards/task
+ * Award task-based reward
+ * Body: { taskType: 'tokenCreation' | 'socialShare' }
+ */
+router.post('/task', requireAuth, async (req, res) => {
+  try {
+    const { taskType } = req.body;
+
+    if (!taskType) {
+      return res.status(400).json({
+        success: false,
+        error: 'taskType required',
+      });
+    }
+
+    const result = await rewardService.awardTaskReward(req.user.id, taskType);
+
+    res.json({
+      success: true,
+      message: `Task reward awarded: ${result.reward} PEPETOR`,
+      data: result,
+    });
+  } catch (error) {
+    logger.error('Error awarding task reward:', error);
+    res.status(400).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/rewards/staking
+ * Update staking balance
+ * Body: { amount }
+ */
+router.post('/staking', requireAuth, async (req, res) => {
+  try {
+    const { amount } = req.body;
+
+    if (typeof amount !== 'number' || amount < 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid amount required',
+      });
+    }
+
+    const result = await rewardService.updateStakingBalance(req.user.id, amount);
+
+    res.json({
+      success: true,
+      message: 'Staking balance updated',
+      data: result,
+    });
+  } catch (error) {
+    logger.error('Error updating staking balance:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // ========================
 // ADMIN ROUTES (PROTECTED)
 // ========================
