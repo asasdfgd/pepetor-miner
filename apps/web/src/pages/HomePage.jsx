@@ -38,6 +38,152 @@ function HomePage() {
         </div>
       </section>
 
+      {/* What Makes PepeTor Different */}
+      <section className="differentiators">
+        <div className="container">
+          <h2 className="section-title">🔥 What Makes PepeTor Different</h2>
+          
+          <div className="diff-intro">
+            <p>
+              PepeTor isn't just another meme-coin exchange. It's a <strong>creation engine</strong> for the next generation of Web3 users. 
+              While other platforms focus on trading hype, PepeTor focuses on building <strong>ecosystems</strong> — giving anyone the power to create, mine, and trade their own coins in one place.
+            </p>
+          </div>
+
+          <div className="diff-points">
+            <div className="diff-point">
+              <div className="diff-number">1</div>
+              <div className="diff-content">
+                <h3>It's Not Just an Exchange — It's a Creator Platform</h3>
+                <p>
+                  Most meme-coin sites only let you buy or sell. PepeTor lets you <strong>launch your own token</strong>, <strong>mine it</strong>, and list it from the same dashboard. 
+                  You don't need to code, manage liquidity, or pay for third-party services. Everything is automated and built around simplicity.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">2</div>
+              <div className="diff-content">
+                <h3>Mining Meets Memecoins</h3>
+                <p>
+                  Traditional mining wastes energy. PepeTor flips that.<br/>
+                  Users earn <strong>$PEPETOR for active uptime</strong> — by running sessions, maintaining private connections, or using the Tor network. 
+                  You can even let others mine the tokens you create, turning your coin into a living, community-driven economy.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">3</div>
+              <div className="diff-content">
+                <h3>Privacy Comes First (Tor Integration)</h3>
+                <p>
+                  ClearNetLabs started with one mission: make privacy profitable.<br/>
+                  The built-in <strong>Tor system</strong> anonymizes user traffic and rewards private participation. No trackers. No middlemen. 
+                  Just pure peer-to-peer activity where your data stays yours.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">4</div>
+              <div className="diff-content">
+                <h3>Smart Bonding-Curve Launches</h3>
+                <p>
+                  PepeTor uses a <strong>pump.fun-style bonding curve</strong> for every token — but adds real utility on top.<br/>
+                  Each curve connects to mining and liquidity systems, so when a token "graduates," it automatically deploys to Raydium. 
+                  That means fair pricing, real volume, and no manual setup headaches.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">5</div>
+              <div className="diff-content">
+                <h3>Early Liquidity Commitments</h3>
+                <p>
+                  Before a token even launches, users can <strong>pledge SOL</strong> to back it.<br/>
+                  When the pool goes live, those early pledges become automatic liquidity, and backers get LP tokens plus fee shares. 
+                  It's like early-stage investing for the meme economy — transparent, fair, and community-powered.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">6</div>
+              <div className="diff-content">
+                <h3>Gamified Mining System</h3>
+                <p>
+                  Mining on PepeTor feels like a game.<br/>
+                  You get <strong>uptime multipliers</strong>, <strong>daily streak bonuses</strong>, and <strong>reward tiers</strong> that make earning fun instead of technical. 
+                  It keeps the platform alive with constant engagement and community competition.
+                </p>
+              </div>
+            </div>
+
+            <div className="diff-point">
+              <div className="diff-number">7</div>
+              <div className="diff-content">
+                <h3>Real Rewards for Creators</h3>
+                <p>
+                  Token creators earn a percentage of fees from trading, mining, and volume their tokens generate.<br/>
+                  Instead of launching and walking away, they're motivated to grow their community — creating a <strong>self-sustaining feedback loop</strong> where both sides win.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="diff-table-section">
+            <h3 className="table-title">TL;DR</h3>
+            <div className="comparison-table">
+              <div className="table-row table-header">
+                <div className="table-cell">Feature</div>
+                <div className="table-cell">PepeTor</div>
+                <div className="table-cell">Typical Meme-Coin Platform</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Token Creation</div>
+                <div className="table-cell success">✅ One-click creation</div>
+                <div className="table-cell fail">❌ Requires coding</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Mining</div>
+                <div className="table-cell success">✅ Built-in passive system</div>
+                <div className="table-cell fail">❌ None</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Privacy Layer</div>
+                <div className="table-cell success">✅ Tor integration</div>
+                <div className="table-cell fail">❌ Trackable activity</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Early Liquidity</div>
+                <div className="table-cell success">✅ Pre-migration pledges</div>
+                <div className="table-cell fail">❌ Manual setup</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Gamified Rewards</div>
+                <div className="table-cell success">✅ Yes</div>
+                <div className="table-cell fail">❌ No</div>
+              </div>
+              <div className="table-row">
+                <div className="table-cell">Ecosystem Focus</div>
+                <div className="table-cell success">✅ Build, Mine, Trade</div>
+                <div className="table-cell fail">❌ Trade only</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="diff-closing">
+            <p>
+              <strong>PepeTor isn't another project riding the meme wave</strong> — it's building the infrastructure for it.<br/>
+              A place where you can create value out of none, anywhere, anyone, and create value out of privacy, creativity, and community.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="features">
         <div className="container">
