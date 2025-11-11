@@ -1,6 +1,5 @@
 .app-header {
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-  border-bottom: 2px solid var(--accent-red);
   color: white;
   padding: 0.75rem 0;
   box-shadow: 0 4px 20px rgba(255, 45, 85, 0.2);

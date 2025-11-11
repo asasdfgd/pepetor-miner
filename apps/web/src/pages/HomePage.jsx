@@ -38,10 +38,10 @@ function HomePage() {
         </div>
       </section>
 
-      {/* What Makes PepeTor Different */}
+      {/* What Makes ClearNetLabs Different */}
       <section className="differentiators">
         <div className="container">
-          <h2 className="section-title">🔥 What Makes PepeTor Different</h2>
+          <h2 className="section-title">🔥 What Makes ClearNetLabs Different</h2>
           
           <div className="diff-intro">
             <p>
