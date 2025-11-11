@@ -173,15 +173,6 @@ function ExtensionPage() {
             </div>
           </div>
         </section>
-
-        {/* CTA */}
-        <section className="extension-cta">
-          <h2>Join Thousands of Miners Today</h2>
-          <p>Download the extension and start earning passive income</p>
-          <button onClick={handleDownload} className="btn btn-primary btn-lg">
-            {isAuthenticated ? 'Download Extension' : 'Sign Up & Download'}
-          </button>
-        </section>
       </div>
     </div>
   );
