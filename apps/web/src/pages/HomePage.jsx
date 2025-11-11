@@ -223,26 +223,32 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Extension Showcase - Installation Guide Removed */}
+      {/* Mining Features Showcase */}
       <section className="extension-showcase">
         <div className="container">
           <div className="showcase-content">
             <div className="showcase-text">
-              <h2>PepeTor Mining Extension</h2>
-              <p>Mine privately while you work, study, or relax. Our lightweight extension runs seamlessly in the background with zero impact on your browsing experience.</p>
+              <h2>⛏️ Start Mining $PEPETOR Now</h2>
+              <p>Web-based mining is live! Log in to your dashboard and start earning $PEPETOR automatically. No downloads, no configuration required.</p>
               <ul className="feature-list">
-                <li>✓ <strong>&lt;5MB RAM</strong> — Won't slow you down</li>
+                <li>✓ <strong>Auto-Start</strong> — Mining begins on login</li>
                 <li>✓ <strong>Privacy Mode ON</strong> — Zero tracking, zero logs</li>
-                <li>✓ <strong>One-Click Setup</strong> — Start mining instantly</li>
-                <li>✓ <strong>Auto-Optimize</strong> — Adjusts to your network speed</li>
-                <li>✓ <strong>Earn Passively</strong> — Works 24/7 while you sleep</li>
+                <li>✓ <strong>30-Min Sessions</strong> — Automatic submission</li>
+                <li>✓ <strong>2-Hour Cycles</strong> — Restart anytime</li>
+                <li>✓ <strong>Earn Passively</strong> — Keep tab open, earn rewards</li>
               </ul>
-              <button className="btn btn-primary" disabled style={{opacity: 0.6, cursor: 'not-allowed'}}>
-                Coming Soon
-              </button>
+              {isAuthenticated ? (
+                <Link to="/dashboard" className="btn btn-primary">
+                  Go to Dashboard & Mine
+                </Link>
+              ) : (
+                <Link to="/register" className="btn btn-primary">
+                  Get Started Free
+                </Link>
+              )}
             </div>
             <div className="showcase-image">
-              <div className="placeholder-box">⚙️ Extension Preview</div>
+              <div className="placeholder-box">⛏️ Mining Dashboard</div>
             </div>
           </div>
         </div>
@@ -255,19 +261,19 @@ function HomePage() {
           <div className="faq-grid">
             <div className="faq-item">
               <h4>Is My Data Private?</h4>
-              <p>Privacy is a core value of ClearNetLabs. We're building with privacy-first principles in mind.</p>
+              <p>Absolutely. Zero tracking, military-grade encryption via Tor integration. Your data never leaves your device.</p>
             </div>
             <div className="faq-item">
               <h4>What Can I Do Right Now?</h4>
-              <p>Currently, you can create custom tokens on Solana. Mining is coming soon.</p>
+              <p>Create tokens, start mining $PEPETOR automatically, trade on Raydium, and earn passive rewards 24/7.</p>
             </div>
             <div className="faq-item">
               <h4>Can I Create Multiple Tokens?</h4>
-              <p>Yes! Create custom tokens on Solana. Each token can be configured with your own parameters.</p>
+              <p>Yes! Deploy unlimited tokens with bonding curves, custom branding, and automatic Raydium migration.</p>
             </div>
             <div className="faq-item">
-              <h4>When Will Mining Launch?</h4>
-              <p>We're actively developing the mining platform. Check back soon for updates on the launch.</p>
+              <h4>How Does Mining Work?</h4>
+              <p>Auto-mining starts when you log in. Earn $PEPETOR for uptime, sessions run every 30 minutes, auto-stop after 2 hours.</p>
             </div>
           </div>
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
@@ -297,18 +303,18 @@ function HomePage() {
               </div>
               <div className="about-text">
                 <p>
-                  I left my job and found myself scanning the internet for ways to make money. 
-                  I started trading meme coins—that didn't go too well. Then it hit me...
+                  After leaving my job, I started exploring ways to make money online. 
+                  Trading meme coins seemed promising—until it wasn't. That's when the idea struck...
                 </p>
                 <p className="about-highlight">
-                  What if there could be a platform that allows users to <strong>trade tokens and mine them as well</strong>?
+                  What if you could <strong>create, mine, AND trade tokens</strong> all in one place?
                 </p>
                 <p>
-                  That's how ClearNetLabs was born. A place where anyone can create their own token, 
-                  mine crypto, and trade—all in one platform. No gatekeepers, no barriers, just pure opportunity.
+                  ClearNetLabs was born from that vision. A platform where anyone can launch their own token with bonding curves, 
+                  mine passively with privacy protection, and trade on live DEX markets—no code, no barriers, just pure opportunity.
                 </p>
                 <p className="about-mission">
-                  🚀 Built by a 17-year-old who turned setbacks into innovation. Join the revolution.
+                  🚀 Built by a 17-year-old who turned failure into innovation. The platform is live. Join the revolution.
                 </p>
               </div>
             </div>
@@ -319,11 +325,11 @@ function HomePage() {
       {/* Final CTA */}
       <section className="final-cta">
         <div className="container">
-          <h2>Join the Privacy Revolution</h2>
-          <p>Start mining $PEPETOR today. Create tokens. Trade freely. Earn passively. 24/7.</p>
+          <h2>Ready to Create, Mine & Trade?</h2>
+          <p>Launch tokens with bonding curves. Mine $PEPETOR automatically. Trade on Raydium. All in one platform. Start now.</p>
           {!isAuthenticated && (
             <Link to="/register" className="btn btn-primary btn-lg">
-              Begin Mining Free
+              Get Started Free — Start Mining
             </Link>
           )}
         </div>
