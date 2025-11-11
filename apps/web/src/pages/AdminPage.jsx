@@ -22,7 +22,7 @@ function AdminPage() {
   const [pagination, setPagination] = useState(null);
 
   useEffect(() => {
-    if (!user || user.username !== 'clearnetmoney') {
+    if (!user || user.username?.toLowerCase() !== 'clearnetmoney') {
       navigate('/');
       return;
     }
