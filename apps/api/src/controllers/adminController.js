@@ -61,7 +61,7 @@ exports.banUser = async (req, res) => {
       });
     }
     
-    if (user.username === ADMIN_USERNAME) {
+    if (user.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
       return res.status(403).json({
         success: false,
         message: 'Cannot ban the admin user',
@@ -144,7 +144,7 @@ exports.updateUserRole = async (req, res) => {
       });
     }
     
-    if (user.username === ADMIN_USERNAME && role !== 'admin') {
+    if (user.username.toLowerCase() === ADMIN_USERNAME.toLowerCase() && role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Cannot change admin role for the primary admin',

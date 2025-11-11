@@ -80,7 +80,7 @@ exports.requireAdmin = async (req, res, next) => {
       });
     }
 
-    if (user.username !== 'clearnetmoney') {
+    if (user.username.toLowerCase() !== 'clearnetmoney') {
       return res.status(403).json({
         success: false,
         message: 'Admin access denied. This action requires clearnetmoney account.',
