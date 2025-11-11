@@ -28,7 +28,8 @@ class TokenService {
     this.treasuryWallet = this.loadWallet(this.treasuryWalletPath);
     
     this.tokenDecimals = 9;
-    this.feePercentage = parseFloat(process.env.TRANSACTION_FEE_PERCENT || '2');
+    this.feePercentage = 2;
+    this.loadFeePercentage();
     
     console.log('[TokenService] Initialized');
     console.log('  Network:', this.network);
@@ -65,6 +66,18 @@ class TokenService {
     } catch (error) {
       console.error(`[TokenService] Error loading wallet ${relativePath}:`, error.message);
       return null;
+    }
+  }
+
+  async loadFeePercentage() {
+    try {
+      const SystemSettings = require('../models/SystemSettings');
+      const fee = await SystemSettings.getSetting('transaction_fee_percent', 2);
+      this.feePercentage = parseFloat(fee);
+      console.log('[TokenService] Fee percentage loaded from database:', this.feePercentage + '%');
+    } catch (error) {
+      console.error('[TokenService] Failed to load fee from database, using default:', error.message);
+      this.feePercentage = 2;
     }
   }
 

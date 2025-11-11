@@ -27,6 +27,7 @@ const bondingCurveService = require('./bondingCurveService');
 const DEPLOYMENT_PRICE_SOL = 0.073;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
 const TREASURY_WALLET = process.env.TREASURY_WALLET_ADDRESS;
+const SystemSettings = require('../models/SystemSettings');
 
 class TokenDeploymentService {
   constructor() {
@@ -540,7 +541,8 @@ class TokenDeploymentService {
       return DEPLOYMENT_PRICE_PEPETOR;
     }
     
-    return DEPLOYMENT_PRICE_SOL;
+    const deploymentPrice = await SystemSettings.getSetting('deployment_price_sol', DEPLOYMENT_PRICE_SOL);
+    return deploymentPrice;
   }
 }
 

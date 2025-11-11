@@ -16,6 +16,7 @@ import TokenTradingPage from './pages/TokenTradingPage';
 import TokenDetailPage from './pages/TokenDetailPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import AdminPage from './pages/AdminPage';
 import './App.css';
 
 /**
@@ -61,6 +62,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPage />
               </ProtectedRoute>
             }
           />

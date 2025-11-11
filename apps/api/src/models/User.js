@@ -180,6 +180,20 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    
+    banReason: {
+      type: String,
+      default: null,
+    },
+    bannedAt: {
+      type: Date,
+      default: null,
+    },
+    bannedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields

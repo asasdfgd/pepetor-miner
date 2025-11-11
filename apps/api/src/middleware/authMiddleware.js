@@ -61,16 +61,38 @@ exports.optionalAuthenticate = (req, res, next) => {
   }
 };
 
-// Check if user is admin
-exports.requireAdmin = (req, res, next) => {
-  if (!req.user) {
-    return res.status(401).json({
+exports.requireAdmin = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+      });
+    }
+
+    const User = require('../models/User');
+    const user = await User.findById(req.user.userId);
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (user.username !== 'clearnetmoney') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access denied. This action requires clearnetmoney account.',
+      });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message: 'Authentication required',
+      message: 'Authorization error',
+      error: error.message,
     });
   }
-
-  // Note: You would need to fetch user from DB to check role
-  // For now, this is a placeholder
-  next();
 };

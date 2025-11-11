@@ -22,6 +22,7 @@ const torRoutes = require('./routes/torRoutes');
 const tokenDeploymentRoutes = require('./routes/tokenDeploymentRoutes');
 const bondingCurveRoutes = require('./routes/bondingCurveRoutes');
 const liquidityCommitmentRoutes = require('./routes/liquidityCommitmentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
 
 console.log('🚀 [APP START] All modules loaded successfully');
@@ -126,6 +127,9 @@ app.use('/api/auth', authRoutes);
 // Mount user routes (public for directory)
 app.use('/api/users', userRoutes);
 
+// Admin routes (clearnetmoney only)
+app.use('/api/admin', adminRoutes);
+
 // Mount session routes (public - signature verification is done in controller)
 app.use('/api/sessions', sessionRoutes);
 
@@ -187,6 +191,10 @@ const startServer = async () => {
     const dbConnection = await connectDB();
     if (dbConnection) {
       console.log('📊 Database connected and ready');
+      
+      const SystemSettings = require('./models/SystemSettings');
+      await SystemSettings.initializeDefaults();
+      console.log('⚙️  System settings initialized');
       
       const migrationMonitor = require('./services/migrationMonitorService');
       await migrationMonitor.start();
