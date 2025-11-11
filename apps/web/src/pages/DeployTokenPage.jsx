@@ -654,9 +654,9 @@ const DeployTokenPage = () => {
   return (
     <div className="deploy-token-page">
       <div className="deploy-token-container">
-        <h1>🪙 Deploy Your Mineable Token</h1>
+        <h1>🪙 Deploy Your Token</h1>
         <p className="subtitle">
-          Create your own mineable token on Solana in minutes
+          Create your own token on Solana in minutes
         </p>
 
         <div className="instructions-card">
@@ -686,8 +686,8 @@ const DeployTokenPage = () => {
             <div className="instruction-step">
               <div className="step-number">4</div>
               <div className="step-content">
-                <h4>Enable Mining</h4>
-                <p>Use the PepeTor Miner to mine your token! Simply connect your wallet on the Dashboard, start mining, and earn your tokens through proof-of-work.</p>
+                <h4>Enable Mining (Coming Soon)</h4>
+                <p>The PepeTor Miner will allow you to mine your token through proof-of-work. This feature is currently under development and will be available soon.</p>
               </div>
             </div>
             <div className="instruction-step">
