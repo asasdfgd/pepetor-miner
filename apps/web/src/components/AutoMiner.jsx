@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { submitSession } from '../services/sessionService';
+import { useAuth } from '../hooks/useAuth';
 import './AutoMiner.css';
 
 const SESSION_DURATION_MS = 30 * 60 * 1000;
+const AUTO_STOP_DURATION_MS = 2 * 60 * 60 * 1000;
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 function AutoMiner({ onSessionSubmitted }) {
+  const { isAuthenticated } = useAuth();
   const [mining, setMining] = useState(false);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -20,6 +23,7 @@ function AutoMiner({ onSessionSubmitted }) {
   const miningIntervalRef = useRef(null);
   const tickIntervalRef = useRef(null);
   const sessionIdRef = useRef(null);
+  const autoStopTimeoutRef = useRef(null);
 
   const generateSessionId = () => {
     return `auto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -47,6 +51,10 @@ function AutoMiner({ onSessionSubmitted }) {
     miningIntervalRef.current = setTimeout(async () => {
       await submitCurrentSession();
     }, SESSION_DURATION_MS);
+
+    autoStopTimeoutRef.current = setTimeout(() => {
+      stopMining();
+    }, AUTO_STOP_DURATION_MS);
   };
 
   const submitCurrentSession = async () => {
@@ -95,6 +103,10 @@ function AutoMiner({ onSessionSubmitted }) {
       clearInterval(tickIntervalRef.current);
       tickIntervalRef.current = null;
     }
+    if (autoStopTimeoutRef.current) {
+      clearTimeout(autoStopTimeoutRef.current);
+      autoStopTimeoutRef.current = null;
+    }
     setMining(false);
     setElapsedSeconds(0);
     setSessionStartTime(null);
@@ -111,10 +123,15 @@ function AutoMiner({ onSessionSubmitted }) {
 
   useEffect(() => {
     fetchAvailableTokens();
+    
+    if (isAuthenticated && !mining) {
+      startMining();
+    }
+    
     return () => {
       stopMining();
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchAvailableTokens = async () => {
     try {
@@ -272,10 +289,11 @@ function AutoMiner({ onSessionSubmitted }) {
       <div className="miner-info">
         <p>💡 <strong>How it works:</strong></p>
         <ul>
-          <li>Mining sessions run automatically every 30 minutes</li>
+          <li>Mining starts automatically when you log in</li>
+          <li>Sessions are submitted every 30 minutes</li>
+          <li>Auto-stops after 2 hours (restart manually to continue)</li>
           <li>Keep this tab open to earn ${selectedToken?.tokenSymbol || 'tokens'} passively</li>
           <li>${selectedToken?.tokenSymbol || 'Tokens'} sent directly to your wallet</li>
-          <li>Close the tab to stop mining</li>
         </ul>
       </div>
     </div>
