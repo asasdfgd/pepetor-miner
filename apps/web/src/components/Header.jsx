@@ -47,9 +47,6 @@ function Header() {
                 <Link to="/tokens" className="nav-link">
                   🪙 Tokens
                 </Link>
-                <Link to="/extension" className="nav-link">
-                  Extension
-                </Link>
                 <Link to="/faq" className="nav-link">
                   FAQ
                 </Link>

@@ -5,9 +5,9 @@
 
 // Configuration
 const CONFIG = {
-  defaultApiUrl: 'http://localhost:3001/api',
-  webAppUrl: 'http://localhost:3000',
-  syncInterval: 5000, // 5 seconds
+  defaultApiUrl: 'https://pepetor-miner.fly.dev/api',
+  webAppUrl: 'https://pepetor-miner-lexa8yzjp-asasdfgds-projects.vercel.app',
+  syncInterval: 5000,
 };
 
 // State

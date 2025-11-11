@@ -91,9 +91,9 @@ function HomePage() {
                 <li>✓ <strong>Auto-Optimize</strong> — Adjusts to your network speed</li>
                 <li>✓ <strong>Earn Passively</strong> — Works 24/7 while you sleep</li>
               </ul>
-              <Link to="/extension" className="btn btn-primary">
-                Get Mining Now
-              </Link>
+              <button className="btn btn-primary" disabled style={{opacity: 0.6, cursor: 'not-allowed'}}>
+                Coming Soon
+              </button>
             </div>
             <div className="showcase-image">
               <div className="placeholder-box">⚙️ Extension Preview</div>

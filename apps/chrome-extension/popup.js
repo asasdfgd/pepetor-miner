@@ -46,7 +46,7 @@ async function init() {
 function setupEventListeners() {
   // Not logged in
   document.getElementById('openAppBtn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:3000' });
+    chrome.tabs.create({ url: 'https://pepetor-miner-lexa8yzjp-asasdfgds-projects.vercel.app' });
   });
 
   document.getElementById('openOptionsBtn').addEventListener('click', () => {
@@ -73,7 +73,7 @@ function setupEventListeners() {
 
   // Footer actions
   document.getElementById('openDashboardBtn').addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:3000/dashboard' });
+    chrome.tabs.create({ url: 'https://pepetor-miner-lexa8yzjp-asasdfgds-projects.vercel.app/dashboard' });
   });
 
   document.getElementById('openAnalyticsBtn').addEventListener('click', () => {

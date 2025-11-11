@@ -31,19 +31,19 @@ function MiningGuideSection() {
         <div className="guide-step">
           <div className="step-number">2</div>
           <div className="step-content">
-            <h3>Download & Install Extension</h3>
-            <p>Available for Chrome, Brave, Edge, and Opera browsers.</p>
+            <h3>Extension (Coming Soon)</h3>
+            <p>Browser extension will be available soon for Chrome, Brave, Edge, and Opera.</p>
             <div className="feature-list">
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon">⏳</span>
                 <span>Authenticates with your wallet</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon">⏳</span>
                 <span>Runs privacy-based mining in background</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon">⏳</span>
                 <span>Tracks active sessions and uptime</span>
               </div>
             </div>

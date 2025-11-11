@@ -1,27 +1,25 @@
 {
   "manifest_version": 3,
   "name": "PEPETOR Miner",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Earn crypto by sharing bandwidth with PEPETOR Tor network",
   "permissions": [
     "storage",
     "tabs",
     "scripting",
-    "activeTab",
-    "proxy"
+    "activeTab"
   ],
   "host_permissions": [
-    "http://localhost:3001/*",
-    "http://localhost:3000/*",
-    "https://*/*",
-    "socks5://127.0.0.1:9149/*"
+    "https://pepetor-miner.fly.dev/*",
+    "https://pepetor-miner-lexa8yzjp-asasdfgds-projects.vercel.app/*",
+    "https://*/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["http://localhost:3000/*"],
+      "matches": ["https://pepetor-miner-lexa8yzjp-asasdfgds-projects.vercel.app/*"],
       "js": ["content.js"],
       "run_at": "document_start"
     }
@@ -30,15 +28,15 @@
     "default_popup": "popup.html",
     "default_title": "PEPETOR Miner",
     "default_icon": {
-      "16": "images/icon-16.svg",
-      "48": "images/icon-48.svg",
-      "128": "images/icon-128.svg"
+      "16": "images/icon-16.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
     }
   },
   "icons": {
-    "16": "images/icon-16.svg",
-    "48": "images/icon-48.svg",
-    "128": "images/icon-128.svg"
+    "16": "images/icon-16.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
   },
   "options_page": "options.html",
   "web_accessible_resources": [
