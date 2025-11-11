@@ -21,6 +21,34 @@ function TorPage() {
           <p>Control Tor process and monitor auto-session submissions</p>
         </div>
 
+        <section className="origin-story">
+          <div className="origin-content">
+            <p>
+              Before PepeTor became a full platform — before token creation, dashboards, and mining rewards — there was just one mission:<br/>
+              <strong>find a way to make privacy itself profitable.</strong>
+            </p>
+            <p>
+              The Tor Integration tab is where that mission began.
+            </p>
+            <p>
+              It was the first proof-of-concept — a tool designed to turn anonymous browsing into earned value.<br/>
+              At the time, ClearNetLabs wasn't about memecoins or creator economies yet. It was about <strong>rebellion</strong> —<br/>
+              a quiet pushback against data collection, surveillance, and control.
+            </p>
+            <p>
+              By building a system that rewarded people for using Tor, the foundation was set:<br/>
+              <em>"If privacy can be monetized, anything online can."</em>
+            </p>
+            <p>
+              That single thought evolved into PepeTor Miner — where mining, creation, and trading all exist in one ecosystem.
+            </p>
+            <p>
+              The Tor tab stands as a tribute to where it all started —<br/>
+              <strong>the experiment that made the entire revolution possible.</strong>
+            </p>
+          </div>
+        </section>
+
         <div className="tor-container">
           {/* Tor Control */}
           <section className="tor-section">
