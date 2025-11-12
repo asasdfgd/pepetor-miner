@@ -136,6 +136,14 @@ const DeployTokenPage = () => {
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
+      const lamportsToSend = Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL);
+      console.log('=== PAYMENT TRANSACTION DEBUG ===');
+      console.log('Pricing breakdown:', pricing.breakdown);
+      console.log('Total price (SOL):', pricing.totalPrice);
+      console.log('Initial purchase amount:', formData.initialPurchaseAmount);
+      console.log('Lamports to send:', lamportsToSend);
+      console.log('Expected SOL:', lamportsToSend / LAMPORTS_PER_SOL);
+      
       const { blockhash } = await connection.getLatestBlockhash('confirmed');
       
       const transaction = new Transaction({
@@ -156,7 +164,7 @@ const DeployTokenPage = () => {
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: treasuryPubkey,
-          lamports: Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL),
+          lamports: lamportsToSend,
         })
       );
 
