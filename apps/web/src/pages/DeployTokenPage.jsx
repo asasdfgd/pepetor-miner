@@ -72,6 +72,7 @@ const DeployTokenPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log('handleInputChange:', { name, value });
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -79,6 +80,7 @@ const DeployTokenPage = () => {
     
     if (name === 'liquidityAmount') {
       const numValue = parseFloat(value);
+      console.log('liquidityAmount changed:', { value, numValue, isValid: !isNaN(numValue) && numValue >= 0 });
       if (!isNaN(numValue) && numValue >= 0) {
         fetchPricing(value, formData.initialPurchaseAmount);
       } else if (value === '' || value === '0') {
@@ -88,7 +90,9 @@ const DeployTokenPage = () => {
     
     if (name === 'initialPurchaseAmount') {
       const numValue = parseFloat(value);
+      console.log('initialPurchaseAmount changed:', { value, numValue, isValid: !isNaN(numValue) && numValue >= 0 });
       if (!isNaN(numValue) && numValue >= 0) {
+        console.log('Calling fetchPricing with liquidityAmount:', formData.liquidityAmount, 'initialPurchaseAmount:', value);
         fetchPricing(formData.liquidityAmount, value);
       } else if (value === '' || value === '0') {
         fetchPricing(formData.liquidityAmount, '0');
