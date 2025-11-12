@@ -126,16 +126,20 @@ const DeployTokenPage = () => {
   const sendPayment = async (retryCount = 0) => {
     if (!publicKey || !pricing) return null;
 
-    const MAX_RETRIES = 5;
-    const basePriorityFee = 2000000;
-    const priorityFeeMultiplier = Math.pow(1.5, retryCount);
-    const currentPriorityFee = Math.min(basePriorityFee * priorityFeeMultiplier, 10000000);
+    const MAX_RETRIES = 3;
+    const JITO_BLOCK_ENGINE = 'https://mainnet.block-engine.jito.wtf/api/v1';
+    const JITO_TIP_ACCOUNTS = [
+      'Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY',
+      'DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL',
+      '96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5',
+      '3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT',
+    ];
 
     try {
-      setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
+      setPaymentStatus(retryCount > 0 ? `Retrying with Jito (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating Jito bundle...');
+      console.log('=== JITO BUNDLE PAYMENT ===');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
-      console.log('Priority fee for this attempt:', currentPriorityFee, 'micro-lamports');
       
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
@@ -146,31 +150,27 @@ const DeployTokenPage = () => {
       }
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
-      
       const lamportsToSend = Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL);
-      console.log('=== PAYMENT TRANSACTION DEBUG ===');
-      console.log('Pricing breakdown:', pricing.breakdown);
-      console.log('Total price (SOL):', pricing.totalPrice);
-      console.log('Initial purchase amount:', formData.initialPurchaseAmount);
-      console.log('Lamports to send:', lamportsToSend);
-      console.log('Expected SOL:', lamportsToSend / LAMPORTS_PER_SOL);
       
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
-      console.log('Got blockhash:', blockhash, 'Valid until block:', lastValidBlockHeight);
+      const jitoTipAmount = Math.floor(0.0015 * LAMPORTS_PER_SOL * (1 + retryCount * 0.5));
+      const jitoTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[retryCount % JITO_TIP_ACCOUNTS.length]);
+      
+      console.log('Payment amount:', lamportsToSend, '(', lamportsToSend / LAMPORTS_PER_SOL, 'SOL)');
+      console.log('Jito tip:', jitoTipAmount, '(', jitoTipAmount / LAMPORTS_PER_SOL, 'SOL)');
+      console.log('Jito tip account:', jitoTipAccount.toBase58());
+      
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      console.log('Got blockhash:', blockhash);
       
       const transaction = new Transaction({
         feePayer: publicKey,
         recentBlockhash: blockhash,
       })
       .add(
-        ComputeBudgetProgram.setComputeUnitLimit({
-          units: 200000,
-        })
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 })
       )
       .add(
-        ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: currentPriorityFee,
-        })
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 10000 })
       )
       .add(
         SystemProgram.transfer({
@@ -178,36 +178,66 @@ const DeployTokenPage = () => {
           toPubkey: treasuryPubkey,
           lamports: lamportsToSend,
         })
+      )
+      .add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: jitoTipAccount,
+          lamports: jitoTipAmount,
+        })
       );
-
-      setPaymentStatus('Sending payment transaction...');
-      console.log('Sending transaction with priority fee:', currentPriorityFee);
       
-      const signature = await sendTransaction(transaction, connection, {
+      setPaymentStatus('Signing transaction...');
+      const signedTx = await sendTransaction(transaction, connection, {
         skipPreflight: true,
-        maxRetries: 0,
+        preflightCommitment: 'finalized',
       });
       
-      console.log('Transaction sent:', signature);
-      setPaymentStatus('Waiting for confirmation...');
-      console.log('Monitoring transaction confirmation...');
+      console.log('Transaction signed:', signedTx);
+      
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false,
+      });
+      
+      const base58Tx = Buffer.from(serializedTx).toString('base64');
+      
+      setPaymentStatus('Submitting to Jito validators...');
+      console.log('Sending bundle to Jito...');
+      
+      const bundleResponse = await fetch(`${JITO_BLOCK_ENGINE}/bundles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'sendBundle',
+          params: [[base58Tx]]
+        }),
+      });
+      
+      const bundleResult = await bundleResponse.json();
+      console.log('Bundle response:', bundleResult);
+      
+      if (bundleResult.error) {
+        throw new Error(`Jito error: ${bundleResult.error.message || JSON.stringify(bundleResult.error)}`);
+      }
+      
+      const bundleId = bundleResult.result;
+      console.log('Bundle submitted:', bundleId);
+      setPaymentStatus('Waiting for Jito confirmation...');
       
       const startTime = Date.now();
-      const CONFIRMATION_TIMEOUT = 150000;
+      const CONFIRMATION_TIMEOUT = 90000;
       let confirmed = false;
       
       while (Date.now() - startTime < CONFIRMATION_TIMEOUT) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         try {
-          const currentBlockHeight = await connection.getBlockHeight('processed');
-          
-          if (currentBlockHeight > lastValidBlockHeight) {
-            console.log('Block height exceeded, transaction likely expired');
-            throw new Error('block height exceeded');
-          }
-          
-          const status = await connection.getSignatureStatus(signature);
+          const status = await connection.getSignatureStatus(signedTx);
           
           if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
             if (status.value.err) {
@@ -217,55 +247,37 @@ const DeployTokenPage = () => {
             break;
           }
         } catch (pollError) {
-          if (pollError.message === 'block height exceeded') {
-            throw pollError;
-          }
           console.log('Poll attempt failed:', pollError.message);
         }
         
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        setPaymentStatus(`Waiting for confirmation... (${elapsed}s elapsed)`);
+        setPaymentStatus(`Waiting for Jito confirmation... (${elapsed}s elapsed)`);
       }
       
       if (!confirmed) {
-        console.warn('Transaction not confirmed after timeout, checking one more time...');
-        const finalStatus = await connection.getSignatureStatus(signature);
-        
-        if (finalStatus?.value?.confirmationStatus === 'confirmed' || finalStatus?.value?.confirmationStatus === 'finalized') {
-          if (finalStatus.value.err) {
-            throw new Error('Transaction failed on-chain');
-          }
-          confirmed = true;
-        }
-      }
-      
-      if (!confirmed) {
-        console.warn('Transaction not confirmed - backend will verify');
+        console.warn('Bundle not confirmed after timeout - backend will verify');
         setPaymentStatus('Transaction submitted - verifying in background...');
       } else {
-        console.log('Transaction confirmed');
+        console.log('Bundle confirmed!');
         setPaymentStatus('Payment confirmed!');
       }
       
-      return signature;
+      return signedTx;
     } catch (error) {
-      console.error('Payment failed:', error);
+      console.error('Jito payment failed:', error);
       
       const isExpirationError = error.message && (
         error.message.includes('block height exceeded') || 
         error.message.includes('blockhash not found') ||
-        error.message.includes('Transaction expired')
+        error.message.includes('Transaction expired') ||
+        error.message.includes('Bundle dropped')
       );
       
-      if (isExpirationError) {
+      if (isExpirationError || retryCount === 0) {
         if (retryCount < MAX_RETRIES) {
-          const backoffDelay = 1000 * Math.pow(2, retryCount);
-          console.log(`Transaction expired, retrying with higher fee in ${backoffDelay}ms (${retryCount + 1}/${MAX_RETRIES})...`);
-          await new Promise(resolve => setTimeout(resolve, backoffDelay));
+          console.log(`Retrying Jito bundle (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return sendPayment(retryCount + 1);
-        } else {
-          setPaymentStatus(null);
-          throw new Error('Network is extremely congested. Please try again in a few minutes.');
         }
       }
       

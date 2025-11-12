@@ -44,6 +44,7 @@
   "author": "Joseph Pietravalle",
   "license": "MIT",
   "dependencies": {
+    "jito-ts": "^4.2.1",
     "mongodb": "^6.20.0"
   }
 }
