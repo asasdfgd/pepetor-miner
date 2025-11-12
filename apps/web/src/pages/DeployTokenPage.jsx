@@ -136,16 +136,20 @@ const DeployTokenPage = () => {
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      const { blockhash } = await connection.getLatestBlockhash('confirmed');
       
       const transaction = new Transaction({
         feePayer: publicKey,
-        blockhash,
-        lastValidBlockHeight,
+        recentBlockhash: blockhash,
       })
       .add(
+        ComputeBudgetProgram.setComputeUnitLimit({
+          units: 200000,
+        })
+      )
+      .add(
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 50000,
+          microLamports: 500000,
         })
       )
       .add(
@@ -157,25 +161,43 @@ const DeployTokenPage = () => {
       );
 
       setPaymentStatus('Sending payment transaction...');
-      console.log('Sending transaction...');
+      console.log('Sending transaction with high priority fees...');
+      
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
-        maxRetries: 3,
-        preflightCommitment: 'finalized',
+        maxRetries: 2,
+        preflightCommitment: 'confirmed',
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Confirming transaction (this may take 30-60 seconds)...');
-      console.log('Waiting for confirmation...');
+      setPaymentStatus('Verifying transaction (this may take up to 60 seconds)...');
+      console.log('Polling for transaction confirmation...');
       
-      const confirmation = await connection.confirmTransaction({
-        signature,
-        blockhash,
-        lastValidBlockHeight,
-      }, 'confirmed');
+      const MAX_CONFIRMATION_ATTEMPTS = 30;
+      let confirmed = false;
       
-      if (confirmation.value.err) {
-        throw new Error('Transaction failed on-chain');
+      for (let i = 0; i < MAX_CONFIRMATION_ATTEMPTS; i++) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        try {
+          const status = await connection.getSignatureStatus(signature);
+          
+          if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
+            if (status.value.err) {
+              throw new Error('Transaction failed on-chain');
+            }
+            confirmed = true;
+            break;
+          }
+        } catch (pollError) {
+          console.log('Poll attempt failed:', pollError.message);
+        }
+        
+        setPaymentStatus(`Verifying transaction... (${i * 2}s elapsed)`);
+      }
+      
+      if (!confirmed) {
+        throw new Error('Transaction confirmation timeout. The transaction may still succeed - check your wallet.');
       }
       
       console.log('Transaction confirmed');
@@ -184,14 +206,14 @@ const DeployTokenPage = () => {
     } catch (error) {
       console.error('Payment failed:', error);
       
-      if (error.message && error.message.includes('block height exceeded')) {
+      if (error.message && (error.message.includes('block height exceeded') || error.message.includes('blockhash not found'))) {
         if (retryCount < MAX_RETRIES) {
-          console.log(`Transaction expired, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log(`Transaction expired, retrying with fresh blockhash (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
           return sendPayment(retryCount + 1);
         } else {
           setPaymentStatus(null);
-          throw new Error('Transaction expired after multiple attempts. Network is congested. Please try again in a few moments.');
+          throw new Error('Network is heavily congested. Please try again in a few minutes or increase your RPC priority tier.');
         }
       }
       
