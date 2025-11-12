@@ -58,10 +58,12 @@ const DeployTokenPage = () => {
   const fetchPricing = async (liquidityAmount = formData.liquidityAmount, initialPurchaseAmount = formData.initialPurchaseAmount) => {
     try {
       const useBondingCurve = formData.useBondingCurve || false;
-      console.log('fetchPricing called with:', { liquidityAmount, initialPurchaseAmount, useBondingCurve });
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}&initialPurchaseAmount=${initialPurchaseAmount || 0}`);
+      const url = `${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}&initialPurchaseAmount=${initialPurchaseAmount || 0}`;
+      console.log('🔍 fetchPricing called with:', { liquidityAmount, initialPurchaseAmount, useBondingCurve });
+      console.log('🌐 Request URL:', url);
+      const response = await fetch(url);
       const data = await response.json();
-      console.log('API pricing response:', data);
+      console.log('📦 API pricing response:', data);
       if (data.success) {
         setPricing(data);
       }
@@ -950,6 +952,13 @@ const DeployTokenPage = () => {
                   min="0"
                   step="0.01"
                 />
+                <div style={{background: '#333', padding: '10px', marginTop: '10px', fontSize: '12px', fontFamily: 'monospace', color: '#0f0'}}>
+                  <div>🔍 DEBUG: Form State</div>
+                  <div>initialPurchaseAmount: {formData.initialPurchaseAmount}</div>
+                  <div>useBondingCurve: {formData.useBondingCurve ? 'true' : 'false'}</div>
+                  {pricing && <div>API returned totalPrice: {pricing.totalPrice}</div>}
+                  {pricing && pricing.initialPurchaseAmount !== undefined && <div>API returned initialPurchaseAmount: {pricing.initialPurchaseAmount}</div>}
+                </div>
               </div>
               
               {pricing && (
