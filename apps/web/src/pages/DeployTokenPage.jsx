@@ -4,7 +4,9 @@ import {
   PublicKey, 
   Transaction, 
   SystemProgram,
-  LAMPORTS_PER_SOL 
+  LAMPORTS_PER_SOL,
+  TransactionInstruction,
+  ComputeBudgetProgram
 } from '@solana/web3.js';
 import './DeployTokenPage.css';
 
@@ -114,11 +116,13 @@ const DeployTokenPage = () => {
     }
   };
 
-  const sendPayment = async () => {
+  const sendPayment = async (retryCount = 0) => {
     if (!publicKey || !pricing) return null;
 
+    const MAX_RETRIES = 3;
+
     try {
-      setPaymentStatus('Creating payment transaction...');
+      setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
       
@@ -132,13 +136,19 @@ const DeployTokenPage = () => {
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
       
       const transaction = new Transaction({
         feePayer: publicKey,
         blockhash,
         lastValidBlockHeight,
-      }).add(
+      })
+      .add(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: 50000,
+        })
+      )
+      .add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: treasuryPubkey,
@@ -150,12 +160,12 @@ const DeployTokenPage = () => {
       console.log('Sending transaction...');
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
-        maxRetries: 5,
-        preflightCommitment: 'confirmed',
+        maxRetries: 3,
+        preflightCommitment: 'finalized',
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Confirming transaction (this may take 15-30 seconds)...');
+      setPaymentStatus('Confirming transaction (this may take 30-60 seconds)...');
       console.log('Waiting for confirmation...');
       
       const confirmation = await connection.confirmTransaction({
@@ -173,10 +183,19 @@ const DeployTokenPage = () => {
       return signature;
     } catch (error) {
       console.error('Payment failed:', error);
-      setPaymentStatus(null);
+      
       if (error.message && error.message.includes('block height exceeded')) {
-        throw new Error('Transaction expired due to network congestion. Please try again.');
+        if (retryCount < MAX_RETRIES) {
+          console.log(`Transaction expired, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return sendPayment(retryCount + 1);
+        } else {
+          setPaymentStatus(null);
+          throw new Error('Transaction expired after multiple attempts. Network is congested. Please try again in a few moments.');
+        }
       }
+      
+      setPaymentStatus(null);
       throw new Error('Payment failed: ' + error.message);
     }
   };
