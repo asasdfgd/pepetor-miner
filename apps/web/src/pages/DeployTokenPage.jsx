@@ -185,10 +185,10 @@ const DeployTokenPage = () => {
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Verifying transaction (this may take up to 60 seconds)...');
+      setPaymentStatus('Verifying transaction (this may take up to 2 minutes)...');
       console.log('Polling for transaction confirmation...');
       
-      const MAX_CONFIRMATION_ATTEMPTS = 30;
+      const MAX_CONFIRMATION_ATTEMPTS = 60;
       let confirmed = false;
       
       for (let i = 0; i < MAX_CONFIRMATION_ATTEMPTS; i++) {
@@ -212,11 +212,13 @@ const DeployTokenPage = () => {
       }
       
       if (!confirmed) {
-        throw new Error('Transaction confirmation timeout. The transaction may still succeed - check your wallet.');
+        console.warn('Transaction not confirmed after 120 seconds, but returning signature anyway - backend will verify');
+        setPaymentStatus('Transaction submitted - verifying in background...');
+      } else {
+        console.log('Transaction confirmed');
+        setPaymentStatus('Payment confirmed!');
       }
       
-      console.log('Transaction confirmed');
-      setPaymentStatus('Payment confirmed!');
       return signature;
     } catch (error) {
       console.error('Payment failed:', error);
