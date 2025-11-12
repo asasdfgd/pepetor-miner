@@ -139,7 +139,7 @@ function HomePage() {
             <div className="comparison-table">
               <div className="table-row table-header">
                 <div className="table-cell">Feature</div>
-                <div className="table-cell">PepeTor</div>
+                <div className="table-cell">ClearNetLabs</div>
                 <div className="table-cell">Typical Meme-Coin Platform</div>
               </div>
               <div className="table-row">
