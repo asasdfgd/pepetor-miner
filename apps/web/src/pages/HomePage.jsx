@@ -291,7 +291,7 @@ function HomePage() {
           <div className="about-content">
             <div className="about-story">
               <div className="about-header">
-                <h3>Joseph Pietravalle</h3>
+                <h3>Joe</h3>
                 <a 
                   href="https://x.com/clearnetmoney" 
                   target="_blank" 
