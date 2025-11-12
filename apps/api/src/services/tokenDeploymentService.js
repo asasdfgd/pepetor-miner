@@ -62,7 +62,7 @@ class TokenDeploymentService {
     try {
       let tx = null;
       let attempts = 0;
-      const maxAttempts = 3;
+      const maxAttempts = 60;
 
       while (attempts < maxAttempts && !tx) {
         try {
@@ -73,7 +73,7 @@ class TokenDeploymentService {
 
           if (!tx && attempts < maxAttempts - 1) {
             console.log(`Transaction not found, retrying... (${attempts + 1}/${maxAttempts})`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
             attempts++;
             continue;
           }
