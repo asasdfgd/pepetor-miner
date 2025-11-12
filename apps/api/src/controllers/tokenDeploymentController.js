@@ -21,6 +21,9 @@ exports.getDeploymentPrice = async (req, res) => {
   try {
     const { paymentMethod = 'SOL', liquidityAmount = 0, useBondingCurve = 'false', initialPurchaseAmount = 0 } = req.query;
     
+    console.log('🔍 /price endpoint received query params:', req.query);
+    console.log('📊 Parsed values:', { paymentMethod, liquidityAmount, useBondingCurve, initialPurchaseAmount });
+    
     const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
@@ -29,6 +32,12 @@ exports.getDeploymentPrice = async (req, res) => {
     
     if (isBondingCurve) {
       const initialPurchase = parseFloat(initialPurchaseAmount) || 0;
+      console.log('💰 Bonding curve pricing calculation:', {
+        deploymentPrice,
+        initialPurchaseAmount,
+        initialPurchaseType: typeof initialPurchaseAmount,
+        parsedInitialPurchase: initialPurchase,
+      });
       const totalPrice = deploymentPrice + initialPurchase;
       const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
       
