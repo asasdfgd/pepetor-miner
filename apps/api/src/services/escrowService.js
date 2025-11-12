@@ -8,6 +8,7 @@ const {
   LAMPORTS_PER_SOL,
 } = require('@solana/web3.js');
 const BN = require('bn.js');
+const path = require('path');
 
 const ESCROW_SEED_PREFIX = 'liquidity_escrow';
 const ESCROW_PROGRAM_ID = new PublicKey('11111111111111111111111111111111');
@@ -19,7 +20,8 @@ class EscrowService {
       'confirmed'
     );
     
-    const treasuryKeypairData = require(process.env.TREASURY_WALLET_PATH || './.wallets/deployer.json');
+    const walletPath = path.resolve(__dirname, '../../', process.env.TREASURY_WALLET_PATH || '.wallets/deployer.json');
+    const treasuryKeypairData = require(walletPath);
     this.treasuryKeypair = Keypair.fromSecretKey(Uint8Array.from(treasuryKeypairData));
   }
 
