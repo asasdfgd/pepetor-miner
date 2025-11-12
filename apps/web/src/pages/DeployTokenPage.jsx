@@ -126,12 +126,16 @@ const DeployTokenPage = () => {
   const sendPayment = async (retryCount = 0) => {
     if (!publicKey || !pricing) return null;
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 5;
+    const basePriorityFee = 2000000;
+    const priorityFeeMultiplier = Math.pow(1.5, retryCount);
+    const currentPriorityFee = Math.min(basePriorityFee * priorityFeeMultiplier, 10000000);
 
     try {
       setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
+      console.log('Priority fee for this attempt:', currentPriorityFee, 'micro-lamports');
       
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
@@ -151,7 +155,8 @@ const DeployTokenPage = () => {
       console.log('Lamports to send:', lamportsToSend);
       console.log('Expected SOL:', lamportsToSend / LAMPORTS_PER_SOL);
       
-      const { blockhash } = await connection.getLatestBlockhash('confirmed');
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
+      console.log('Got blockhash:', blockhash, 'Valid until block:', lastValidBlockHeight);
       
       const transaction = new Transaction({
         feePayer: publicKey,
@@ -164,7 +169,7 @@ const DeployTokenPage = () => {
       )
       .add(
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 500000,
+          microLamports: currentPriorityFee,
         })
       )
       .add(
@@ -176,25 +181,32 @@ const DeployTokenPage = () => {
       );
 
       setPaymentStatus('Sending payment transaction...');
-      console.log('Sending transaction with high priority fees...');
+      console.log('Sending transaction with priority fee:', currentPriorityFee);
       
       const signature = await sendTransaction(transaction, connection, {
-        skipPreflight: false,
-        maxRetries: 2,
-        preflightCommitment: 'confirmed',
+        skipPreflight: true,
+        maxRetries: 0,
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Verifying transaction (this may take up to 2 minutes)...');
-      console.log('Polling for transaction confirmation...');
+      setPaymentStatus('Waiting for confirmation...');
+      console.log('Monitoring transaction confirmation...');
       
-      const MAX_CONFIRMATION_ATTEMPTS = 60;
+      const startTime = Date.now();
+      const CONFIRMATION_TIMEOUT = 150000;
       let confirmed = false;
       
-      for (let i = 0; i < MAX_CONFIRMATION_ATTEMPTS; i++) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      while (Date.now() - startTime < CONFIRMATION_TIMEOUT) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         try {
+          const currentBlockHeight = await connection.getBlockHeight('processed');
+          
+          if (currentBlockHeight > lastValidBlockHeight) {
+            console.log('Block height exceeded, transaction likely expired');
+            throw new Error('block height exceeded');
+          }
+          
           const status = await connection.getSignatureStatus(signature);
           
           if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
@@ -205,14 +217,30 @@ const DeployTokenPage = () => {
             break;
           }
         } catch (pollError) {
+          if (pollError.message === 'block height exceeded') {
+            throw pollError;
+          }
           console.log('Poll attempt failed:', pollError.message);
         }
         
-        setPaymentStatus(`Verifying transaction... (${i * 2}s elapsed)`);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        setPaymentStatus(`Waiting for confirmation... (${elapsed}s elapsed)`);
       }
       
       if (!confirmed) {
-        console.warn('Transaction not confirmed after 120 seconds, but returning signature anyway - backend will verify');
+        console.warn('Transaction not confirmed after timeout, checking one more time...');
+        const finalStatus = await connection.getSignatureStatus(signature);
+        
+        if (finalStatus?.value?.confirmationStatus === 'confirmed' || finalStatus?.value?.confirmationStatus === 'finalized') {
+          if (finalStatus.value.err) {
+            throw new Error('Transaction failed on-chain');
+          }
+          confirmed = true;
+        }
+      }
+      
+      if (!confirmed) {
+        console.warn('Transaction not confirmed - backend will verify');
         setPaymentStatus('Transaction submitted - verifying in background...');
       } else {
         console.log('Transaction confirmed');
@@ -223,14 +251,21 @@ const DeployTokenPage = () => {
     } catch (error) {
       console.error('Payment failed:', error);
       
-      if (error.message && (error.message.includes('block height exceeded') || error.message.includes('blockhash not found'))) {
+      const isExpirationError = error.message && (
+        error.message.includes('block height exceeded') || 
+        error.message.includes('blockhash not found') ||
+        error.message.includes('Transaction expired')
+      );
+      
+      if (isExpirationError) {
         if (retryCount < MAX_RETRIES) {
-          console.log(`Transaction expired, retrying with fresh blockhash (${retryCount + 1}/${MAX_RETRIES})...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          const backoffDelay = 1000 * Math.pow(2, retryCount);
+          console.log(`Transaction expired, retrying with higher fee in ${backoffDelay}ms (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise(resolve => setTimeout(resolve, backoffDelay));
           return sendPayment(retryCount + 1);
         } else {
           setPaymentStatus(null);
-          throw new Error('Network is heavily congested. Please try again in a few minutes or increase your RPC priority tier.');
+          throw new Error('Network is extremely congested. Please try again in a few minutes.');
         }
       }
       
