@@ -962,13 +962,15 @@ const DeployTokenPage = () => {
               </div>
               
               {pricing && (
-                <div className="bonding-curve-info">
+                <div className="bonding-curve-info" style={{border: '2px solid #0f0', padding: '15px', marginTop: '10px'}}>
                   <h4>📈 Bonding Curve Launch</h4>
-                  <p className="cost-display">💰 Total Cost: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)</p>
+                  <p className="cost-display" style={{fontSize: '20px', fontWeight: 'bold', color: '#0f0'}}>
+                    💰 Total Cost: {pricing.totalPrice.toFixed(4)} SOL (~${pricing.priceUSD} USD)
+                  </p>
                   {pricing.breakdown && (
-                    <div className="price-breakdown">
+                    <div className="price-breakdown" style={{background: '#222', padding: '10px', marginTop: '10px'}}>
                       {pricing.breakdown.map((line, i) => (
-                        <p key={i} className="breakdown-line">{line}</p>
+                        <p key={i} className="breakdown-line" style={{margin: '5px 0', fontSize: '14px'}}>{line}</p>
                       ))}
                     </div>
                   )}
