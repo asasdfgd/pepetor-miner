@@ -63,11 +63,6 @@ function Header() {
                 <Link to="/dashboard" className="nav-link">
                   Dashboard
                 </Link>
-                {user?.username?.toLowerCase() === 'clearnetmoney' && (
-                  <Link to="/admin" className="nav-link">
-                    🛡️ Admin
-                  </Link>
-                )}
                 <Link to="/tokens" className="nav-link">
                   🪙 Tokens
                 </Link>
