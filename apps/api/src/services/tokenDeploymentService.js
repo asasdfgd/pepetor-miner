@@ -60,16 +60,38 @@ class TokenDeploymentService {
 
   async verifyPayment(signature, expectedAmount, paymentMethod = 'SOL') {
     try {
-      const tx = await this.connection.getTransaction(signature, {
-        maxSupportedTransactionVersion: 0,
-      });
+      let tx = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (attempts < maxAttempts && !tx) {
+        try {
+          tx = await this.connection.getTransaction(signature, {
+            maxSupportedTransactionVersion: 0,
+            commitment: 'confirmed',
+          });
+
+          if (!tx && attempts < maxAttempts - 1) {
+            console.log(`Transaction not found, retrying... (${attempts + 1}/${maxAttempts})`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            attempts++;
+            continue;
+          }
+        } catch (err) {
+          if (err.message && err.message.includes('block height exceeded')) {
+            throw new Error('Transaction expired. Please send a new payment transaction and try again.');
+          }
+          throw err;
+        }
+        break;
+      }
 
       if (!tx) {
-        throw new Error('Transaction not found');
+        throw new Error('Transaction not found. Please ensure the transaction is confirmed on the blockchain.');
       }
 
       if (!tx.meta || tx.meta.err) {
-        throw new Error('Transaction failed');
+        throw new Error('Transaction failed on-chain');
       }
 
       if (paymentMethod === 'SOL') {

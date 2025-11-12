@@ -34,6 +34,7 @@ const DeployTokenPage = () => {
   const [deploymentStatus, setDeploymentStatus] = useState(null);
   const [error, setError] = useState(null);
   const [paymentSignature, setPaymentSignature] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   useEffect(() => {
     fetchPricing();
@@ -117,6 +118,7 @@ const DeployTokenPage = () => {
     if (!publicKey || !pricing) return null;
 
     try {
+      setPaymentStatus('Creating payment transaction...');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
       
@@ -130,7 +132,7 @@ const DeployTokenPage = () => {
 
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
       
       const transaction = new Transaction({
         feePayer: publicKey,
@@ -144,20 +146,37 @@ const DeployTokenPage = () => {
         })
       );
 
+      setPaymentStatus('Sending payment transaction...');
+      console.log('Sending transaction...');
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
-        maxRetries: 3,
+        maxRetries: 5,
+        preflightCommitment: 'confirmed',
       });
       
-      await connection.confirmTransaction({
+      console.log('Transaction sent:', signature);
+      setPaymentStatus('Confirming transaction (this may take 15-30 seconds)...');
+      console.log('Waiting for confirmation...');
+      
+      const confirmation = await connection.confirmTransaction({
         signature,
         blockhash,
         lastValidBlockHeight,
-      }, 'processed');
+      }, 'confirmed');
       
+      if (confirmation.value.err) {
+        throw new Error('Transaction failed on-chain');
+      }
+      
+      console.log('Transaction confirmed');
+      setPaymentStatus('Payment confirmed!');
       return signature;
     } catch (error) {
       console.error('Payment failed:', error);
+      setPaymentStatus(null);
+      if (error.message && error.message.includes('block height exceeded')) {
+        throw new Error('Transaction expired due to network congestion. Please try again.');
+      }
       throw new Error('Payment failed: ' + error.message);
     }
   };
@@ -165,6 +184,7 @@ const DeployTokenPage = () => {
   const handleDeploy = async (e) => {
     e.preventDefault();
     setError(null);
+    setPaymentStatus(null);
     setDeploying(true);
 
     try {
@@ -178,6 +198,7 @@ const DeployTokenPage = () => {
       }
 
       setPaymentSignature(signature);
+      setPaymentStatus('Submitting deployment request...');
 
       const token = localStorage.getItem('token');
       
@@ -237,9 +258,11 @@ const DeployTokenPage = () => {
       }
 
       setDeploymentId(data.deploymentId);
+      setPaymentStatus('Deployment started! Creating your token...');
     } catch (error) {
       console.error('Deployment error:', error);
       setError(error.message);
+      setPaymentStatus(null);
     } finally {
       setDeploying(false);
     }
@@ -1005,6 +1028,12 @@ const DeployTokenPage = () => {
             </div>
           )}
 
+          {paymentStatus && (
+            <div className="payment-status-message">
+              🔄 {paymentStatus}
+            </div>
+          )}
+
           {!publicKey ? (
             <div className="connect-prompt">
               <p>⚠️ Please connect your wallet to deploy a token</p>
@@ -1015,7 +1044,7 @@ const DeployTokenPage = () => {
               className="btn btn-primary btn-deploy"
               disabled={deploying || !pricing}
             >
-              {deploying ? 'Deploying...' : parseFloat(formData.liquidityAmount) > 0 
+              {deploying ? (paymentStatus || 'Deploying...') : parseFloat(formData.liquidityAmount) > 0 
                 ? `🚀 Launch on DEX (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)` 
                 : `Deploy Token (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)`}
             </button>
