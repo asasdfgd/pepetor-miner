@@ -58,6 +58,7 @@ const DeployTokenPage = () => {
   const fetchPricing = async (liquidityAmount = formData.liquidityAmount, initialPurchaseAmount = formData.initialPurchaseAmount) => {
     try {
       const useBondingCurve = formData.useBondingCurve || false;
+      console.log('fetchPricing called with:', { liquidityAmount, initialPurchaseAmount, useBondingCurve });
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/token-deployment/price?liquidityAmount=${liquidityAmount || 0}&useBondingCurve=${useBondingCurve}&initialPurchaseAmount=${initialPurchaseAmount || 0}`);
       const data = await response.json();
       console.log('API pricing response:', data);
