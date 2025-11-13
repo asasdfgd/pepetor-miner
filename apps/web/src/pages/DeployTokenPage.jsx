@@ -184,7 +184,16 @@ const DeployTokenPage = () => {
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Payment sent - signature: ' + signature.substring(0, 8) + '...');
+      setPaymentStatus('Confirming payment on-chain...');
+      
+      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+      
+      if (confirmation.value.err) {
+        throw new Error('Transaction failed: ' + JSON.stringify(confirmation.value.err));
+      }
+      
+      console.log('Transaction confirmed:', signature);
+      setPaymentStatus('Payment confirmed - signature: ' + signature.substring(0, 8) + '...');
       
       return signature;
     } catch (error) {
