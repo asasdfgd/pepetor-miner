@@ -38,6 +38,7 @@ const DeployTokenPage = () => {
   const [error, setError] = useState(null);
   const [paymentSignature, setPaymentSignature] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [freshBlockhash, setFreshBlockhash] = useState(null);
 
   useEffect(() => {
     fetchPricing();
@@ -55,6 +56,22 @@ const DeployTokenPage = () => {
       return () => clearInterval(interval);
     }
   }, [deploymentId]);
+
+  useEffect(() => {
+    const refreshBlockhash = async () => {
+      try {
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
+        setFreshBlockhash({ blockhash, lastValidBlockHeight, timestamp: Date.now() });
+        console.log('🔄 Blockhash refreshed:', blockhash.substring(0, 8) + '...', 'Valid until:', lastValidBlockHeight);
+      } catch (err) {
+        console.error('Failed to refresh blockhash:', err);
+      }
+    };
+
+    refreshBlockhash();
+    const interval = setInterval(refreshBlockhash, 10000);
+    return () => clearInterval(interval);
+  }, [connection]);
 
   const fetchPricing = async (liquidityAmount = formData.liquidityAmount, initialPurchaseAmount = formData.initialPurchaseAmount) => {
     try {
@@ -128,7 +145,7 @@ const DeployTokenPage = () => {
     if (!publicKey || !pricing) return null;
 
     const MAX_RETRIES = 3;
-    const PRIORITY_FEE = 100000000;
+    const PRIORITY_FEE = 50000000;
 
     const BACKUP_RPCS = [
       'https://api.mainnet-beta.solana.com',
@@ -138,10 +155,10 @@ const DeployTokenPage = () => {
 
     try {
       setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
-      console.log('=== MULTI-RPC BROADCAST - MAX PRIORITY ===');
+      console.log('=== FRESH BLOCKHASH + MULTI-RPC BROADCAST ===');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
-      console.log('Priority fee:', PRIORITY_FEE, 'micro-lamports (~0.02 SOL)');
+      console.log('Priority fee:', PRIORITY_FEE, 'micro-lamports (~0.01 SOL)');
       
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
@@ -156,8 +173,20 @@ const DeployTokenPage = () => {
       
       console.log('Payment amount:', lamportsToSend, '(', lamportsToSend / LAMPORTS_PER_SOL, 'SOL)');
       
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
-      console.log('Got blockhash:', blockhash, 'Valid until block:', lastValidBlockHeight);
+      const age = freshBlockhash ? Date.now() - freshBlockhash.timestamp : Infinity;
+      
+      if (!freshBlockhash || age > 5000) {
+        console.log('⏳ Refreshing blockhash (age:', Math.floor(age / 1000) + 's)...');
+        const fresh = await connection.getLatestBlockhash('processed');
+        setFreshBlockhash({ blockhash: fresh.blockhash, lastValidBlockHeight: fresh.lastValidBlockHeight, timestamp: Date.now() });
+        console.log('✅ Fresh blockhash:', fresh.blockhash.substring(0, 8) + '...', 'Valid until:', fresh.lastValidBlockHeight);
+        var blockhash = fresh.blockhash;
+        var lastValidBlockHeight = fresh.lastValidBlockHeight;
+      } else {
+        console.log('✅ Using cached blockhash:', freshBlockhash.blockhash.substring(0, 8) + '...', 'Age:', Math.floor(age / 1000) + 's', 'Valid until:', freshBlockhash.lastValidBlockHeight);
+        var blockhash = freshBlockhash.blockhash;
+        var lastValidBlockHeight = freshBlockhash.lastValidBlockHeight;
+      }
       
       const transaction = new Transaction({
         feePayer: publicKey,
@@ -291,8 +320,12 @@ const DeployTokenPage = () => {
       );
       
       if (isExpirationError && retryCount < MAX_RETRIES) {
+        console.log(`🔄 Transaction expired, forcing blockhash refresh...`);
+        const fresh = await connection.getLatestBlockhash('processed');
+        setFreshBlockhash({ blockhash: fresh.blockhash, lastValidBlockHeight: fresh.lastValidBlockHeight, timestamp: Date.now() });
+        
         const backoffDelay = 500 * Math.pow(1.5, retryCount);
-        console.log(`Retrying with higher fee in ${backoffDelay}ms (${retryCount + 1}/${MAX_RETRIES})...`);
+        console.log(`🔁 Retrying in ${backoffDelay}ms (${retryCount + 1}/${MAX_RETRIES})...`);
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
         return sendPayment(retryCount + 1);
       }
