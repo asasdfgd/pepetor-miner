@@ -278,6 +278,58 @@ exports.walletAuth = async (req, res) => {
   }
 };
 
+exports.linkWallet = async (req, res) => {
+  try {
+    const { walletAddress } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+      });
+    }
+
+    if (!walletAddress) {
+      return res.status(400).json({
+        success: false,
+        message: 'Wallet address is required',
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { walletAddress },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.refreshToken;
+
+    res.json({
+      success: true,
+      message: 'Wallet linked successfully',
+      data: {
+        user: userResponse,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error linking wallet',
+      error: error.message,
+    });
+  }
+};
+
 exports.markTutorialSeen = async (req, res) => {
   try {
     const userId = req.user?.id;

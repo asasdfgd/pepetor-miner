@@ -107,7 +107,7 @@ exports.createUser = async (req, res) => {
 // Update user
 exports.updateUser = async (req, res) => {
   try {
-    const { username, email, fullName, role, isActive } = req.body;
+    const { username, email, fullName, role, isActive, walletAddress } = req.body;
 
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -123,6 +123,7 @@ exports.updateUser = async (req, res) => {
     if (fullName) user.fullName = fullName;
     if (role) user.role = role;
     if (isActive !== undefined) user.isActive = isActive;
+    if (walletAddress) user.walletAddress = walletAddress;
 
     await user.save();
     const userResponse = user.toObject();

@@ -139,13 +139,15 @@ exports.requestDeployment = async (req, res) => {
       });
     }
 
-    const owner = req.user?.walletAddress;
-    if (!owner) {
+    const User = require('../models/User');
+    const user = await User.findById(req.user.id);
+    if (!user || !user.walletAddress) {
       return res.status(401).json({
         success: false,
         message: 'Wallet authentication required',
       });
     }
+    const owner = user.walletAddress;
 
     const existingDeployment = await DeployedToken.findOne({
       paymentSignature,
@@ -343,14 +345,15 @@ exports.getDeploymentStatus = async (req, res) => {
 
 exports.getUserDeployments = async (req, res) => {
   try {
-    const owner = req.user?.walletAddress;
-    
-    if (!owner) {
+    const User = require('../models/User');
+    const user = await User.findById(req.user.id);
+    if (!user || !user.walletAddress) {
       return res.status(401).json({
         success: false,
         message: 'Wallet authentication required',
       });
     }
+    const owner = user.walletAddress;
 
     const deployments = await DeployedToken.find({ owner })
       .select('tokenName tokenSymbol mintAddress status deployedAt createdAt')
