@@ -8,6 +8,7 @@ import {
   TransactionInstruction,
   ComputeBudgetProgram
 } from '@solana/web3.js';
+import bs58 from 'bs58';
 import './DeployTokenPage.css';
 
 const DeployTokenPage = () => {
@@ -188,19 +189,24 @@ const DeployTokenPage = () => {
       );
       
       setPaymentStatus('Signing transaction...');
-      const signedTx = await sendTransaction(transaction, connection, {
-        skipPreflight: true,
-        preflightCommitment: 'finalized',
-      });
       
-      console.log('Transaction signed:', signedTx);
+      if (!window.solana || !window.solana.signTransaction) {
+        throw new Error('Wallet does not support transaction signing');
+      }
       
-      const serializedTx = transaction.serialize({
+      const signedTransaction = await window.solana.signTransaction(transaction);
+      console.log('Transaction signed');
+      
+      const serializedTx = signedTransaction.serialize({
         requireAllSignatures: false,
         verifySignatures: false,
       });
       
-      const base58Tx = Buffer.from(serializedTx).toString('base64');
+      const base64Tx = btoa(String.fromCharCode(...new Uint8Array(serializedTx)));
+      
+      const signature = signedTransaction.signature ? 
+        signedTransaction.signature.toString('base64') : 
+        null;
       
       setPaymentStatus('Submitting to Jito validators...');
       console.log('Sending bundle to Jito...');
@@ -214,7 +220,7 @@ const DeployTokenPage = () => {
           jsonrpc: '2.0',
           id: 1,
           method: 'sendBundle',
-          params: [[base58Tx]]
+          params: [[base64Tx]]
         }),
       });
       
@@ -227,6 +233,9 @@ const DeployTokenPage = () => {
       
       const bundleId = bundleResult.result;
       console.log('Bundle submitted:', bundleId);
+      
+      const txSignature = bs58.encode(signedTransaction.signature);
+      console.log('Transaction signature:', txSignature);
       setPaymentStatus('Waiting for Jito confirmation...');
       
       const startTime = Date.now();
@@ -237,7 +246,7 @@ const DeployTokenPage = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         try {
-          const status = await connection.getSignatureStatus(signedTx);
+          const status = await connection.getSignatureStatus(txSignature);
           
           if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
             if (status.value.err) {
@@ -262,7 +271,7 @@ const DeployTokenPage = () => {
         setPaymentStatus('Payment confirmed!');
       }
       
-      return signedTx;
+      return txSignature;
     } catch (error) {
       console.error('Jito payment failed:', error);
       
