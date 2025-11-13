@@ -283,6 +283,8 @@ exports.linkWallet = async (req, res) => {
     const { walletAddress } = req.body;
     const userId = req.user?.id;
 
+    console.log('🔗 Link wallet request:', { userId, walletAddress });
+
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -294,6 +296,14 @@ exports.linkWallet = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Wallet address is required',
+      });
+    }
+
+    const existingWallet = await User.findOne({ walletAddress });
+    if (existingWallet && existingWallet._id.toString() !== userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'This wallet is already linked to another account',
       });
     }
 
@@ -310,6 +320,8 @@ exports.linkWallet = async (req, res) => {
       });
     }
 
+    console.log('✅ Wallet linked successfully:', walletAddress);
+
     const userResponse = user.toObject();
     delete userResponse.password;
     delete userResponse.refreshToken;
@@ -322,6 +334,7 @@ exports.linkWallet = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('❌ Error linking wallet:', error);
     res.status(500).json({
       success: false,
       message: 'Error linking wallet',
