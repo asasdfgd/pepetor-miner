@@ -283,9 +283,10 @@ exports.linkWallet = async (req, res) => {
     const { walletAddress } = req.body;
     const userId = req.user?.id;
 
-    console.log('🔗 Link wallet request:', { userId, walletAddress });
+    console.log('🔗 Link wallet request:', { userId, walletAddress, userObject: req.user });
 
     if (!userId) {
+      console.log('❌ No userId found in request');
       return res.status(401).json({
         success: false,
         message: 'Authentication required',
@@ -293,34 +294,48 @@ exports.linkWallet = async (req, res) => {
     }
 
     if (!walletAddress) {
+      console.log('❌ No walletAddress provided');
       return res.status(400).json({
         success: false,
         message: 'Wallet address is required',
       });
     }
 
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.log('❌ Invalid userId format:', userId);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID',
+      });
+    }
+
+    console.log('🔍 Checking for existing wallet...');
     const existingWallet = await User.findOne({ walletAddress });
-    if (existingWallet && existingWallet._id.toString() !== userId) {
+    if (existingWallet && existingWallet._id.toString() !== userId.toString()) {
+      console.log('❌ Wallet already linked to another account:', existingWallet._id);
       return res.status(400).json({
         success: false,
         message: 'This wallet is already linked to another account',
       });
     }
 
+    console.log('💾 Updating user with wallet address...');
     const user = await User.findByIdAndUpdate(
       userId,
-      { walletAddress },
+      { walletAddress, solanaWallet: walletAddress },
       { new: true }
     );
 
     if (!user) {
+      console.log('❌ User not found for ID:', userId);
       return res.status(404).json({
         success: false,
         message: 'User not found',
       });
     }
 
-    console.log('✅ Wallet linked successfully:', walletAddress);
+    console.log('✅ Wallet linked successfully:', walletAddress, 'to user:', user.username);
 
     const userResponse = user.toObject();
     delete userResponse.password;
@@ -335,6 +350,7 @@ exports.linkWallet = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error linking wallet:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Error linking wallet',
