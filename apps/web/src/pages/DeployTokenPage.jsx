@@ -127,17 +127,21 @@ const DeployTokenPage = () => {
   const sendPayment = async (retryCount = 0) => {
     if (!publicKey || !pricing) return null;
 
-    const MAX_RETRIES = 5;
-    const basePriorityFee = 5000000;
-    const priorityFeeMultiplier = Math.pow(1.5, retryCount);
-    const currentPriorityFee = Math.min(basePriorityFee * priorityFeeMultiplier, 20000000);
+    const MAX_RETRIES = 3;
+    const PRIORITY_FEE = 100000000;
+
+    const BACKUP_RPCS = [
+      'https://api.mainnet-beta.solana.com',
+      'https://solana-api.projectserum.com',
+      'https://rpc.ankr.com/solana',
+    ];
 
     try {
       setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
-      console.log('=== ULTRA-PRIORITY PAYMENT ===');
+      console.log('=== MULTI-RPC BROADCAST - MAX PRIORITY ===');
       console.log('Pricing object:', pricing);
       console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
-      console.log('Priority fee for this attempt:', currentPriorityFee, 'micro-lamports (~', (currentPriorityFee * 0.0002 / 1000000).toFixed(6), 'SOL)');
+      console.log('Priority fee:', PRIORITY_FEE, 'micro-lamports (~0.02 SOL)');
       
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
@@ -163,7 +167,7 @@ const DeployTokenPage = () => {
         ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 })
       )
       .add(
-        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: currentPriorityFee })
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: PRIORITY_FEE })
       )
       .add(
         SystemProgram.transfer({
@@ -173,15 +177,51 @@ const DeployTokenPage = () => {
         })
       );
       
-      setPaymentStatus('Sending transaction with ultra-high priority...');
-      console.log('Sending transaction, priority fee:', currentPriorityFee);
+      setPaymentStatus('Broadcasting to multiple RPCs...');
+      console.log('Broadcasting transaction to primary + backup RPCs, priority fee:', PRIORITY_FEE);
       
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: true,
         maxRetries: 0,
       });
       
-      console.log('Transaction sent:', signature);
+      console.log('Primary RPC signature:', signature);
+      
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false,
+      });
+      const base64Tx = btoa(String.fromCharCode(...new Uint8Array(serializedTx)));
+      
+      const backupBroadcasts = BACKUP_RPCS.map(async (rpcUrl, index) => {
+        try {
+          const response = await fetch(rpcUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'sendTransaction',
+              params: [
+                base64Tx,
+                { encoding: 'base64', skipPreflight: true, maxRetries: 0 }
+              ]
+            })
+          });
+          const result = await response.json();
+          console.log(`Backup RPC ${index + 1} response:`, result.result || result.error);
+          return result.result;
+        } catch (err) {
+          console.log(`Backup RPC ${index + 1} failed:`, err.message);
+          return null;
+        }
+      });
+      
+      Promise.all(backupBroadcasts).then(results => {
+        const successful = results.filter(r => r).length;
+        console.log(`Transaction broadcast to ${successful + 1}/${BACKUP_RPCS.length + 1} RPCs`);
+      });
+      
       setPaymentStatus('Monitoring confirmation...');
       
       const startTime = Date.now();
