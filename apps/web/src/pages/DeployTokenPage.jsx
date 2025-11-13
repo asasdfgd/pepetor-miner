@@ -324,7 +324,7 @@ const DeployTokenPage = () => {
     if (!deploymentId) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/token-deployment/status/${deploymentId}`,
         {
