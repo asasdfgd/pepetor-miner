@@ -222,7 +222,7 @@ const DeployTokenPage = () => {
       setPaymentSignature(signature);
       setPaymentStatus('Submitting deployment request...');
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       
       const formDataToSend = new FormData();
       formDataToSend.append('tokenName', formData.tokenName);
