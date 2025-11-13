@@ -164,6 +164,14 @@ exports.requestDeployment = async (req, res) => {
     const initialPurchase = initialPurchaseAmount ? parseFloat(initialPurchaseAmount) : 0;
     const expectedAmount = deploymentPrice + initialPurchase;
     
+    console.log('💵 Payment amount calculation:', {
+      deploymentPrice,
+      initialPurchaseAmount,
+      initialPurchase,
+      expectedAmount,
+      paymentSignature,
+    });
+    
     const paymentValid = await tokenDeploymentService.verifyPayment(
       paymentSignature,
       expectedAmount,

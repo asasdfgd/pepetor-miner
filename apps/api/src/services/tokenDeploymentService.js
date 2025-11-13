@@ -60,6 +60,7 @@ class TokenDeploymentService {
 
   async verifyPayment(signature, expectedAmount, paymentMethod = 'SOL') {
     try {
+      console.log('💳 Verifying payment:', { signature, expectedAmount, paymentMethod });
       let tx = null;
       let attempts = 0;
       const maxAttempts = 60;
@@ -95,18 +96,39 @@ class TokenDeploymentService {
       }
 
       if (paymentMethod === 'SOL') {
+        console.log('📊 Transaction accounts:', tx.transaction.message.accountKeys.map(k => k.toString()));
+        console.log('📊 Pre-balances:', tx.meta.preBalances);
+        console.log('📊 Post-balances:', tx.meta.postBalances);
+        
         const postBalance = tx.meta.postBalances[1];
         const preBalance = tx.meta.preBalances[1];
         const amountReceived = (postBalance - preBalance) / LAMPORTS_PER_SOL;
 
+        console.log('💰 Payment verification details:', {
+          expectedAmount,
+          amountReceived,
+          postBalance,
+          preBalance,
+          difference: postBalance - preBalance,
+          recipient: tx.transaction.message.accountKeys[1]?.toString(),
+          treasury: TREASURY_WALLET,
+        });
+
         if (amountReceived < expectedAmount) {
+          console.error('❌ Payment amount mismatch:', {
+            expected: expectedAmount,
+            received: amountReceived,
+            shortfall: expectedAmount - amountReceived,
+          });
           throw new Error(`Insufficient payment. Expected ${expectedAmount} SOL, got ${amountReceived} SOL`);
         }
+        
+        console.log('✅ Payment verified successfully');
       }
 
       return true;
     } catch (error) {
-      console.error('Payment verification failed:', error);
+      console.error('❌ Payment verification failed:', error);
       return false;
     }
   }
