@@ -191,7 +191,7 @@ const DeployTokenPage = () => {
       const lamportsToSend = Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL);
       
       console.log('Fetching latest blockhash...');
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+      const { blockhash } = await connection.getLatestBlockhash('finalized');
       
       const transaction = new Transaction({
         feePayer: publicKey,
@@ -199,7 +199,7 @@ const DeployTokenPage = () => {
       })
       .add(
         ComputeBudgetProgram.setComputeUnitPrice({
-          microLamports: 50000,
+          microLamports: 1000000,
         })
       )
       .add(
@@ -210,58 +210,17 @@ const DeployTokenPage = () => {
         })
       );
       
-      setPaymentStatus('Sending payment...');
-      console.log('Sending transaction with priority fee...');
-      console.log('Last valid block height:', lastValidBlockHeight);
+      setPaymentStatus('Waiting for wallet approval...');
+      console.log('Sending transaction with maximum priority fee...');
       
       const signature = await sendTransaction(transaction, connection, {
         skipPreflight: false,
         preflightCommitment: 'finalized',
-        maxRetries: 3,
       });
       
       console.log('Transaction sent:', signature);
-      setPaymentStatus('Confirming payment on-chain (this may take 30-60 seconds)...');
-      
-      const startTime = Date.now();
-      let confirmed = false;
-      let attempts = 0;
-      const maxAttempts = 60;
-      
-      while (!confirmed && attempts < maxAttempts) {
-        try {
-          const status = await connection.getSignatureStatus(signature);
-          
-          if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
-            if (status.value.err) {
-              throw new Error('Transaction failed on-chain: ' + JSON.stringify(status.value.err));
-            }
-            confirmed = true;
-            console.log('Transaction confirmed after', ((Date.now() - startTime) / 1000).toFixed(1), 'seconds');
-            break;
-          }
-          
-          const currentHeight = await connection.getBlockHeight();
-          if (currentHeight > lastValidBlockHeight) {
-            throw new Error('Transaction expired - block height exceeded. Please try again.');
-          }
-          
-          attempts++;
-          setPaymentStatus(`Confirming payment... (${attempts}/${maxAttempts})`);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (err) {
-          if (err.message.includes('expired')) throw err;
-          console.warn('Confirmation check error:', err.message);
-          attempts++;
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
-      
-      if (!confirmed) {
-        throw new Error('Transaction confirmation timeout after 60 seconds. Check transaction status: ' + signature);
-      }
-      
-      setPaymentStatus('Payment confirmed - signature: ' + signature.substring(0, 8) + '...');
+      console.log('⚠️ Transaction sent - backend will verify payment');
+      setPaymentStatus('Payment sent - verifying...');
       
       return signature;
     } catch (error) {

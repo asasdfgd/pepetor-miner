@@ -74,13 +74,19 @@ class TokenDeploymentService {
 
           if (!tx && attempts < maxAttempts - 1) {
             console.log(`Transaction not found, retrying... (${attempts + 1}/${maxAttempts})`);
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await new Promise(resolve => setTimeout(resolve, 5000));
             attempts++;
             continue;
           }
         } catch (err) {
           if (err.message && err.message.includes('block height exceeded')) {
             throw new Error('Transaction expired. Please send a new payment transaction and try again.');
+          }
+          if (err.message && err.message.includes('429')) {
+            console.warn(`⚠️ RPC rate limit hit, waiting 10s before retry (${attempts + 1}/${maxAttempts})`);
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            attempts++;
+            continue;
           }
           throw err;
         }
