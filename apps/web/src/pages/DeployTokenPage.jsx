@@ -141,24 +141,13 @@ const DeployTokenPage = () => {
     }
   };
 
-  const sendPayment = async (retryCount = 0) => {
+  const sendPayment = async () => {
     if (!publicKey || !pricing) return null;
 
-    const MAX_RETRIES = 3;
-    const PRIORITY_FEE = 50000000;
-
-    const BACKUP_RPCS = [
-      'https://api.mainnet-beta.solana.com',
-      'https://solana-api.projectserum.com',
-      'https://rpc.ankr.com/solana',
-    ];
-
     try {
-      setPaymentStatus(retryCount > 0 ? `Retrying payment (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...` : 'Creating payment transaction...');
-      console.log('=== FRESH BLOCKHASH + MULTI-RPC BROADCAST ===');
-      console.log('Pricing object:', pricing);
-      console.log('totalPrice value:', pricing.totalPrice, 'type:', typeof pricing.totalPrice);
-      console.log('Priority fee:', PRIORITY_FEE, 'micro-lamports (~0.01 SOL)');
+      setPaymentStatus('Creating payment transaction...');
+      console.log('=== PAYMENT TRANSACTION ===');
+      console.log('Pricing:', pricing.totalPrice, 'SOL');
       
       if (!pricing.treasuryWallet || pricing.treasuryWallet === 'Not configured') {
         throw new Error('Treasury wallet not configured. Please contact support.');
@@ -171,33 +160,13 @@ const DeployTokenPage = () => {
       const treasuryPubkey = new PublicKey(pricing.treasuryWallet);
       const lamportsToSend = Math.floor(pricing.totalPrice * LAMPORTS_PER_SOL);
       
-      console.log('Payment amount:', lamportsToSend, '(', lamportsToSend / LAMPORTS_PER_SOL, 'SOL)');
-      
-      const age = freshBlockhash ? Date.now() - freshBlockhash.timestamp : Infinity;
-      
-      if (!freshBlockhash || age > 5000) {
-        console.log('⏳ Refreshing blockhash (age:', Math.floor(age / 1000) + 's)...');
-        const fresh = await connection.getLatestBlockhash('processed');
-        setFreshBlockhash({ blockhash: fresh.blockhash, lastValidBlockHeight: fresh.lastValidBlockHeight, timestamp: Date.now() });
-        console.log('✅ Fresh blockhash:', fresh.blockhash.substring(0, 8) + '...', 'Valid until:', fresh.lastValidBlockHeight);
-        var blockhash = fresh.blockhash;
-        var lastValidBlockHeight = fresh.lastValidBlockHeight;
-      } else {
-        console.log('✅ Using cached blockhash:', freshBlockhash.blockhash.substring(0, 8) + '...', 'Age:', Math.floor(age / 1000) + 's', 'Valid until:', freshBlockhash.lastValidBlockHeight);
-        var blockhash = freshBlockhash.blockhash;
-        var lastValidBlockHeight = freshBlockhash.lastValidBlockHeight;
-      }
+      console.log('Fetching latest blockhash...');
+      const { blockhash } = await connection.getLatestBlockhash('confirmed');
       
       const transaction = new Transaction({
         feePayer: publicKey,
         recentBlockhash: blockhash,
       })
-      .add(
-        ComputeBudgetProgram.setComputeUnitLimit({ units: 200000 })
-      )
-      .add(
-        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: PRIORITY_FEE })
-      )
       .add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
@@ -206,130 +175,20 @@ const DeployTokenPage = () => {
         })
       );
       
-      setPaymentStatus('Broadcasting to multiple RPCs...');
-      console.log('Broadcasting transaction to primary + backup RPCs, priority fee:', PRIORITY_FEE);
+      setPaymentStatus('Sending payment...');
+      console.log('Sending transaction...');
       
       const signature = await sendTransaction(transaction, connection, {
-        skipPreflight: true,
-        maxRetries: 0,
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
       });
       
-      console.log('Primary RPC signature:', signature);
-      
-      const serializedTx = transaction.serialize({
-        requireAllSignatures: false,
-        verifySignatures: false,
-      });
-      const base64Tx = btoa(String.fromCharCode(...new Uint8Array(serializedTx)));
-      
-      const backupBroadcasts = BACKUP_RPCS.map(async (rpcUrl, index) => {
-        try {
-          const response = await fetch(rpcUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: 1,
-              method: 'sendTransaction',
-              params: [
-                base64Tx,
-                { encoding: 'base64', skipPreflight: true, maxRetries: 0 }
-              ]
-            })
-          });
-          const result = await response.json();
-          console.log(`Backup RPC ${index + 1} response:`, result.result || result.error);
-          return result.result;
-        } catch (err) {
-          console.log(`Backup RPC ${index + 1} failed:`, err.message);
-          return null;
-        }
-      });
-      
-      Promise.all(backupBroadcasts).then(results => {
-        const successful = results.filter(r => r).length;
-        console.log(`Transaction broadcast to ${successful + 1}/${BACKUP_RPCS.length + 1} RPCs`);
-      });
-      
-      setPaymentStatus('Monitoring confirmation...');
-      
-      const startTime = Date.now();
-      const CONFIRMATION_TIMEOUT = 120000;
-      let confirmed = false;
-      
-      while (Date.now() - startTime < CONFIRMATION_TIMEOUT) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        try {
-          const currentBlockHeight = await connection.getBlockHeight('processed');
-          
-          if (currentBlockHeight > lastValidBlockHeight) {
-            console.log('Block height exceeded');
-            throw new Error('block height exceeded');
-          }
-          
-          const status = await connection.getSignatureStatus(signature);
-          
-          if (status?.value) {
-            console.log('Status:', status.value.confirmationStatus, 'Error:', status.value.err);
-            
-            if (status.value.confirmationStatus === 'confirmed' || status.value.confirmationStatus === 'finalized') {
-              if (status.value.err) {
-                throw new Error('Transaction failed on-chain: ' + JSON.stringify(status.value.err));
-              }
-              confirmed = true;
-              break;
-            }
-          }
-        } catch (pollError) {
-          if (pollError.message === 'block height exceeded') {
-            throw pollError;
-          }
-          console.log('Poll error:', pollError.message);
-        }
-        
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        setPaymentStatus(`Monitoring confirmation... (${elapsed}s)`);
-      }
-      
-      if (!confirmed) {
-        const finalStatus = await connection.getSignatureStatus(signature);
-        if (finalStatus?.value?.confirmationStatus === 'confirmed' || finalStatus?.value?.confirmationStatus === 'finalized') {
-          if (!finalStatus.value.err) {
-            confirmed = true;
-          }
-        }
-      }
-      
-      if (!confirmed) {
-        console.warn('Not confirmed after timeout - backend will verify');
-        setPaymentStatus('Submitted - backend verifying...');
-      } else {
-        console.log('Transaction confirmed!');
-        setPaymentStatus('Payment confirmed!');
-      }
+      console.log('Transaction sent:', signature);
+      setPaymentStatus('Payment sent - signature: ' + signature.substring(0, 8) + '...');
       
       return signature;
     } catch (error) {
       console.error('Payment error:', error);
-      
-      const isExpirationError = error.message && (
-        error.message.includes('block height exceeded') || 
-        error.message.includes('blockhash not found') ||
-        error.message.includes('Transaction expired')
-      );
-      
-      if (isExpirationError && retryCount < MAX_RETRIES) {
-        console.log(`🔄 Transaction expired, forcing blockhash refresh...`);
-        const fresh = await connection.getLatestBlockhash('processed');
-        setFreshBlockhash({ blockhash: fresh.blockhash, lastValidBlockHeight: fresh.lastValidBlockHeight, timestamp: Date.now() });
-        
-        const backoffDelay = 500 * Math.pow(1.5, retryCount);
-        console.log(`🔁 Retrying in ${backoffDelay}ms (${retryCount + 1}/${MAX_RETRIES})...`);
-        await new Promise(resolve => setTimeout(resolve, backoffDelay));
-        return sendPayment(retryCount + 1);
-      }
-      
       setPaymentStatus(null);
       throw new Error('Payment failed: ' + error.message);
     }
