@@ -36,15 +36,20 @@ function WalletConnect() {
   }, [publicKey, connected, isAuthenticated, login, navigate, disconnect]);
 
   const linkWallet = useCallback(async () => {
+    console.log('🔗 linkWallet called:', { publicKey: publicKey?.toString(), isAuthenticated, hasLinked: hasLinkedRef.current });
+    
     if (!publicKey || !isAuthenticated || hasLinkedRef.current) {
+      console.log('⏭️ Skipping wallet link:', { publicKey: !!publicKey, isAuthenticated, hasLinked: hasLinkedRef.current });
       return;
     }
 
     try {
       hasLinkedRef.current = true;
       const token = localStorage.getItem('authToken');
+      console.log('🔑 Token exists:', !!token);
       if (!token) return;
 
+      console.log('📡 Sending link wallet request...');
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/link-wallet`, {
         method: 'POST',
         headers: {
@@ -58,13 +63,18 @@ function WalletConnect() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('✅ Link wallet response:', data);
         if (data.data?.user) {
           updateUser(data.data.user);
         }
-        console.log('Wallet linked successfully');
+        console.log('✅ Wallet linked successfully');
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Link wallet failed:', errorData);
+        hasLinkedRef.current = false;
       }
     } catch (error) {
-      console.error('Failed to link wallet:', error);
+      console.error('❌ Failed to link wallet:', error);
       hasLinkedRef.current = false;
     }
   }, [publicKey, isAuthenticated, updateUser]);
