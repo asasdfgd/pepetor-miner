@@ -49,6 +49,36 @@ const DeployTokenPage = () => {
   }, [formData.useBondingCurve]);
 
   useEffect(() => {
+    const linkWallet = async () => {
+      if (!publicKey) return;
+      
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/link-wallet`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            walletAddress: publicKey.toString(),
+          }),
+        });
+
+        if (response.ok) {
+          console.log('Wallet linked successfully');
+        }
+      } catch (error) {
+        console.error('Failed to link wallet:', error);
+      }
+    };
+
+    linkWallet();
+  }, [publicKey]);
+
+  useEffect(() => {
     if (deploymentId) {
       const interval = setInterval(() => {
         checkDeploymentStatus();
