@@ -103,22 +103,28 @@ class TokenDeploymentService {
         const postBalance = tx.meta.postBalances[1];
         const preBalance = tx.meta.preBalances[1];
         const amountReceived = (postBalance - preBalance) / LAMPORTS_PER_SOL;
+        
+        const TOLERANCE_SOL = 0.000001;
+        const shortfall = expectedAmount - amountReceived;
 
         console.log('💰 Payment verification details:', {
           expectedAmount,
           amountReceived,
+          shortfall,
           postBalance,
           preBalance,
           difference: postBalance - preBalance,
           recipient: tx.transaction.message.accountKeys[1]?.toString(),
           treasury: TREASURY_WALLET,
+          withinTolerance: shortfall <= TOLERANCE_SOL,
         });
 
-        if (amountReceived < expectedAmount) {
+        if (shortfall > TOLERANCE_SOL) {
           console.error('❌ Payment amount mismatch:', {
             expected: expectedAmount,
             received: amountReceived,
-            shortfall: expectedAmount - amountReceived,
+            shortfall,
+            tolerance: TOLERANCE_SOL,
           });
           throw new Error(`Insufficient payment. Expected ${expectedAmount} SOL, got ${amountReceived} SOL`);
         }
