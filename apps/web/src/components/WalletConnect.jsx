@@ -9,8 +9,9 @@ import './WalletConnect.css';
 function WalletConnect() {
   const { publicKey, connected, disconnect } = useWallet();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, updateUser } = useAuth();
   const hasAuthenticatedRef = useRef(false);
+  const hasLinkedRef = useRef(false);
 
   const handleWalletAuth = useCallback(async () => {
     if (!publicKey || !connected || hasAuthenticatedRef.current || isAuthenticated) {
@@ -34,6 +35,40 @@ function WalletConnect() {
     }
   }, [publicKey, connected, isAuthenticated, login, navigate, disconnect]);
 
+  const linkWallet = useCallback(async () => {
+    if (!publicKey || !isAuthenticated || hasLinkedRef.current) {
+      return;
+    }
+
+    try {
+      hasLinkedRef.current = true;
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/link-wallet`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          walletAddress: publicKey.toString(),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data?.user) {
+          updateUser(data.data.user);
+        }
+        console.log('Wallet linked successfully');
+      }
+    } catch (error) {
+      console.error('Failed to link wallet:', error);
+      hasLinkedRef.current = false;
+    }
+  }, [publicKey, isAuthenticated, updateUser]);
+
   useEffect(() => {
     if (connected && publicKey && !isAuthenticated) {
       handleWalletAuth();
@@ -41,8 +76,15 @@ function WalletConnect() {
   }, [connected, publicKey, isAuthenticated, handleWalletAuth]);
 
   useEffect(() => {
+    if (connected && publicKey && isAuthenticated) {
+      linkWallet();
+    }
+  }, [connected, publicKey, isAuthenticated, linkWallet]);
+
+  useEffect(() => {
     if (!connected) {
       hasAuthenticatedRef.current = false;
+      hasLinkedRef.current = false;
     }
   }, [connected]);
 
