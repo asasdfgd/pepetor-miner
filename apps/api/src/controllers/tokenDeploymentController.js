@@ -38,7 +38,7 @@ exports.getDeploymentPrice = async (req, res) => {
         initialPurchaseType: typeof initialPurchaseAmount,
         parsedInitialPurchase: initialPurchase,
       });
-      const totalPrice = deploymentPrice + initialPurchase;
+      const totalPrice = parseFloat((deploymentPrice + initialPurchase).toFixed(9));
       const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
       
       const breakdown = [
@@ -73,7 +73,7 @@ exports.getDeploymentPrice = async (req, res) => {
     
     const liquidity = parseFloat(liquidityAmount) || 0;
     const marketCreationCost = liquidity > 0 ? 0.4 : 0;
-    const totalPrice = deploymentPrice + liquidity + marketCreationCost;
+    const totalPrice = parseFloat((deploymentPrice + liquidity + marketCreationCost).toFixed(9));
     
     const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
     

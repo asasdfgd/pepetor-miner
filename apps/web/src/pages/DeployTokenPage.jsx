@@ -779,7 +779,7 @@ const DeployTokenPage = () => {
           <div className="pricing-card">
             <h3>💰 Total Cost</h3>
             <div className="price">
-              <span className="amount">{pricing.totalPrice} SOL</span>
+              <span className="amount">{pricing.totalPrice.toFixed(4)} SOL</span>
               <span className="usd">~${pricing.priceUSD || '0.00'} USD</span>
             </div>
             {pricing.breakdown && (
@@ -952,7 +952,7 @@ const DeployTokenPage = () => {
                   <div>🔍 DEBUG: Form State</div>
                   <div>initialPurchaseAmount: {formData.initialPurchaseAmount}</div>
                   <div>useBondingCurve: {formData.useBondingCurve ? 'true' : 'false'}</div>
-                  {pricing && <div>API returned totalPrice: {pricing.totalPrice}</div>}
+                  {pricing && <div>API returned totalPrice: {pricing.totalPrice.toFixed(6)}</div>}
                   {pricing && pricing.initialPurchaseAmount !== undefined && <div>API returned initialPurchaseAmount: {pricing.initialPurchaseAmount}</div>}
                 </div>
               </div>
