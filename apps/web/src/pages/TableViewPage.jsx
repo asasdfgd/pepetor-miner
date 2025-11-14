@@ -29,7 +29,7 @@ function TableViewPage() {
       }
 
       const data = await response.json();
-      setTokens(data.tokens || []);
+      setTokens(data.deployments || []);
       setTotal(data.total || 0);
       setError(null);
     } catch (err) {

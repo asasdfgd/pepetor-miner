@@ -703,6 +703,11 @@ const DeployTokenPage = () => {
 
           <div className="status-info">
             <p>Status: <strong>{deploymentStatus?.status || 'pending'}</strong></p>
+            {deploymentStatus?.errorMessage && (
+              <p className="error-message" style={{ color: '#ff4444', marginTop: '10px' }}>
+                ❌ Error: {deploymentStatus.errorMessage}
+              </p>
+            )}
             <p>Estimated time: 2-5 minutes</p>
             {paymentSignature && (
               <p className="tx-link">

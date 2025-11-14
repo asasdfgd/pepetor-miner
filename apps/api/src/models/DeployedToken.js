@@ -109,6 +109,7 @@ const deployedTokenSchema = new mongoose.Schema({
   },
   deployedAt: Date,
   expiresAt: Date,
+  errorMessage: String,
 }, {
   timestamps: true,
 });

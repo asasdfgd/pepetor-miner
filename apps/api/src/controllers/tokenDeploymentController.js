@@ -294,6 +294,7 @@ async function deployTokenAsync(deploymentId, config) {
     
     await DeployedToken.findByIdAndUpdate(deploymentId, {
       status: 'failed',
+      errorMessage: error.message || 'Unknown error occurred during deployment',
     });
   }
 }
@@ -311,7 +312,9 @@ exports.getDeploymentStatus = async (req, res) => {
       });
     }
 
-    if (deployment.owner !== req.user?.walletAddress) {
+    const User = require('../models/User');
+    const user = await User.findById(req.user.id);
+    if (!user || deployment.owner !== user.walletAddress) {
       return res.status(403).json({
         success: false,
         message: 'Access denied',
@@ -339,6 +342,7 @@ exports.getDeploymentStatus = async (req, res) => {
         poolAddress: deployment.poolAddress,
         deployedAt: deployment.deployedAt,
         network: deployment.network,
+        errorMessage: deployment.errorMessage,
       },
     });
   } catch (error) {
