@@ -115,6 +115,6 @@ const deployedTokenSchema = new mongoose.Schema({
 
 deployedTokenSchema.index({ owner: 1, createdAt: -1 });
 deployedTokenSchema.index({ status: 1, createdAt: -1 });
-deployedTokenSchema.index({ mintAddress: 1 });
+deployedTokenSchema.index({ mintAddress: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('DeployedToken', deployedTokenSchema);

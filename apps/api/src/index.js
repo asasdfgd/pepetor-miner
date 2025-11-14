@@ -35,6 +35,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://clearnetlabs.fun',
   'https://www.clearnetlabs.fun',
+  'https://pepetor-miner.fly.dev',
   process.env.CORS_ORIGIN
 ].filter(Boolean);
 
