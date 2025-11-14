@@ -243,6 +243,7 @@ exports.requestDeployment = async (req, res) => {
 
 async function deployTokenAsync(deploymentId, config) {
   try {
+    console.log(`🚀 Starting token deployment for ID: ${deploymentId}`);
     const result = await tokenDeploymentService.deployCustomToken(config);
 
     const deployment = await DeployedToken.findByIdAndUpdate(deploymentId, {
@@ -290,7 +291,9 @@ async function deployTokenAsync(deploymentId, config) {
       // Don't fail deployment if reward fails
     }
   } catch (error) {
-    console.error('Error deploying token:', error);
+    console.error('❌ Error deploying token:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Deployment ID:', deploymentId);
     
     await DeployedToken.findByIdAndUpdate(deploymentId, {
       status: 'failed',
