@@ -24,8 +24,8 @@ class TokenService {
     this.rewardsWalletPath = process.env.REWARDS_WALLET_PATH || '.wallets/rewards.json';
     this.treasuryWalletPath = process.env.TREASURY_WALLET_PATH || '.wallets/treasury.json';
     
-    this.rewardsWallet = this.loadWallet(this.rewardsWalletPath);
-    this.treasuryWallet = this.loadWallet(this.treasuryWalletPath);
+    this.rewardsWallet = this.loadWallet('REWARDS_WALLET', this.rewardsWalletPath);
+    this.treasuryWallet = this.loadWallet('TREASURY_WALLET', this.treasuryWalletPath);
     
     this.tokenDecimals = 9;
     this.feePercentage = 2;
@@ -49,8 +49,17 @@ class TokenService {
     return urls[this.network] || urls['devnet'];
   }
 
-  loadWallet(relativePath) {
+  loadWallet(envVarName, relativePath) {
     try {
+      if (process.env[envVarName]) {
+        console.log(`[TokenService] Loading ${envVarName} from environment variable`);
+        const base64Data = process.env[envVarName];
+        const keypairData = JSON.parse(Buffer.from(base64Data, 'base64').toString('utf-8'));
+        const keypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
+        console.log(`[TokenService] Loaded wallet from env: ${envVarName}`);
+        return keypair;
+      }
+
       const walletPath = path.join(__dirname, '../../', relativePath);
       
       if (!fs.existsSync(walletPath)) {
