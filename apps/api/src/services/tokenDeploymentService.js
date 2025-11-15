@@ -106,8 +106,16 @@ class TokenDeploymentService {
         console.log('📊 Pre-balances:', tx.meta.preBalances);
         console.log('📊 Post-balances:', tx.meta.postBalances);
         
-        const postBalance = tx.meta.postBalances[1];
-        const preBalance = tx.meta.preBalances[1];
+        const treasuryIndex = tx.transaction.message.accountKeys.findIndex(
+          key => key.toString() === TREASURY_WALLET
+        );
+        
+        if (treasuryIndex === -1) {
+          throw new Error('Treasury wallet not found in transaction');
+        }
+        
+        const postBalance = tx.meta.postBalances[treasuryIndex];
+        const preBalance = tx.meta.preBalances[treasuryIndex];
         const amountReceived = (postBalance - preBalance) / LAMPORTS_PER_SOL;
         
         const TOLERANCE_SOL = 0.000001;
@@ -120,7 +128,8 @@ class TokenDeploymentService {
           postBalance,
           preBalance,
           difference: postBalance - preBalance,
-          recipient: tx.transaction.message.accountKeys[1]?.toString(),
+          treasuryIndex,
+          recipient: tx.transaction.message.accountKeys[treasuryIndex]?.toString(),
           treasury: TREASURY_WALLET,
           withinTolerance: shortfall <= TOLERANCE_SOL,
         });
