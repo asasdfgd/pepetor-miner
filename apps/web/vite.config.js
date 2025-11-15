@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// Force rebuild timestamp: 20251105-2340
+// Force rebuild timestamp: 20251114-2054
 export default defineConfig({
   plugins: [react()],
   resolve: {
