@@ -186,9 +186,12 @@ class TokenDeploymentService {
     const deployer = Keypair.fromSecretKey(new Uint8Array(deployerData));
 
     const balance = await this.connection.getBalance(deployer.publicKey);
-    const requiredBalance = createPool ? (poolLiquiditySOL + 1) * LAMPORTS_PER_SOL : 0.5 * LAMPORTS_PER_SOL;
+    const ataCreationCost = 0.02 * LAMPORTS_PER_SOL;
+    const requiredBalance = createPool 
+      ? (poolLiquiditySOL + 1 + ataCreationCost / LAMPORTS_PER_SOL) * LAMPORTS_PER_SOL 
+      : (0.5 + ataCreationCost / LAMPORTS_PER_SOL) * LAMPORTS_PER_SOL;
     if (balance < requiredBalance) {
-      throw new Error(`Insufficient SOL in deployer wallet. Need ${requiredBalance / LAMPORTS_PER_SOL} SOL, have ${balance / LAMPORTS_PER_SOL} SOL`);
+      throw new Error(`Insufficient SOL in deployer wallet. Need ${(requiredBalance / LAMPORTS_PER_SOL).toFixed(3)} SOL, have ${(balance / LAMPORTS_PER_SOL).toFixed(3)} SOL. Please fund: ${deployer.publicKey.toString()}`);
     }
 
     console.log('🪙 Creating token mint...');
@@ -228,23 +231,31 @@ class TokenDeploymentService {
       const amount = Math.floor((totalSupply * allocation) / 100);
 
       if (amount > 0) {
-        const tokenAccount = await getOrCreateAssociatedTokenAccount(
-          this.connection,
-          deployer,
-          mint,
-          keypair.publicKey
-        );
+        try {
+          const tokenAccount = await getOrCreateAssociatedTokenAccount(
+            this.connection,
+            deployer,
+            mint,
+            keypair.publicKey
+          );
 
-        await mintTo(
-          this.connection,
-          deployer,
-          mint,
-          tokenAccount.address,
-          deployer,
-          amount * Math.pow(10, decimals)
-        );
+          await mintTo(
+            this.connection,
+            deployer,
+            mint,
+            tokenAccount.address,
+            deployer,
+            amount * Math.pow(10, decimals)
+          );
 
-        console.log(`  ✅ ${name}: ${amount.toLocaleString()} ${tokenSymbol}`);
+          console.log(`  ✅ ${name}: ${amount.toLocaleString()} ${tokenSymbol}`);
+        } catch (error) {
+          console.error(`❌ Failed to mint to ${name}:`, error.message);
+          if (error.name === 'TokenAccountNotFoundError' || error.message.includes('insufficient')) {
+            throw new Error(`Insufficient SOL in deployer wallet to create token accounts. Need ~0.01 SOL more. Contact support.`);
+          }
+          throw error;
+        }
       }
     }
 
@@ -552,25 +563,33 @@ class TokenDeploymentService {
           deployer,
           lpMint,
           deployer.publicKey
-        );
+        ).catch(err => {
+          if (err.name === 'TokenAccountNotFoundError') {
+            console.warn('⚠️  LP token account not found, may already be burned');
+            return null;
+          }
+          throw err;
+        });
         
-        const lpBalance = (await this.connection.getTokenAccountBalance(deployerLpAccount.address)).value.amount;
-        
-        if (parseInt(lpBalance) > 0) {
-          const burnTx = new Transaction().add(
-            createBurnInstruction(
-              deployerLpAccount.address,
-              lpMint,
-              deployer.publicKey,
-              lpBalance
-            )
-          );
+        if (deployerLpAccount) {
+          const lpBalance = (await this.connection.getTokenAccountBalance(deployerLpAccount.address)).value.amount;
           
-          const burnSig = await this.connection.sendTransaction(burnTx, [deployer]);
-          await this.connection.confirmTransaction(burnSig, 'confirmed');
-          
-          console.log('✅ LP Tokens Burned - Liquidity Locked Forever!');
-          console.log('   Burn Transaction:', burnSig);
+          if (parseInt(lpBalance) > 0) {
+            const burnTx = new Transaction().add(
+              createBurnInstruction(
+                deployerLpAccount.address,
+                lpMint,
+                deployer.publicKey,
+                lpBalance
+              )
+            );
+            
+            const burnSig = await this.connection.sendTransaction(burnTx, [deployer]);
+            await this.connection.confirmTransaction(burnSig, 'confirmed');
+            
+            console.log('✅ LP Tokens Burned - Liquidity Locked Forever!');
+            console.log('   Burn Transaction:', burnSig);
+          }
         }
       } catch (burnError) {
         console.error('⚠️  LP burn failed (non-critical):', burnError.message);
