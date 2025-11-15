@@ -292,12 +292,17 @@ async function deployTokenAsync(deploymentId, config) {
     }
   } catch (error) {
     console.error('❌ Error deploying token:', error);
+    console.error('Error type:', typeof error);
+    console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
+    console.error('Error string:', String(error));
     console.error('Deployment ID:', deploymentId);
+    
+    const errorMessage = error.message || error.toString() || 'Unknown error occurred during deployment';
     
     await DeployedToken.findByIdAndUpdate(deploymentId, {
       status: 'failed',
-      errorMessage: error.message || 'Unknown error occurred during deployment',
+      errorMessage: errorMessage,
     });
   }
 }
