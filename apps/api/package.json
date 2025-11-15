@@ -24,7 +24,7 @@
     "@openbook-dex/openbook": "^0.0.9",
     "@pepetor-miner/shared": "file:../../packages/shared",
     "@raydium-io/raydium-sdk-v2": "^0.2.30-alpha",
-    "@solana/spl-token": "^0.4.9",
+    "@solana/spl-token": "0.3.11",
     "@solana/web3.js": "^1.98.4",
     "bcryptjs": "^2.4.3",
     "bn.js": "^5.2.2",

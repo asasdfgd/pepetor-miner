@@ -192,16 +192,12 @@ class TokenDeploymentService {
     }
 
     console.log('🪙 Creating token mint...');
-    const mintKeypair = Keypair.generate();
     const mint = await createMint(
       this.connection,
       deployer,
       deployer.publicKey,
       deployer.publicKey,
-      decimals,
-      mintKeypair,
-      { commitment: 'confirmed' },
-      TOKEN_PROGRAM_ID
+      decimals
     );
 
     console.log('✅ Token Mint:', mint.toString());
