@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Transaction, PublicKey } from '@solana/web3.js';
+import { Transaction, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import './LiquidityCommitmentWidget.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -18,6 +18,8 @@ const LiquidityCommitmentWidget = ({ tokenMint, tokenName, tokenSymbol }) => {
   const [success, setSuccess] = useState('');
   const [estimatedAPY, setEstimatedAPY] = useState(null);
   const [estimatedLPTokens, setEstimatedLPTokens] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [balanceError, setBalanceError] = useState(null);
 
   useEffect(() => {
     if (tokenMint) {
@@ -37,6 +39,34 @@ const LiquidityCommitmentWidget = ({ tokenMint, tokenName, tokenSymbol }) => {
       calculateEstimates();
     }
   }, [amountSOL, stats]);
+
+  useEffect(() => {
+    const checkBalance = async () => {
+      if (!publicKey || !connection) return;
+      
+      try {
+        const balance = await connection.getBalance(publicKey);
+        const balanceSOL = balance / LAMPORTS_PER_SOL;
+        setWalletBalance(balanceSOL);
+        
+        const amount = parseFloat(amountSOL);
+        const requiredAmount = amount + 0.01;
+        
+        if (balanceSOL < requiredAmount) {
+          setBalanceError(`Insufficient balance. You have ${balanceSOL.toFixed(4)} SOL but need ${requiredAmount.toFixed(4)} SOL (includes ~0.01 SOL for fees)`);
+        } else {
+          setBalanceError(null);
+        }
+      } catch (err) {
+        console.error('Failed to check balance:', err);
+        setWalletBalance(null);
+      }
+    };
+
+    checkBalance();
+    const interval = setInterval(checkBalance, 10000);
+    return () => clearInterval(interval);
+  }, [publicKey, connection, amountSOL]);
 
   const loadStats = async () => {
     try {
@@ -111,6 +141,11 @@ const LiquidityCommitmentWidget = ({ tokenMint, tokenName, tokenSymbol }) => {
     const amount = parseFloat(amountSOL);
     if (amount < 0.01) {
       setError('Minimum commitment is 0.01 SOL');
+      return;
+    }
+
+    if (walletBalance !== null && walletBalance < (amount + 0.01)) {
+      setError(`Insufficient balance. You have ${walletBalance.toFixed(4)} SOL but need ${(amount + 0.01).toFixed(4)} SOL (includes fees)`);
       return;
     }
 
@@ -279,12 +314,32 @@ const LiquidityCommitmentWidget = ({ tokenMint, tokenName, tokenSymbol }) => {
           {error && <div className="error-message">❌ {error}</div>}
           {success && <div className="success-message">{success}</div>}
 
+          {walletBalance !== null && publicKey && (
+            <div className="balance-info" style={{ 
+              padding: '10px', 
+              backgroundColor: balanceError ? '#fff3cd' : '#d4edda', 
+              color: balanceError ? '#856404' : '#155724',
+              borderRadius: '6px',
+              marginBottom: '1rem',
+              border: `1px solid ${balanceError ? '#ffeeba' : '#c3e6cb'}`,
+              fontSize: '0.9em'
+            }}>
+              <strong>💰 Your Balance:</strong> {walletBalance.toFixed(4)} SOL
+              <br />
+              <strong>📋 Required:</strong> {(parseFloat(amountSOL) + 0.01).toFixed(4)} SOL (includes fees)
+            </div>
+          )}
+
           <button 
             type="submit" 
             className="btn btn-primary"
-            disabled={loading || !publicKey}
+            disabled={loading || !publicKey || balanceError !== null}
           >
-            {loading ? 'Processing...' : publicKey ? `Commit ${amountSOL} SOL` : 'Connect Wallet'}
+            {loading ? 'Processing...' : balanceError 
+              ? '❌ Insufficient Balance' 
+              : publicKey 
+                ? `Commit ${amountSOL} SOL` 
+                : 'Connect Wallet'}
           </button>
         </form>
       )}

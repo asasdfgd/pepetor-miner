@@ -314,7 +314,7 @@ function HomePage() {
                   mine passively with privacy protection, and trade on live DEX markets—no code, no barriers, just pure opportunity.
                 </p>
                 <p className="about-mission">
-                  🚀 Built by a 17-year-old who turned failure into innovation. The platform is live. Join the revolution.
+                  🚀 Built from turning failure into innovation. The platform is live. Join the revolution.
                 </p>
               </div>
             </div>

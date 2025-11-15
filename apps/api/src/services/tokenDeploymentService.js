@@ -393,75 +393,83 @@ class TokenDeploymentService {
   }
 
   async uploadMetadata({ mint, tokenName, tokenSymbol, description, logoBuffer, deployer, totalSupply, website, twitter, walletAddress }) {
-    const metaplex = Metaplex.make(this.connection)
-      .use(keypairIdentity(deployer))
-      .use(irysStorage({
-        address: this.network === 'mainnet-beta' 
-          ? 'https://node1.irys.xyz' 
-          : 'https://devnet.irys.xyz',
-        providerUrl: process.env.SOLANA_RPC_URL || clusterApiUrl(this.network),
-        timeout: 60000,
-      }));
+    try {
+      const metaplex = Metaplex.make(this.connection)
+        .use(keypairIdentity(deployer))
+        .use(irysStorage({
+          address: this.network === 'mainnet-beta' 
+            ? 'https://node1.irys.xyz' 
+            : 'https://devnet.irys.xyz',
+          providerUrl: process.env.SOLANA_RPC_URL || clusterApiUrl(this.network),
+          timeout: 60000,
+        }));
 
-    const imageFile = {
-      buffer: logoBuffer,
-      fileName: `${tokenSymbol.toLowerCase()}-logo.png`,
-      displayName: `${tokenName} Logo`,
-      uniqueName: `${tokenSymbol.toLowerCase()}-logo`,
-      contentType: 'image/png',
-      extension: 'png',
-      tags: [{ name: 'Content-Type', value: 'image/png' }],
-    };
+      const imageFile = {
+        buffer: logoBuffer,
+        fileName: `${tokenSymbol.toLowerCase()}-logo.png`,
+        displayName: `${tokenName} Logo`,
+        uniqueName: `${tokenSymbol.toLowerCase()}-logo`,
+        contentType: 'image/png',
+        extension: 'png',
+        tags: [{ name: 'Content-Type', value: 'image/png' }],
+      };
 
-    const imageUri = await metaplex.storage().upload(imageFile);
+      const imageUri = await metaplex.storage().upload(imageFile);
 
-    const metadata = {
-      name: tokenName,
-      symbol: tokenSymbol,
-      description: description || `${tokenName} (${tokenSymbol}) - A mineable token on Solana`,
-      image: imageUri,
-      attributes: [
-        { trait_type: 'Type', value: 'Mineable Token' },
-        { trait_type: 'Network', value: 'Solana' },
-        { trait_type: 'Supply', value: totalSupply.toLocaleString() },
-      ],
-      properties: {
-        files: [
-          {
-            uri: imageUri,
-            type: 'image/png',
-          },
+      const metadata = {
+        name: tokenName,
+        symbol: tokenSymbol,
+        description: description || `${tokenName} (${tokenSymbol}) - A mineable token on Solana`,
+        image: imageUri,
+        attributes: [
+          { trait_type: 'Type', value: 'Mineable Token' },
+          { trait_type: 'Network', value: 'Solana' },
+          { trait_type: 'Supply', value: totalSupply.toLocaleString() },
         ],
-        category: 'image',
-        creators: [
-          {
-            address: deployer.publicKey.toString(),
-            share: 100,
-          },
-        ],
-      },
-    };
+        properties: {
+          files: [
+            {
+              uri: imageUri,
+              type: 'image/png',
+            },
+          ],
+          category: 'image',
+          creators: [
+            {
+              address: deployer.publicKey.toString(),
+              share: 100,
+            },
+          ],
+        },
+      };
 
-    if (website) {
-      metadata.external_url = website;
-    }
-
-    if (twitter || walletAddress) {
-      metadata.properties.links = {};
-      
-      if (twitter) {
-        const twitterHandle = twitter.startsWith('@') ? twitter.slice(1) : twitter.replace(/https?:\/\/(twitter|x)\.com\//, '');
-        metadata.properties.links.twitter = `https://x.com/${twitterHandle}`;
+      if (website) {
+        metadata.external_url = website;
       }
-      
-      if (walletAddress) {
-        metadata.properties.links.wallet = walletAddress;
+
+      if (twitter || walletAddress) {
+        metadata.properties.links = {};
+        
+        if (twitter) {
+          const twitterHandle = twitter.startsWith('@') ? twitter.slice(1) : twitter.replace(/https?:\/\/(twitter|x)\.com\//, '');
+          metadata.properties.links.twitter = `https://x.com/${twitterHandle}`;
+        }
+        
+        if (walletAddress) {
+          metadata.properties.links.wallet = walletAddress;
+        }
       }
+
+      const metadataUri = await metaplex.storage().uploadJson(metadata);
+
+      return metadataUri;
+    } catch (error) {
+      console.error('❌ Metadata upload failed:', error);
+      if (error.message && error.message.includes('signature')) {
+        throw new Error(`Metadata upload failed: Signature verification error. Please ensure deployer wallet is properly funded with at least 0.1 SOL.`);
+      }
+      throw new Error(`Metadata upload failed: ${error.message}`);
     }
-
-    const metadataUri = await metaplex.storage().uploadJson(metadata);
-
-    return metadataUri;
   }
 
   async createOpenBookMarket({ baseMint, deployer, decimals }) {

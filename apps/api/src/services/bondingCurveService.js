@@ -107,6 +107,7 @@ class BondingCurveService {
       createConfigTx.feePayer = deployer.publicKey;
 
       createConfigTx.partialSign(config);
+      createConfigTx.partialSign(deployer);
 
       const configSignature = await this.connection.sendRawTransaction(
         createConfigTx.serialize(),
@@ -144,6 +145,7 @@ class BondingCurveService {
       poolTransaction.feePayer = deployer.publicKey;
 
       poolTransaction.partialSign(poolCreator);
+      poolTransaction.partialSign(deployer);
 
       const poolSignature = await this.connection.sendRawTransaction(
         poolTransaction.serialize(),

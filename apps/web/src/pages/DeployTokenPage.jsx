@@ -39,6 +39,8 @@ const DeployTokenPage = () => {
   const [paymentSignature, setPaymentSignature] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [freshBlockhash, setFreshBlockhash] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [balanceError, setBalanceError] = useState(null);
 
   useEffect(() => {
     fetchPricing();
@@ -102,6 +104,33 @@ const DeployTokenPage = () => {
     const interval = setInterval(refreshBlockhash, 10000);
     return () => clearInterval(interval);
   }, [connection]);
+
+  useEffect(() => {
+    const checkBalance = async () => {
+      if (!publicKey || !connection || !pricing) return;
+      
+      try {
+        const balance = await connection.getBalance(publicKey);
+        const balanceSOL = balance / LAMPORTS_PER_SOL;
+        setWalletBalance(balanceSOL);
+        
+        const requiredAmount = pricing.totalPrice + 0.01;
+        
+        if (balanceSOL < requiredAmount) {
+          setBalanceError(`Insufficient balance. You have ${balanceSOL.toFixed(4)} SOL but need ${requiredAmount.toFixed(4)} SOL (includes ~0.01 SOL for transaction fees)`);
+        } else {
+          setBalanceError(null);
+        }
+      } catch (err) {
+        console.error('Failed to check balance:', err);
+        setWalletBalance(null);
+      }
+    };
+
+    checkBalance();
+    const interval = setInterval(checkBalance, 10000);
+    return () => clearInterval(interval);
+  }, [publicKey, connection, pricing]);
 
   const fetchPricing = async (liquidityAmount = formData.liquidityAmount, initialPurchaseAmount = formData.initialPurchaseAmount) => {
     try {
@@ -175,6 +204,10 @@ const DeployTokenPage = () => {
     if (!publicKey || !pricing) return null;
 
     try {
+      if (walletBalance !== null && walletBalance < (pricing.totalPrice + 0.01)) {
+        throw new Error(`Insufficient balance. You have ${walletBalance.toFixed(4)} SOL but need ${(pricing.totalPrice + 0.01).toFixed(4)} SOL (includes fees)`);
+      }
+
       setPaymentStatus('Creating payment transaction...');
       console.log('=== PAYMENT TRANSACTION ===');
       console.log('Pricing:', pricing.totalPrice, 'SOL');
@@ -1091,6 +1124,27 @@ const DeployTokenPage = () => {
             </div>
           )}
 
+          {balanceError && (
+            <div className="error-message" style={{ backgroundColor: '#fff3cd', color: '#856404', border: '1px solid #ffeeba' }}>
+              ⚠️ {balanceError}
+            </div>
+          )}
+
+          {walletBalance !== null && publicKey && pricing && (
+            <div className="balance-info" style={{ 
+              padding: '12px', 
+              backgroundColor: balanceError ? '#fff3cd' : '#d4edda', 
+              color: balanceError ? '#856404' : '#155724',
+              borderRadius: '8px',
+              marginBottom: '1rem',
+              border: `1px solid ${balanceError ? '#ffeeba' : '#c3e6cb'}`
+            }}>
+              <strong>💰 Your Balance:</strong> {walletBalance.toFixed(4)} SOL
+              <br />
+              <strong>📋 Required:</strong> {(pricing.totalPrice + 0.01).toFixed(4)} SOL (includes fees)
+            </div>
+          )}
+
           {paymentStatus && (
             <div className="payment-status-message">
               🔄 {paymentStatus}
@@ -1105,11 +1159,13 @@ const DeployTokenPage = () => {
             <button 
               type="submit" 
               className="btn btn-primary btn-deploy"
-              disabled={deploying || !pricing}
+              disabled={deploying || !pricing || balanceError !== null}
             >
-              {deploying ? (paymentStatus || 'Deploying...') : parseFloat(formData.liquidityAmount) > 0 
-                ? `🚀 Launch on DEX (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)` 
-                : `Deploy Token (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)`}
+              {deploying ? (paymentStatus || 'Deploying...') : balanceError 
+                ? '❌ Insufficient Balance'
+                : parseFloat(formData.liquidityAmount) > 0 
+                  ? `🚀 Launch on DEX (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)` 
+                  : `Deploy Token (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)`}
             </button>
           )}
         </form>
