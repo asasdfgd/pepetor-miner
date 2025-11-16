@@ -300,10 +300,30 @@ async function deployTokenAsync(deploymentId, config) {
     
     const errorMessage = error.message || error.toString() || 'Unknown error occurred during deployment';
     
-    await DeployedToken.findByIdAndUpdate(deploymentId, {
-      status: 'failed',
-      errorMessage: errorMessage,
-    });
+    const deployment = await DeployedToken.findById(deploymentId);
+    
+    try {
+      console.log('💸 Attempting to refund failed deployment...');
+      const refundSignature = await tokenDeploymentService.refundFailedDeployment(
+        deployment.owner,
+        deployment.paymentAmount
+      );
+      
+      await DeployedToken.findByIdAndUpdate(deploymentId, {
+        status: 'refunded',
+        errorMessage: errorMessage,
+        refundSignature: refundSignature,
+        refundedAt: new Date(),
+      });
+      
+      console.log(`✅ Refunded ${deployment.paymentAmount} SOL to ${deployment.owner}`);
+    } catch (refundError) {
+      console.error('❌ Refund failed:', refundError);
+      await DeployedToken.findByIdAndUpdate(deploymentId, {
+        status: 'failed',
+        errorMessage: errorMessage + ' (Refund failed: ' + refundError.message + ')',
+      });
+    }
   }
 }
 

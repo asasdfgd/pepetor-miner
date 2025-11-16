@@ -144,8 +144,16 @@ class BondingCurveService {
       poolTransaction.recentBlockhash = poolBlockhash;
       poolTransaction.feePayer = deployer.publicKey;
 
+      console.log('🔑 Required signers:');
+      console.log('   Deployer:', deployer.publicKey.toString());
+      console.log('   Pool Creator:', poolCreator.publicKey.toString());
+      console.log('📝 Transaction signers before signing:', poolTransaction.signatures.map(s => s.publicKey.toString()));
+
       poolTransaction.partialSign(poolCreator);
       poolTransaction.partialSign(deployer);
+
+      console.log('📝 Signed by:', poolTransaction.signatures.filter(s => s.signature).map(s => s.publicKey.toString()));
+      console.log('❌ Missing signatures:', poolTransaction.signatures.filter(s => !s.signature).map(s => s.publicKey.toString()));
 
       const poolSignature = await this.connection.sendRawTransaction(
         poolTransaction.serialize(),

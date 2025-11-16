@@ -64,8 +64,14 @@ const deployedTokenSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'deployed', 'failed'],
+    enum: ['pending', 'deployed', 'failed', 'refunded'],
     default: 'pending',
+  },
+  refundSignature: {
+    type: String,
+  },
+  refundedAt: {
+    type: Date,
   },
   deploymentSignature: String,
   network: {

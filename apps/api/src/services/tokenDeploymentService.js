@@ -633,6 +633,53 @@ class TokenDeploymentService {
     const deploymentPrice = await SystemSettings.getSetting('deployment_price_sol', DEPLOYMENT_PRICE_SOL);
     return deploymentPrice;
   }
+
+  async refundFailedDeployment(userWalletAddress, amount) {
+    try {
+      const treasuryPath = process.env.TREASURY_WALLET_PATH || '.wallets/treasury.json';
+      let treasuryKeypair;
+      
+      if (process.env.TREASURY_WALLET) {
+        const keypairData = JSON.parse(Buffer.from(process.env.TREASURY_WALLET, 'base64').toString('utf-8'));
+        treasuryKeypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
+      } else {
+        const fullPath = path.join(__dirname, '../../', treasuryPath);
+        const keypairData = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+        treasuryKeypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
+      }
+      
+      const userPublicKey = new PublicKey(userWalletAddress);
+      const lamportsToRefund = Math.floor(amount * LAMPORTS_PER_SOL);
+      
+      console.log(`💸 Refunding ${amount} SOL to ${userWalletAddress}`);
+      
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: treasuryKeypair.publicKey,
+          toPubkey: userPublicKey,
+          lamports: lamportsToRefund,
+        })
+      );
+      
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = treasuryKeypair.publicKey;
+      
+      const signature = await this.connection.sendTransaction(
+        transaction,
+        [treasuryKeypair],
+        { skipPreflight: false, preflightCommitment: 'confirmed' }
+      );
+      
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      
+      console.log('✅ Refund successful:', signature);
+      return signature;
+    } catch (error) {
+      console.error('Error refunding deployment:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new TokenDeploymentService();
