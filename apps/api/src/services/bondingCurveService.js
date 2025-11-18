@@ -149,6 +149,12 @@ class BondingCurveService {
       console.log('   Pool Creator:', poolCreator.publicKey.toString());
       console.log('📝 Transaction signers before signing:', poolTransaction.signatures.map(s => s.publicKey.toString()));
 
+      console.log('🔍 Checking if tokenMint needs signing...');
+      if (tokenMint && typeof tokenMint === 'object' && 'secretKey' in tokenMint) {
+        console.log('   Token Mint keypair detected, signing...');
+        poolTransaction.partialSign(tokenMint);
+      }
+
       poolTransaction.partialSign(poolCreator);
       poolTransaction.partialSign(deployer);
 

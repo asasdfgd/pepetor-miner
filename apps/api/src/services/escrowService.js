@@ -62,19 +62,33 @@ class EscrowService {
       const lamports = Math.floor(amountSOL * LAMPORTS_PER_SOL);
 
       const rentExemption = await this.connection.getMinimumBalanceForRentExemption(0);
-      const totalLamports = lamports + rentExemption;
 
-      const transaction = new Transaction().add(
+      const transaction = new Transaction();
+      
+      // Treasury pays for rent exemption
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: this.treasuryKeypair.publicKey,
+          toPubkey: escrowPublicKey,
+          lamports: rentExemption,
+        })
+      );
+      
+      // User only pays their commitment amount
+      transaction.add(
         SystemProgram.transfer({
           fromPubkey: userPublicKey,
           toPubkey: escrowPublicKey,
-          lamports: totalLamports,
+          lamports: lamports,
         })
       );
 
       const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
-      transaction.feePayer = userPublicKey;
+      transaction.feePayer = this.treasuryKeypair.publicKey;
+
+      // Pre-sign with treasury for rent payment
+      transaction.partialSign(this.treasuryKeypair);
 
       const serializedTransaction = transaction.serialize({
         requireAllSignatures: false,
@@ -102,6 +116,7 @@ class EscrowService {
       const expectedLamports = Math.floor(expectedAmount * LAMPORTS_PER_SOL);
       const rentExemption = await this.connection.getMinimumBalanceForRentExemption(0);
 
+      // Balance should be user's commitment + rent (paid by treasury)
       return balance >= (expectedLamports + rentExemption);
     } catch (error) {
       console.error('Error verifying commitment:', error);
@@ -124,6 +139,7 @@ class EscrowService {
     escrowAddress,
     destinationWallet,
     amount,
+    returnRentToTreasury = true,
   }) {
     try {
       console.log('🔓 Releasing escrow funds...');
@@ -135,13 +151,34 @@ class EscrowService {
       const destinationPublicKey = new PublicKey(destinationWallet);
       const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
 
-      const transaction = new Transaction().add(
+      const transaction = new Transaction();
+      
+      // Transfer the specified amount to destination
+      transaction.add(
         SystemProgram.transfer({
           fromPubkey: escrowPublicKey,
           toPubkey: destinationPublicKey,
           lamports,
         })
       );
+      
+      // If specified, return rent to treasury
+      if (returnRentToTreasury) {
+        const balance = await this.connection.getBalance(escrowPublicKey);
+        const remainingAfterTransfer = balance - lamports;
+        
+        // If there's rent remaining, return it to treasury
+        if (remainingAfterTransfer > 0) {
+          transaction.add(
+            SystemProgram.transfer({
+              fromPubkey: escrowPublicKey,
+              toPubkey: this.treasuryKeypair.publicKey,
+              lamports: remainingAfterTransfer,
+            })
+          );
+          console.log(`   Returning ${remainingAfterTransfer / LAMPORTS_PER_SOL} SOL rent to treasury`);
+        }
+      }
 
       const signature = await this.connection.sendTransaction(
         transaction,
@@ -168,22 +205,50 @@ class EscrowService {
       console.log('Escrow:', escrowAddress);
       console.log('User:', userWallet);
 
-      const balance = await this.getEscrowBalance(escrowAddress);
+      const escrowPublicKey = new PublicKey(escrowAddress);
+      const balance = await this.connection.getBalance(escrowPublicKey);
       
       if (balance <= 0) {
         throw new Error('Escrow has no balance to refund');
       }
 
       const rentExemption = await this.connection.getMinimumBalanceForRentExemption(0);
-      const refundAmount = balance - (rentExemption / LAMPORTS_PER_SOL);
+      const userRefund = (balance - rentExemption) / LAMPORTS_PER_SOL;
 
-      const signature = await this.releaseEscrow({
-        escrowAddress,
-        destinationWallet: userWallet,
-        amount: refundAmount,
-      });
+      // Create a transaction for both refunds
+      const transaction = new Transaction();
+      
+      // Refund user's commitment
+      if (userRefund > 0) {
+        transaction.add(
+          SystemProgram.transfer({
+            fromPubkey: escrowPublicKey,
+            toPubkey: new PublicKey(userWallet),
+            lamports: Math.floor(userRefund * LAMPORTS_PER_SOL),
+          })
+        );
+      }
+      
+      // Return rent to treasury
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: escrowPublicKey,
+          toPubkey: this.treasuryKeypair.publicKey,
+          lamports: rentExemption,
+        })
+      );
+
+      const signature = await this.connection.sendTransaction(
+        transaction,
+        [this.treasuryKeypair],
+        { skipPreflight: false }
+      );
+
+      await this.connection.confirmTransaction(signature, 'confirmed');
 
       console.log('✅ Commitment refunded:', signature);
+      console.log(`   User refund: ${userRefund} SOL`);
+      console.log(`   Rent returned to treasury: ${rentExemption / LAMPORTS_PER_SOL} SOL`);
       return signature;
     } catch (error) {
       console.error('Error refunding commitment:', error);

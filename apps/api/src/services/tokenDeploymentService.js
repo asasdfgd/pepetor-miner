@@ -177,42 +177,48 @@ class TokenDeploymentService {
 
     console.log(`🚀 Deploying ${tokenName} (${tokenSymbol}) for ${ownerPublicKey}`);
 
-    const deployerPath = path.join(__dirname, '../../.wallets/deployer.json');
-    if (!fs.existsSync(deployerPath)) {
-      throw new Error('Deployer wallet not found');
+    const treasuryPath = path.join(__dirname, '../..', process.env.TREASURY_WALLET_PATH || '.wallets/treasury-keypair.json');
+    if (!fs.existsSync(treasuryPath)) {
+      throw new Error('Treasury wallet not found');
     }
 
-    const deployerData = JSON.parse(fs.readFileSync(deployerPath, 'utf-8'));
-    const deployer = Keypair.fromSecretKey(new Uint8Array(deployerData));
+    const treasuryData = JSON.parse(fs.readFileSync(treasuryPath, 'utf-8'));
+    const treasury = Keypair.fromSecretKey(new Uint8Array(treasuryData));
 
-    const balance = await this.connection.getBalance(deployer.publicKey);
+    const balance = await this.connection.getBalance(treasury.publicKey);
     const ataCreationCost = 0.02 * LAMPORTS_PER_SOL;
     const requiredBalance = createPool 
       ? (poolLiquiditySOL + 1 + ataCreationCost / LAMPORTS_PER_SOL) * LAMPORTS_PER_SOL 
       : (0.5 + ataCreationCost / LAMPORTS_PER_SOL) * LAMPORTS_PER_SOL;
     if (balance < requiredBalance) {
-      throw new Error(`Insufficient SOL in deployer wallet. Need ${(requiredBalance / LAMPORTS_PER_SOL).toFixed(3)} SOL, have ${(balance / LAMPORTS_PER_SOL).toFixed(3)} SOL. Please fund: ${deployer.publicKey.toString()}`);
+      throw new Error(`Insufficient SOL in treasury wallet. Need ${(requiredBalance / LAMPORTS_PER_SOL).toFixed(3)} SOL, have ${(balance / LAMPORTS_PER_SOL).toFixed(3)} SOL. Please fund: ${treasury.publicKey.toString()}`);
     }
 
-    console.log('🪙 Creating token mint...');
-    const mint = await createMint(
-      this.connection,
-      deployer,
-      deployer.publicKey,
-      deployer.publicKey,
-      decimals
-    );
-
-    console.log('✅ Token Mint:', mint.toString());
-
+    let mint;
     const wallets = {
-      treasury: Keypair.generate(),
+      creator: Keypair.generate(),
       rewards: Keypair.generate(),
       liquidity: Keypair.generate(),
       marketing: Keypair.generate(),
     };
 
-    const walletsDir = path.join(__dirname, '../../.custom-tokens', mint.toString());
+    if (useBondingCurve) {
+      console.log('🎢 Generating mint keypair for Meteora (mint creation will be handled by SDK)...');
+      mint = Keypair.generate();
+      console.log('✅ Mint Keypair Generated:', mint.publicKey.toString());
+    } else {
+      console.log('🪙 Creating token mint...');
+      mint = await createMint(
+        this.connection,
+        treasury,
+        treasury.publicKey,
+        treasury.publicKey,
+        decimals
+      );
+      console.log('✅ Token Mint:', mint.toString());
+    }
+
+    const walletsDir = path.join(__dirname, '../../.custom-tokens', mint.publicKey ? mint.publicKey.toString() : mint.toString());
     if (!fs.existsSync(walletsDir)) {
       fs.mkdirSync(walletsDir, { recursive: true });
     }
@@ -225,36 +231,47 @@ class TokenDeploymentService {
       );
     }
 
-    console.log('💰 Minting tokens to wallets...');
-    for (const [name, keypair] of Object.entries(wallets)) {
-      const allocation = allocations[name] || 0;
-      const amount = Math.floor((totalSupply * allocation) / 100);
+    if (useBondingCurve) {
+      const mintKeypairPath = path.join(walletsDir, 'mint-keypair.json');
+      fs.writeFileSync(
+        mintKeypairPath,
+        JSON.stringify(Array.from(mint.secretKey))
+      );
+      console.log('✅ Mint keypair saved for Meteora SDK');
+    }
 
-      if (amount > 0) {
-        try {
-          const tokenAccount = await getOrCreateAssociatedTokenAccount(
-            this.connection,
-            deployer,
-            mint,
-            keypair.publicKey
-          );
+    if (!useBondingCurve) {
+      console.log('💰 Minting tokens to wallets...');
+      for (const [name, keypair] of Object.entries(wallets)) {
+        const allocation = allocations[name] || 0;
+        const amount = Math.floor((totalSupply * allocation) / 100);
 
-          await mintTo(
-            this.connection,
-            deployer,
-            mint,
-            tokenAccount.address,
-            deployer,
-            amount * Math.pow(10, decimals)
-          );
+        if (amount > 0) {
+          try {
+            const tokenAccount = await getOrCreateAssociatedTokenAccount(
+              this.connection,
+              treasury,
+              mint,
+              keypair.publicKey
+            );
 
-          console.log(`  ✅ ${name}: ${amount.toLocaleString()} ${tokenSymbol}`);
-        } catch (error) {
-          console.error(`❌ Failed to mint to ${name}:`, error.message);
-          if (error.name === 'TokenAccountNotFoundError' || error.message.includes('insufficient')) {
-            throw new Error(`Insufficient SOL in deployer wallet to create token accounts. Need ~0.01 SOL more. Contact support.`);
+            await mintTo(
+              this.connection,
+              treasury,
+              mint,
+              tokenAccount.address,
+              treasury,
+              amount * Math.pow(10, decimals)
+            );
+
+            console.log(`  ✅ ${name}: ${amount.toLocaleString()} ${tokenSymbol}`);
+          } catch (error) {
+            console.error(`❌ Failed to mint to ${name}:`, error.message);
+            if (error.name === 'TokenAccountNotFoundError' || error.message.includes('insufficient')) {
+              throw new Error(`Insufficient SOL in treasury wallet to create token accounts. Need ~0.01 SOL more. Contact support.`);
+            }
+            throw error;
           }
-          throw error;
         }
       }
     }
@@ -263,12 +280,12 @@ class TokenDeploymentService {
     if (logoBuffer) {
       console.log('📤 Uploading metadata to Arweave...');
       metadataUri = await this.uploadMetadata({
-        mint: mint.toString(),
+        mint: mint.publicKey ? mint.publicKey.toString() : mint.toString(),
         tokenName,
         tokenSymbol,
         description,
         logoBuffer,
-        deployer,
+        deployer: treasury,
         totalSupply,
         website,
         twitter,
@@ -290,8 +307,8 @@ class TokenDeploymentService {
         tokenSymbol,
         tokenMint: mint,
         totalSupply,
-        deployer,
-        poolCreator: wallets.treasury,
+        deployer: treasury,
+        poolCreator: wallets.creator,
         initialMarketCap: bondingCurveInitialMC,
         migrationMarketCap: bondingCurveMigrationMC,
         metadataUri: metadataUri || '',
@@ -340,7 +357,7 @@ class TokenDeploymentService {
       console.log('🏪 Creating OpenBook Market ID...');
       marketId = await this.createOpenBookMarket({
         baseMint: mint,
-        deployer,
+        deployer: treasury,
         decimals,
       });
       console.log('✅ Market ID:', marketId);
@@ -350,7 +367,7 @@ class TokenDeploymentService {
         marketId,
         baseMint: mint,
         liquidityWallet: wallets.liquidity,
-        deployer,
+        deployer: treasury,
         liquiditySOL: poolLiquiditySOL,
         decimals,
       });
@@ -360,21 +377,21 @@ class TokenDeploymentService {
     console.log('🔒 Revoking mint authority...');
     await setAuthority(
       this.connection,
-      deployer,
+      treasury,
       mint,
-      deployer.publicKey,
+      treasury.publicKey,
       AuthorityType.MintTokens,
       null
     );
     console.log('✅ Mint authority revoked - supply is now immutable');
 
     return {
-      mintAddress: mint.toString(),
-      treasuryWallet: wallets.treasury.publicKey.toString(),
+      mintAddress: mint.publicKey ? mint.publicKey.toString() : mint.toString(),
+      treasuryWallet: wallets.creator.publicKey.toString(),
       rewardsWallet: wallets.rewards.publicKey.toString(),
       liquidityWallet: wallets.liquidity.publicKey.toString(),
       marketingWallet: wallets.marketing.publicKey.toString(),
-      treasuryKeypair: Array.from(wallets.treasury.secretKey),
+      treasuryKeypair: Array.from(wallets.creator.secretKey),
       rewardsKeypair: Array.from(wallets.rewards.secretKey),
       liquidityKeypair: Array.from(wallets.liquidity.secretKey),
       marketingKeypair: Array.from(wallets.marketing.secretKey),
@@ -466,7 +483,7 @@ class TokenDeploymentService {
     } catch (error) {
       console.error('❌ Metadata upload failed:', error);
       if (error.message && error.message.includes('signature')) {
-        throw new Error(`Metadata upload failed: Signature verification error. Please ensure deployer wallet is properly funded with at least 0.1 SOL.`);
+        throw new Error(`Metadata upload failed: Signature verification error. Please ensure treasury wallet is properly funded with at least 0.1 SOL.`);
       }
       throw new Error(`Metadata upload failed: ${error.message}`);
     }
