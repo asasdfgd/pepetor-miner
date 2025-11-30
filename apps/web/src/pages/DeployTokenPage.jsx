@@ -1159,13 +1159,9 @@ const DeployTokenPage = () => {
             <button 
               type="submit" 
               className="btn btn-primary btn-deploy"
-              disabled={deploying || !pricing || balanceError !== null}
+              disabled={true}
             >
-              {deploying ? (paymentStatus || 'Deploying...') : balanceError 
-                ? '❌ Insufficient Balance'
-                : parseFloat(formData.liquidityAmount) > 0 
-                  ? `🚀 Launch on DEX (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)` 
-                  : `Deploy Token (${pricing?.totalPrice?.toFixed(4) || '...'} SOL)`}
+⏳ Coming Soon - Temporarily Unavailable
             </button>
           )}
         </form>
