@@ -28,6 +28,7 @@ const DEPLOYMENT_PRICE_SOL = 0.073;
 const DEPLOYMENT_PRICE_PEPETOR = 10000;
 const TREASURY_WALLET = process.env.TREASURY_WALLET_ADDRESS;
 const SystemSettings = require('../models/SystemSettings');
+const DeployedToken = require('../models/DeployedToken');
 
 class TokenDeploymentService {
   constructor() {
@@ -355,23 +356,34 @@ class TokenDeploymentService {
       }
     } else if (createPool) {
       console.log('🏪 Creating OpenBook Market ID...');
-      marketId = await this.createOpenBookMarket({
-        baseMint: mint,
-        deployer: treasury,
-        decimals,
-      });
-      console.log('✅ Market ID:', marketId);
+      try {
+        marketId = await this.createOpenBookMarket({
+          baseMint: mint,
+          deployer: treasury,
+          decimals,
+        });
+        console.log('✅ Market ID:', marketId);
+      } catch (error) {
+        console.error('❌ Failed to create OpenBook Market:', error.message);
+        throw new Error(`OpenBook Market creation failed: ${error.message}`);
+      }
+
 
       console.log('🌊 Creating Raydium Pool...');
-      poolAddress = await this.createRaydiumPool({
-        marketId,
-        baseMint: mint,
-        liquidityWallet: wallets.liquidity,
-        deployer: treasury,
-        liquiditySOL: poolLiquiditySOL,
-        decimals,
-      });
-      console.log('✅ Pool Address:', poolAddress);
+      try {
+        poolAddress = await this.createRaydiumPool({
+          marketId,
+          baseMint: mint,
+          liquidityWallet: wallets.liquidity,
+          deployer: treasury,
+          liquiditySOL: poolLiquiditySOL,
+          decimals,
+        });
+        console.log('✅ Pool Address:', poolAddress);
+      } catch (error) {
+        console.error('❌ Failed to create Raydium Pool:', error.message);
+        throw new Error(`Raydium Pool creation failed: ${error.message}`);
+      }
     }
 
     console.log('🔒 Revoking mint authority...');
@@ -617,7 +629,8 @@ class TokenDeploymentService {
           }
         }
       } catch (burnError) {
-        console.error('⚠️  LP burn failed (non-critical):', burnError.message);
+        console.error('❌ LP burn failed:', burnError.message);
+        throw new Error(`LP token burn failed: ${burnError.message}`);
       }
       
       return extInfo.address.poolId.toString();

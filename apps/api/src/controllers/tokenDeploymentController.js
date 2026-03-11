@@ -21,12 +21,16 @@ exports.getDeploymentPrice = async (req, res) => {
   try {
     const { paymentMethod = 'SOL', liquidityAmount = 0, useBondingCurve = 'false', initialPurchaseAmount = 0 } = req.query;
     
+    const TARGET_USD_DEPLOYMENT_FEE = 15; // $15 USD fixed deployment fee
+
     console.log('🔍 /price endpoint received query params:', req.query);
     console.log('📊 Parsed values:', { paymentMethod, liquidityAmount, useBondingCurve, initialPurchaseAmount });
     
-    const deploymentPrice = await tokenDeploymentService.getDeploymentPrice(paymentMethod);
     const solPrice = await tokenDeploymentService.fetchSOLPrice();
     const treasuryWallet = process.env.TREASURY_WALLET_ADDRESS || 'Not configured';
+    
+    // Calculate deploymentPrice based on fixed USD fee and current SOL price
+    const deploymentPrice = TARGET_USD_DEPLOYMENT_FEE / solPrice;
     
     const isBondingCurve = useBondingCurve === 'true';
     
@@ -39,10 +43,10 @@ exports.getDeploymentPrice = async (req, res) => {
         parsedInitialPurchase: initialPurchase,
       });
       const totalPrice = parseFloat((deploymentPrice + initialPurchase).toFixed(9));
-      const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
+      const priceUSD = totalPrice * solPrice; // Always calculate based on current SOL price
       
       const breakdown = [
-        `Deployment: ${deploymentPrice} SOL`,
+        `Deployment: ${deploymentPrice.toFixed(4)} SOL (~$${TARGET_USD_DEPLOYMENT_FEE.toFixed(2)} USD)`,
         `Bonding Curve Pool: Free`,
       ];
       
@@ -50,17 +54,17 @@ exports.getDeploymentPrice = async (req, res) => {
         breakdown.push(`Initial Buy: ${initialPurchase} SOL`);
       }
       
-      breakdown.push(`Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`);
+      breakdown.push(`Total: ${totalPrice.toFixed(4)} SOL (~$${priceUSD.toFixed(2)} USD)`);
       
       return res.json({
         success: true,
         paymentMethod,
-        deploymentPrice,
+        deploymentPrice: parseFloat(deploymentPrice.toFixed(9)),
         liquidityAmount: 0,
         marketCreationCost: 0,
         initialPurchaseAmount: initialPurchase,
-        totalPrice,
-        priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
+        totalPrice: parseFloat(totalPrice.toFixed(9)),
+        priceUSD: parseFloat(priceUSD.toFixed(2)),
         solPrice,
         treasuryWallet,
         launchType: 'bonding_curve',
@@ -72,28 +76,31 @@ exports.getDeploymentPrice = async (req, res) => {
     }
     
     const liquidity = parseFloat(liquidityAmount) || 0;
-    const marketCreationCost = liquidity > 0 ? 0.4 : 0;
+    const marketCreationCost = liquidity > 0 ? 0.4 : 0; // Fixed market creation cost
     const totalPrice = parseFloat((deploymentPrice + liquidity + marketCreationCost).toFixed(9));
     
-    const priceUSD = paymentMethod === 'SOL' ? totalPrice * solPrice : null;
+    const priceUSD = totalPrice * solPrice;
     
     res.json({
       success: true,
       paymentMethod,
-      deploymentPrice,
+      deploymentPrice: parseFloat(deploymentPrice.toFixed(9)),
       liquidityAmount: liquidity,
       marketCreationCost,
-      totalPrice,
-      priceUSD: priceUSD ? parseFloat(priceUSD.toFixed(2)) : null,
+      totalPrice: parseFloat(totalPrice.toFixed(9)),
+      priceUSD: parseFloat(priceUSD.toFixed(2)),
       solPrice,
       treasuryWallet,
       launchType: 'traditional',
       breakdown: liquidity > 0 ? [
-        `Deployment: ${deploymentPrice} SOL`,
+        `Deployment: ${deploymentPrice.toFixed(4)} SOL (~$${TARGET_USD_DEPLOYMENT_FEE.toFixed(2)} USD)`,
         `Liquidity: ${liquidity} SOL`,
         `OpenBook Market: ${marketCreationCost} SOL`,
-        `Total: ${totalPrice} SOL (~$${priceUSD.toFixed(2)} USD)`,
-      ] : null,
+        `Total: ${totalPrice.toFixed(4)} SOL (~$${priceUSD.toFixed(2)} USD)`,
+      ] : [
+        `Deployment: ${deploymentPrice.toFixed(4)} SOL (~$${TARGET_USD_DEPLOYMENT_FEE.toFixed(2)} USD)`,
+        `Total: ${totalPrice.toFixed(4)} SOL (~$${priceUSD.toFixed(2)} USD)`,
+      ],
       note: paymentMethod === 'PEPETOR' 
         ? 'PEPETOR payment coming soon after mainnet launch'
         : liquidity > 0
@@ -300,8 +307,16 @@ async function deployTokenAsync(deploymentId, config) {
     
     const errorMessage = error.message || error.toString() || 'Unknown error occurred during deployment';
     
-    const deployment = await DeployedToken.findById(deploymentId);
-    
+    let deployment = await DeployedToken.findById(deploymentId);
+    if (!deployment) {
+      console.error('❌ Deployment not found for ID:', deploymentId);
+      return; 
+    }
+
+    // Store the original error message
+    deployment.errorMessage = errorMessage;
+    deployment.status = 'failed'; // Default to failed before attempting refund
+
     try {
       console.log('💸 Attempting to refund failed deployment...');
       const refundSignature = await tokenDeploymentService.refundFailedDeployment(
@@ -309,20 +324,17 @@ async function deployTokenAsync(deploymentId, config) {
         deployment.paymentAmount
       );
       
-      await DeployedToken.findByIdAndUpdate(deploymentId, {
-        status: 'refunded',
-        errorMessage: errorMessage,
-        refundSignature: refundSignature,
-        refundedAt: new Date(),
-      });
-      
+      deployment.status = 'refunded';
+      deployment.refundSignature = refundSignature;
+      deployment.refundedAt = new Date();
       console.log(`✅ Refunded ${deployment.paymentAmount} SOL to ${deployment.owner}`);
     } catch (refundError) {
       console.error('❌ Refund failed:', refundError);
-      await DeployedToken.findByIdAndUpdate(deploymentId, {
-        status: 'failed',
-        errorMessage: errorMessage + ' (Refund failed: ' + refundError.message + ')',
-      });
+      // Append refund failure to original error message
+      deployment.errorMessage += ` (Refund failed: ${refundError.message})`;
+      // Status remains 'failed' from above
+    } finally {
+      await deployment.save();
     }
   }
 }

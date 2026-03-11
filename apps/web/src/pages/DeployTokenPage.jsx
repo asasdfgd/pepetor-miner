@@ -259,7 +259,8 @@ const DeployTokenPage = () => {
     } catch (error) {
       console.error('Payment error:', error);
       setPaymentStatus(null);
-      throw new Error('Payment failed: ' + error.message);
+      const errorMessage = error.message || String(error);
+      throw new Error(`Payment failed: ${errorMessage}`);
     }
   };
 
