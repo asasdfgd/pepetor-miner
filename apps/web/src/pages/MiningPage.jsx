@@ -87,7 +87,7 @@ const MiningPage = () => {
         miner.current.stop();
       }
     };
-  }, [user]);
+  }, [user?.walletAddress]);
 
   useEffect(() => {
     if (miner.current) {
@@ -115,10 +115,13 @@ const MiningPage = () => {
       alert(response.data.message);
       // Refresh stats after withdrawal
       const statsResponse = await api.get('/mining/stats');
-      setTotalHashes(statsResponse.data.totalHashes);
-      setEstimatedEarnings(statsResponse.data.rewardsEarned);
+      if (statsResponse && statsResponse.data) {
+        setTotalHashes(statsResponse.data.totalHashes || 0);
+        setEstimatedEarnings(statsResponse.data.rewardsEarned || 0);
+      }
     } catch (error) {
-      alert(error.response.data.message || 'Failed to withdraw rewards');
+      const errorMessage = error.response?.data?.message || 'Failed to withdraw rewards';
+      alert(errorMessage);
     }
   };
 
