@@ -15,6 +15,7 @@ console.log('  CORS_ORIGIN:', process.env.CORS_ORIGIN || 'not set');
 
 console.log('🚀 [APP START] Loading custom modules...');
 const { connectDB, disconnectDB } = require('./config/database');
+const miningService = require('./services/miningService');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
@@ -23,6 +24,7 @@ const tokenDeploymentRoutes = require('./routes/tokenDeploymentRoutes');
 const bondingCurveRoutes = require('./routes/bondingCurveRoutes');
 const liquidityCommitmentRoutes = require('./routes/liquidityCommitmentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const miningRoutes = require('./routes/miningRoutes');
 const { authenticate } = require('./middleware/authMiddleware');
 
 console.log('🚀 [APP START] All modules loaded successfully');
@@ -146,6 +148,9 @@ app.use('/api/bonding-curve', bondingCurveRoutes);
 // Mount liquidity commitment routes
 app.use('/api/liquidity-commitment', liquidityCommitmentRoutes);
 
+// Mount mining routes
+app.use('/api/mining', miningRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err);
@@ -199,6 +204,10 @@ const startServer = async () => {
       
       const migrationMonitor = require('./services/migrationMonitorService');
       await migrationMonitor.start();
+
+      console.log('⛏️  Initializing mining service...');
+      await miningService.connect();
+      console.log('✅ Mining service connected to pool');
     }
 
     // Start Express server on all interfaces for Docker/Fly.io compatibility

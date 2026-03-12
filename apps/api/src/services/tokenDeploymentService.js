@@ -397,6 +397,18 @@ class TokenDeploymentService {
     );
     console.log('✅ Mint authority revoked - supply is now immutable');
 
+    // Revoke freeze authority as well
+    console.log('❄️ Revoking freeze authority...');
+    await setAuthority(
+      this.connection,
+      treasury,
+      mint,
+      treasury.publicKey,
+      AuthorityType.FreezeAccount,
+      null
+    );
+    console.log('✅ Freeze authority revoked - tokens cannot be frozen');
+
     return {
       mintAddress: mint.publicKey ? mint.publicKey.toString() : mint.toString(),
       treasuryWallet: wallets.creator.publicKey.toString(),

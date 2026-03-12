@@ -72,6 +72,9 @@ function Header() {
                 <Link to="/tor" className="nav-link">
                   🧅 Tor
                 </Link>
+                <Link to="/mine" className="nav-link">
+                  ⛏️ Mine
+                </Link>
                 <button onClick={handleShowTutorial} className="nav-link tutorial-btn">
                   🎓 Tutorial
                 </button>

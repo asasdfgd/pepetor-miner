@@ -16,6 +16,7 @@ import TokenTradingPage from './pages/TokenTradingPage';
 import TokenDetailPage from './pages/TokenDetailPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import MiningPage from './pages/MiningPage';
 import './App.css';
 
 /**
@@ -61,6 +62,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mine"
+            element={
+              <ProtectedRoute>
+                <MiningPage />
               </ProtectedRoute>
             }
           />

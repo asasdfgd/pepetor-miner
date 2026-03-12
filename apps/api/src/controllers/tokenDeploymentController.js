@@ -250,10 +250,23 @@ exports.requestDeployment = async (req, res) => {
 
 async function deployTokenAsync(deploymentId, config) {
   try {
+    // Fetch the deployment to check its current status
+    const deployment = await DeployedToken.findById(deploymentId);
+    if (!deployment) {
+      console.error('❌ deployTokenAsync: Deployment not found for ID:', deploymentId);
+      return;
+    }
+
+    // Prevent duplicate processing if status is not 'pending'
+    if (deployment.status !== 'pending') {
+      console.warn(`⚠️ deployTokenAsync: Deployment ID ${deploymentId} is already in status '${deployment.status}'. Skipping duplicate processing.`);
+      return;
+    }
+
     console.log(`🚀 Starting token deployment for ID: ${deploymentId}`);
     const result = await tokenDeploymentService.deployCustomToken(config);
 
-    const deployment = await DeployedToken.findByIdAndUpdate(deploymentId, {
+    const updatedDeployment = await DeployedToken.findByIdAndUpdate(deploymentId, {
       status: 'deployed',
       mintAddress: result.mintAddress,
       treasuryWallet: result.treasuryWallet,
@@ -288,7 +301,7 @@ async function deployTokenAsync(deploymentId, config) {
       const User = require('../models/User');
       
       // Find user by wallet address
-      const user = await User.findOne({ walletAddress: deployment.owner });
+      const user = await User.findOne({ walletAddress: updatedDeployment.owner });
       if (user) {
         await rewardService.awardTaskReward(user._id, 'tokenCreation');
         console.log(`🎁 Awarded 100 PEPETOR token creation reward to ${user.username}`);
