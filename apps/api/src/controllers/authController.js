@@ -310,15 +310,15 @@ exports.linkWallet = async (req, res) => {
       });
     }
 
-    console.log('🔍 Checking for existing wallet...');
-    const existingWallet = await User.findOne({ walletAddress });
-    if (existingWallet && existingWallet._id.toString() !== userId.toString()) {
-      console.log('❌ Wallet already linked to another account:', existingWallet._id);
-      return res.status(400).json({
-        success: false,
-        message: 'This wallet is already linked to another account',
-      });
-    }
+    // console.log('🔍 Checking for existing wallet...');
+    // const existingWallet = await User.findOne({ walletAddress });
+    // if (existingWallet && existingWallet._id.toString() !== userId.toString()) {
+    //   console.log('❌ Wallet already linked to another account:', existingWallet._id);
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'This wallet is already linked to another account',
+    //   });
+    // }
 
     console.log('💾 Updating user with wallet address...');
     const user = await User.findByIdAndUpdate(
