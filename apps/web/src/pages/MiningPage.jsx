@@ -27,11 +27,21 @@ const MiningPage = () => {
       console.log('MiningPage: Attempting to fetch stats...');
       try {
         const response = await api.get('/mining/stats');
-        setTotalHashes(response.data.totalHashes);
-        setEstimatedEarnings(response.data.rewardsEarned);
-        console.log('MiningPage: Successfully fetched stats.', response.data);
+        // Gracefully handle cases where the API returns no stats for a new user
+        if (response && response.data) {
+          setTotalHashes(response.data.totalHashes || 0);
+          setEstimatedEarnings(response.data.rewardsEarned || 0);
+          console.log('MiningPage: Successfully fetched stats.', response.data);
+        } else {
+          console.log('MiningPage: No initial stats found for user, using defaults.');
+          setTotalHashes(0);
+          setEstimatedEarnings(0);
+        }
       } catch (error) {
         console.error('MiningPage: Failed to fetch mining stats.', error);
+        // Set default stats on failure to prevent crash
+        setTotalHashes(0);
+        setEstimatedEarnings(0);
       }
     };
 
