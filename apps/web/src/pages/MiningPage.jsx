@@ -13,9 +13,29 @@ const MiningPage = () => {
   const [hashRateHistory, setHashRateHistory] = useState([]);
   const miner = useRef(null);
   const { user } = useAuth();
+  console.log('MiningPage: Component rendered.');
 
   useEffect(() => {
-    if (!user) return;
+    console.log('MiningPage: User effect triggered.', user);
+    if (!user) {
+      console.log('MiningPage: User is not available yet.');
+      return;
+    }
+    console.log('MiningPage: User is available.');
+
+    const fetchStats = async () => {
+      console.log('MiningPage: Attempting to fetch stats...');
+      try {
+        const response = await api.get('/mining/stats');
+        setTotalHashes(response.data.totalHashes);
+        setEstimatedEarnings(response.data.rewardsEarned);
+        console.log('MiningPage: Successfully fetched stats.', response.data);
+      } catch (error) {
+        console.error('MiningPage: Failed to fetch mining stats.', error);
+      }
+    };
+
+    fetchStats();
 
     const getJob = async () => {
       const response = await api.get('/mining/job');
@@ -27,18 +47,27 @@ const MiningPage = () => {
     };
 
     const initMiner = async () => {
-      if (!miner.current) {
-        miner.current = await WebMiner.Client(user.walletAddress, {
-          getJob,
-          submit,
-          throttle: 1 - cpuThrottle / 100,
-        });
+      console.log('MiningPage: Attempting to initialize miner...');
+      if (!miner.current && user && user.walletAddress) {
+        console.log('MiningPage: Conditions met for miner initialization. Wallet:', user.walletAddress);
+        try {
+          miner.current = await WebMiner({
+            getJob,
+            submit,
+            throttle: 1 - cpuThrottle / 100,
+          });
+          console.log('MiningPage: Miner initialized successfully.');
 
-        miner.current.on('update', (data) => {
-          setHashRate(data.hashesPerSecond);
-          setTotalHashes(data.totalHashes);
-          setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: data.hashesPerSecond }].slice(-20));
-        });
+          miner.current.on('update', (data) => {
+            setHashRate(data.hashesPerSecond);
+            setTotalHashes(data.totalHashes);
+            setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: data.hashesPerSecond }].slice(-20));
+          });
+        } catch (error) {
+          console.error('MiningPage: Miner initialization failed!', error);
+        }
+      } else {
+        console.log('MiningPage: Conditions for miner initialization not met.', { hasMiner: !!miner.current, hasUser: !!user, hasWallet: !!user?.walletAddress });
       }
     };
     initMiner();
@@ -70,6 +99,19 @@ const MiningPage = () => {
     }
   };
 
+  const handleWithdraw = async () => {
+    try {
+      const response = await api.post('/mining/withdraw');
+      alert(response.data.message);
+      // Refresh stats after withdrawal
+      const statsResponse = await api.get('/mining/stats');
+      setTotalHashes(statsResponse.data.totalHashes);
+      setEstimatedEarnings(statsResponse.data.rewardsEarned);
+    } catch (error) {
+      alert(error.response.data.message || 'Failed to withdraw rewards');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 relative">
       <img 
@@ -87,70 +129,73 @@ const MiningPage = () => {
         }}
       />
       <div className="relative z-10">
-      <h1 className="text-4xl font-bold mb-4">Monero Miner</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold">Status</h2>
-          <p className={`text-2xl ${isMining ? 'text-green-500' : 'text-red-500'}`}>
-            {isMining ? 'Active' : 'Stopped'}
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold">Hash Rate</h2>
-          <p className="text-2xl">{hashRate} H/s</p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold">Total Hashes</h2>
-          <p className="text-2xl">{totalHashes}</p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold">Est. Earnings (XMR)</h2>
-          <p className="text-2xl">{estimatedEarnings.toFixed(8)}</p>
-        </div>
-      </div>
-
-      <div className="bg-gray-800 p-6 rounded-lg mb-8">
-        <h2 className="text-2xl font-bold mb-4">Controls</h2>
-        <div className="flex items-center space-x-4">
-          {!isMining ? (
-            <button onClick={handleStartMining} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Start Mining
-            </button>
-          ) : (
-            <button onClick={handleStopMining} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-              Stop Mining
-            </button>
-          )}
-          <div className="flex items-center space-x-2">
-            <label htmlFor="cpuThrottle">CPU Usage:</label>
-            <input 
-              type="range" 
-              id="cpuThrottle" 
-              min="10" 
-              max="80" 
-              value={cpuThrottle} 
-              onChange={(e) => setCpuThrottle(e.target.value)} 
-              className="w-64"
-            />
-            <span>{cpuThrottle}%</span>
+        <h1 className="text-4xl font-bold mb-4">Monero Miner</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold">Status</h2>
+            <p className={`text-2xl ${isMining ? 'text-green-500' : 'text-red-500'}`}>
+              {isMining ? 'Active' : 'Stopped'}
+            </p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold">Hash Rate</h2>
+            <p className="text-2xl">{hashRate} H/s</p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold">Total Hashes</h2>
+            <p className="text-2xl">{totalHashes}</p>
+          </div>
+          <div className="bg-gray-800 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold">Est. Earnings (XMR)</h2>
+            <p className="text-2xl">{estimatedEarnings.toFixed(8)}</p>
           </div>
         </div>
-      </div>
 
-      <div className="bg-gray-800 p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Hash Rate Chart</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={hashRateHistory}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="time" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="hashRate" stroke="#8884d8" activeDot={{ r: 8 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+        <div className="bg-gray-800 p-6 rounded-lg mb-8">
+          <h2 className="text-2xl font-bold mb-4">Controls</h2>
+          <div className="flex items-center space-x-4">
+            {!isMining ? (
+              <button onClick={handleStartMining} disabled={!miner.current} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-500">
+                Start Mining
+              </button>
+            ) : (
+              <button onClick={handleStopMining} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Stop Mining
+              </button>
+            )}
+            <div className="flex items-center space-x-2">
+              <label htmlFor="cpuThrottle">CPU Usage:</label>
+              <input 
+                type="range" 
+                id="cpuThrottle" 
+                min="10" 
+                max="80" 
+                value={cpuThrottle} 
+                onChange={(e) => setCpuThrottle(e.target.value)} 
+                className="w-64"
+              />
+              <span>{cpuThrottle}%</span>
+            </div>
+            <button onClick={handleWithdraw} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+              Withdraw Rewards
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Hash Rate Chart</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={hashRateHistory}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="hashRate" stroke="#8884d8" activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

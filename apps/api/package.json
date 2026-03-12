@@ -34,11 +34,11 @@
     "express": "^4.18.2",
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
+    "monero-ts": "^0.11.8",
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
     "redis": "^5.9.0",
     "socket.io": "^4.8.1",
-    "stratum-client": "^1.1.0",
     "tweetnacl": "^1.0.3",
     "uuid": "^9.0.0"
   },

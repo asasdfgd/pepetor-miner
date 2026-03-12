@@ -18,4 +18,9 @@ router.post('/submit', authenticate, miningController.submitHash);
 // @access  Private
 router.get('/stats', authenticate, miningController.getStats);
 
+// @route   POST api/mining/withdraw
+// @desc    Withdraw mining rewards
+// @access  Private
+router.post('/withdraw', authenticate, miningController.withdrawRewards);
+
 module.exports = router;

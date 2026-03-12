@@ -1,55 +1,58 @@
-const stratumClient = require('stratum-client');
+const moneroTs = require('monero-ts');
 const MiningStats = require('../models/MiningStats');
 
 class MiningService {
   constructor() {
-    this.poolConfig = {
-      server: process.env.MINING_POOL_SERVER || 'pool.supportxmr.com',
-      port: process.env.MINING_POOL_PORT || 3333,
-      worker: process.env.MINING_POOL_WORKER || 'pepetor-miner',
-      password: 'x',
-    };
-    this.client = null;
+    this.wallet = null;
+    this.daemon = null;
     this.currentJob = null;
   }
 
-  connect() {
-    return new Promise((resolve, reject) => {
-      this.client = stratumClient({
-        ...this.poolConfig,
-        autoReconnectOnError: true,
-        onConnect: () => {
-          console.log('Connected to mining pool');
-          resolve();
-        },
-        onClose: () => console.log('Connection closed'),
-        onError: (error) => {
-          console.error('Mining pool connection error:', error.message);
-          reject(error);
-        },
-        onAuthorizeSuccess: () => console.log('Worker authorized'),
-        onAuthorizeFail: () => console.log('WORKER FAILED TO AUTHORIZE'),
-        onNewDifficulty: (newDiff) => console.log('New difficulty', newDiff),
-        onSubscribe: (subscribeData) => console.log('[Subscribe]', subscribeData),
-        onNewMiningWork: (newWork) => this.handleNewWork(newWork),
+  async connect() {
+    try {
+      console.log('⛏️  Initializing Monero-TS Service...');
+
+      // Connect to a Monero daemon
+      this.daemon = await moneroTs.connectToDaemonRpc(process.env.MONERO_DAEMON_RPC || 'http://node.supportxmr.com:18081');
+      console.log('✅ Connected to Monero daemon');
+
+      // Create a wallet in-memory to receive rewards
+      // In a real application, you would load or create a wallet for the user
+      this.wallet = await moneroTs.createWalletFull({
+        password: 'supersecretpassword',
+        networkType: moneroTs.MoneroNetworkType.MAINNET,
+        server: {
+          uri: process.env.MONERO_DAEMON_RPC || 'http://node.supportxmr.com:18081'
+        }
       });
-    });
+      console.log('✅ In-memory wallet created for mining service');
+      
+    } catch (error) {
+      console.error('❌ Failed to initialize MiningService:', error);
+      throw error;
+    }
   }
 
-  handleNewWork(work) {
-    this.currentJob = work;
-    console.log('New mining job received and stored');
+  // Placeholder for getting a job. This would need a custom Stratum implementation.
+  getJob() {
+    console.warn('getJob() is not fully implemented. Using placeholder data.');
+    // This is a simplified placeholder. A real implementation would require a full stratum client.
+    this.currentJob = {
+      job_id: '12345',
+      blob: '0c0c8cd6a8b20562c2f733621e523f71ca849129cf6383c35831526431e13a7c6428751503c50900000000213a830b0a88b5329ac96b6855b35d554e2e4b37068abb94a87c130d2a106e2305',
+      target: 'ffffffff',
+      algo: 'cn/r'
+    };
+    return this.currentJob;
   }
 
+  // Placeholder for submitting work
   submitWork(work) {
-    // This is where clients would submit completed work
-    this.client.submit(work);
+    console.log('Submitting work to pool (placeholder):', work);
+    // A real implementation would send this to the pool via a Stratum connection.
   }
 
   calculateRewards(totalHashes) {
-    // This is a placeholder. In a real-world scenario, this would be a complex calculation
-    // based on the pool's reward scheme, the number of shares submitted, and the current
-    // block reward.
     const rewardPerHash = 0.00000001; // Example value
     return totalHashes * rewardPerHash;
   }

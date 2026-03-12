@@ -124,6 +124,8 @@ app.get('/api', (req, res) => {
   });
 });
 
+app.use('/api/mining', miningRoutes);
+
 // Mount auth routes (public)
 app.use('/api/auth', authRoutes);
 
@@ -147,9 +149,6 @@ app.use('/api/bonding-curve', bondingCurveRoutes);
 
 // Mount liquidity commitment routes
 app.use('/api/liquidity-commitment', liquidityCommitmentRoutes);
-
-// Mount mining routes
-app.use('/api/mining', miningRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
