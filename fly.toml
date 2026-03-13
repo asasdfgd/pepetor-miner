@@ -6,12 +6,16 @@ primary_region = "ord"
 dockerfile = "apps/api/Dockerfile"
 dockerignore = "apps/api/.dockerignore"
 
+[vm]
+size = "shared-cpu-2x"
+memory = 1024
+
 [env]
 NODE_ENV = "production"
 PORT = "3001"
 
 [[services]]
-internal_port = 3001
+internal_port = 8080
 protocol = "tcp"
 
 [[services.ports]]

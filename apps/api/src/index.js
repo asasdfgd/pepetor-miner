@@ -30,14 +30,14 @@ const { authenticate } = require('./middleware/authMiddleware');
 console.log('🚀 [APP START] All modules loaded successfully');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://clearnetlabs.fun',
   'https://www.clearnetlabs.fun',
   'https://pepetor-miner.fly.dev',
+  'https://clearnetlabs.fun',
   process.env.CORS_ORIGIN
 ].filter(Boolean);
 

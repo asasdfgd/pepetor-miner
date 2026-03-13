@@ -61,7 +61,7 @@ const MiningPage = () => {
       if (!miner.current && user && user.walletAddress) {
         console.log('MiningPage: Conditions met for miner initialization. Wallet:', user.walletAddress);
         try {
-          miner.current = await WebMiner({
+          miner.current = await WebMiner(user.walletAddress, {
             getJob,
             submit,
             throttle: 1 - cpuThrottle / 100,
