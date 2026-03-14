@@ -1,3 +1,4 @@
+require('./instrument.js');
 console.log('🚀 [APP START] Loading Express modules...');
 
 const express = require('express');
@@ -29,7 +30,11 @@ const { authenticate } = require('./middleware/authMiddleware');
 
 console.log('🚀 [APP START] All modules loaded successfully');
 
+const Sentry = require('@sentry/node');
 const app = express();
+
+// Sentry request handler must be the first middleware
+app.use(Sentry.Handlers.requestHandler());
 
 // Middleware
 const allowedOrigins = [
@@ -126,6 +131,9 @@ app.get('*', (req, res) => {
     });
   }
 });
+
+// The Sentry error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 // Error handling middleware (should be after routes)
 app.use((err, req, res, next) => {
