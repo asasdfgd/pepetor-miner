@@ -30,7 +30,6 @@ const { authenticate } = require('./middleware/authMiddleware');
 console.log('🚀 [APP START] All modules loaded successfully');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
 
 // Middleware
 const allowedOrigins = [
@@ -172,8 +171,8 @@ const startServer = async () => {
       console.log(`🔌 Client connected: ${socket.id}`);
     });
     
-    server.listen(PORT, '0.0.0.0', () => {
-      console.log(`\n✅ Backend server is running on 0.0.0.0:${PORT}`);
+    server.listen(8080, '0.0.0.0', () => {
+      console.log(`\n✅ Backend server is running on 0.0.0.0:8080`);
     });
 
     server.on('error', (error) => {
