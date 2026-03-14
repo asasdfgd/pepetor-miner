@@ -36,6 +36,12 @@ const app = express();
 // Sentry request handler must be the first middleware
 app.use(Sentry.Handlers.requestHandler());
 
+try {
+  foo();
+} catch (e) {
+  Sentry.captureException(e);
+}
+
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
