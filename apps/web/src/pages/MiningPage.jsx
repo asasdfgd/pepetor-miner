@@ -27,7 +27,6 @@ const MiningPage = () => {
       console.log('MiningPage: Attempting to fetch stats...');
       try {
         const response = await api.get('/mining/stats');
-        // Gracefully handle cases where the API returns no stats for a new user
         if (response && response.data) {
           setTotalHashes(response.data.totalHashes || 0);
           setEstimatedEarnings(response.data.rewardsEarned || 0);
@@ -39,7 +38,6 @@ const MiningPage = () => {
         }
       } catch (error) {
         console.error('MiningPage: Failed to fetch mining stats.', error);
-        // Set default stats on failure to prevent crash
         setTotalHashes(0);
         setEstimatedEarnings(0);
       }
@@ -47,46 +45,40 @@ const MiningPage = () => {
 
     fetchStats();
 
-    const initMiner = async () => {
-      console.log('MiningPage: Attempting to initialize miner...');
-      if (user && user.walletAddress) {
-        console.log('MiningPage: Conditions met for miner initialization. Wallet:', user.walletAddress);
-        const stratum = {
-          server: "gulf.moneroocean.stream",
-          port: 10128,
-          worker: user.walletAddress,
-          password: "x",
-          ssl: false
-        };
-
-        try {
-          miner.current = await cpuWebMiner.start(
-            cpuWebMiner.ghostrider, // Assuming ghostrider is the desired algorithm, this might need to be adjusted
-            stratum,
-            null,
-            cpuWebMiner.ALL_THREADS,
-            (work) => console.log(work),
-            (hashrate) => {
-              setHashRate(hashrate);
-              setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: hashrate }].slice(-20));
-            },
-            (error) => console.error(error)
-          );
-          console.log('MiningPage: Miner initialized successfully.');
-        } catch (error) {
-          console.error('MiningPage: Miner initialization failed!', error);
-        }
-      } else {
-        console.log('MiningPage: Conditions for miner initialization not met.', { hasUser: !!user, hasWallet: !!user?.walletAddress });
+    return () => {
+      if (miner.current) {
+        miner.current.stop();
       }
     };
-    initMiner();
-  }, [user?.walletAddress]);
+  }, [user]);
 
   const handleStartMining = async () => {
-    if (miner.current) {
-      miner.current.start();
-      setIsMining(true);
+    if (user && user.walletAddress) {
+      const stratum = {
+        server: "gulf.moneroocean.stream",
+        port: 10128,
+        worker: user.walletAddress,
+        password: "x",
+        ssl: false
+      };
+      try {
+        miner.current = await cpuWebMiner.start(
+          cpuWebMiner.ghostrider, // Assuming ghostrider is the desired algorithm, this might need to be adjusted
+          stratum,
+          null,
+          cpuWebMiner.ALL_THREADS,
+          (work) => console.log(work),
+          (hashrate) => {
+            setHashRate(hashrate);
+            setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: hashrate }].slice(-20));
+          },
+          (error) => console.error(error)
+        );
+        setIsMining(true);
+        console.log('MiningPage: Miner started successfully.');
+      } catch (error) {
+        console.error('MiningPage: Miner start failed!', error);
+      }
     }
   };
 
@@ -94,6 +86,7 @@ const MiningPage = () => {
     if (miner.current) {
       miner.current.stop();
       setIsMining(false);
+      console.log('MiningPage: Miner stopped.');
     }
   };
 
@@ -157,7 +150,7 @@ const MiningPage = () => {
           <h2 className="text-2xl font-bold mb-4">Controls</h2>
           <div className="flex items-center space-x-4">
             {!isMining ? (
-              <button onClick={handleStartMining} disabled={!miner.current} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-500">
+              <button onClick={handleStartMining} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Start Mining
               </button>
             ) : (
