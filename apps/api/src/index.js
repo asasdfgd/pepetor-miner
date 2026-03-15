@@ -10,7 +10,6 @@ require('dotenv').config();
 // Debug environment
 console.log('🔍 [ENVIRONMENT CHECK]');
 console.log('  NODE_ENV:', process.env.NODE_ENV || 'not set');
-console.log('  PORT:', process.env.PORT || '8080 (default)');
 console.log('  MONGODB_URI:', process.env.MONGODB_URI ? 'set (*****)' : 'not set');
 console.log('  CORS_ORIGIN:', process.env.CORS_ORIGIN || 'not set');
 

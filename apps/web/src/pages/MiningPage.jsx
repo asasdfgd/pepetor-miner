@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
-import WebMiner from 'web-miner';
+import * as cpuWebMiner from '@marco_ciaramella/cpu-web-miner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const MiningPage = () => {
@@ -47,64 +47,52 @@ const MiningPage = () => {
 
     fetchStats();
 
-    const getJob = async () => {
-      const response = await api.get('/mining/job');
-      return response.data;
-    };
-
-    const submit = async (data) => {
-      await api.post('/mining/submit', data);
-    };
-
     const initMiner = async () => {
       console.log('MiningPage: Attempting to initialize miner...');
-      if (!miner.current && user && user.walletAddress) {
+      if (user && user.walletAddress) {
         console.log('MiningPage: Conditions met for miner initialization. Wallet:', user.walletAddress);
-        try {
-          miner.current = await WebMiner(user.walletAddress, {
-            getJob,
-            submit,
-            throttle: 1 - cpuThrottle / 100,
-          });
-          console.log('MiningPage: Miner initialized successfully.');
+        const stratum = {
+          server: "gulf.moneroocean.stream",
+          port: 10128,
+          worker: user.walletAddress,
+          password: "x",
+          ssl: false
+        };
 
-          miner.current.on('update', (data) => {
-            setHashRate(data.hashesPerSecond);
-            setTotalHashes(data.totalHashes);
-            setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: data.hashesPerSecond }].slice(-20));
-          });
+        try {
+          miner.current = await cpuWebMiner.start(
+            cpuWebMiner.ghostrider, // Assuming ghostrider is the desired algorithm, this might need to be adjusted
+            stratum,
+            null,
+            cpuWebMiner.ALL_THREADS,
+            (work) => console.log(work),
+            (hashrate) => {
+              setHashRate(hashrate);
+              setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: hashrate }].slice(-20));
+            },
+            (error) => console.error(error)
+          );
+          console.log('MiningPage: Miner initialized successfully.');
         } catch (error) {
           console.error('MiningPage: Miner initialization failed!', error);
         }
       } else {
-        console.log('MiningPage: Conditions for miner initialization not met.', { hasMiner: !!miner.current, hasUser: !!user, hasWallet: !!user?.walletAddress });
+        console.log('MiningPage: Conditions for miner initialization not met.', { hasUser: !!user, hasWallet: !!user?.walletAddress });
       }
     };
     initMiner();
-
-    return () => {
-      if (miner.current && miner.current.isRunning()) {
-        miner.current.stop();
-      }
-    };
   }, [user?.walletAddress]);
-
-  useEffect(() => {
-    if (miner.current) {
-      miner.current.setThrottle(1 - cpuThrottle / 100);
-    }
-  }, [cpuThrottle]);
 
   const handleStartMining = async () => {
     if (miner.current) {
-      await miner.current.start();
+      miner.current.start();
       setIsMining(true);
     }
   };
 
   const handleStopMining = async () => {
     if (miner.current) {
-      await miner.current.stop();
+      miner.current.stop();
       setIsMining(false);
     }
   };
@@ -177,19 +165,6 @@ const MiningPage = () => {
                 Stop Mining
               </button>
             )}
-            <div className="flex items-center space-x-2">
-              <label htmlFor="cpuThrottle">CPU Usage:</label>
-              <input 
-                type="range" 
-                id="cpuThrottle" 
-                min="10" 
-                max="80" 
-                value={cpuThrottle} 
-                onChange={(e) => setCpuThrottle(e.target.value)} 
-                className="w-64"
-              />
-              <span>{cpuThrottle}%</span>
-            </div>
             <button onClick={handleWithdraw} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
               Withdraw Rewards
             </button>
