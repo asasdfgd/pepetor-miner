@@ -36,17 +36,15 @@ const app = express();
 app.use(Sentry.requestHandler());
 
 // Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://www.clearnetlabs.fun',
-  'https://pepetor-miner.fly.dev',
-  'https://clearnetlabs.fun',
-  process.env.CORS_ORIGIN
-].filter(Boolean);
-
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://pepetor-miner.fly.dev',
+      process.env.CORS_ORIGIN
+    ].filter(Boolean);
+
+    if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed) || (new RegExp(`^https://[a-zA-Z0-9-]+\.clearnetlabs\.fun$`)).test(origin) || origin === 'https://clearnetlabs.fun')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
