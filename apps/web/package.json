@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@jup-ag/react-hook": "^6.2.0",
-    "@marco_ciaramella/cpu-web-miner": "^1.9.4",
     "@meteora-ag/dynamic-bonding-curve-sdk": "^1.4.6",
     "@pepetor-miner/shared": "file:../../packages/shared",
     "@solana/spl-token": "^0.4.14",

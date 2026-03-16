@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
-import * as cpuWebMiner from '@marco_ciaramella/cpu-web-miner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const MiningPage = () => {
@@ -9,84 +8,44 @@ const MiningPage = () => {
   const [hashRate, setHashRate] = useState(0);
   const [totalHashes, setTotalHashes] = useState(0);
   const [estimatedEarnings, setEstimatedEarnings] = useState(0);
-  const [cpuThrottle, setCpuThrottle] = useState(50);
   const [hashRateHistory, setHashRateHistory] = useState([]);
-  const miner = useRef(null);
   const { user } = useAuth();
-  console.log('MiningPage: Component rendered.');
 
-  useEffect(() => {
-    console.log('MiningPage: User effect triggered.', user);
-    if (!user) {
-      console.log('MiningPage: User is not available yet.');
-      return;
+  const fetchStats = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await api.get('/mining/stats');
+      setIsMining(data.isMining || false);
+      setHashRate(data.hashRate || 0);
+      setTotalHashes(data.totalHashes || 0);
+      setEstimatedEarnings(data.rewardsEarned || 0);
+      setHashRateHistory(Array.isArray(data.history) ? data.history : []);
+    } catch (error) {
+      console.error('Failed to fetch mining stats:', error);
     }
-    console.log('MiningPage: User is available.');
-
-    const fetchStats = async () => {
-      console.log('MiningPage: Attempting to fetch stats...');
-      try {
-        const response = await api.get('/mining/stats');
-        if (response && response.data) {
-          setTotalHashes(response.data.totalHashes || 0);
-          setEstimatedEarnings(response.data.rewardsEarned || 0);
-          console.log('MiningPage: Successfully fetched stats.', response.data);
-        } else {
-          console.log('MiningPage: No initial stats found for user, using defaults.');
-          setTotalHashes(0);
-          setEstimatedEarnings(0);
-        }
-      } catch (error) {
-        console.error('MiningPage: Failed to fetch mining stats.', error);
-        setTotalHashes(0);
-        setEstimatedEarnings(0);
-      }
-    };
-
-    fetchStats();
-
-    return () => {
-      if (miner.current) {
-        miner.current.stop();
-      }
-    };
   }, [user]);
 
+  useEffect(() => {
+    fetchStats();
+    const interval = setInterval(fetchStats, 5000); // Poll for stats every 5 seconds
+    return () => clearInterval(interval);
+  }, [fetchStats]);
+
   const handleStartMining = async () => {
-    if (user && user.walletAddress) {
-      const stratum = {
-        server: "gulf.moneroocean.stream",
-        port: 10128,
-        worker: user.walletAddress,
-        password: "x",
-        ssl: false
-      };
-      try {
-        miner.current = await cpuWebMiner.start(
-          cpuWebMiner.ghostrider, // Assuming ghostrider is the desired algorithm, this might need to be adjusted
-          stratum,
-          null,
-          cpuWebMiner.ALL_THREADS,
-          (work) => console.log(work),
-          (hashrate) => {
-            setHashRate(hashrate);
-            setHashRateHistory(oldHistory => [...oldHistory, { time: new Date().toLocaleTimeString(), hashRate: hashrate }].slice(-20));
-          },
-          (error) => console.error(error)
-        );
-        setIsMining(true);
-        console.log('MiningPage: Miner started successfully.');
-      } catch (error) {
-        console.error('MiningPage: Miner start failed!', error);
-      }
+    try {
+      await api.post('/mining/start');
+      setIsMining(true);
+    } catch (err) {
+      console.error('Start mining failed:', err);
     }
   };
 
   const handleStopMining = async () => {
-    if (miner.current) {
-      miner.current.stop();
+    try {
+      await api.post('/mining/stop');
       setIsMining(false);
-      console.log('MiningPage: Miner stopped.');
+    } catch (err) {
+      console.error('Stop mining failed:', err);
     }
   };
 
@@ -94,17 +53,14 @@ const MiningPage = () => {
     try {
       const response = await api.post('/mining/withdraw');
       alert(response.data.message);
-      // Refresh stats after withdrawal
-      const statsResponse = await api.get('/mining/stats');
-      if (statsResponse && statsResponse.data) {
-        setTotalHashes(statsResponse.data.totalHashes || 0);
-        setEstimatedEarnings(statsResponse.data.rewardsEarned || 0);
-      }
+      fetchStats(); // Refresh stats after withdrawal
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to withdraw rewards';
       alert(errorMessage);
     }
   };
+
+  const chartData = Array.isArray(hashRateHistory) ? hashRateHistory : [];
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
@@ -167,7 +123,7 @@ const MiningPage = () => {
         <div className="bg-gray-800 p-6 rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Hash Rate Chart</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={hashRateHistory}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
               <YAxis />
